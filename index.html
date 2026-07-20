@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Viaje Europa — Octubre 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cr: #1565C0; --cr-l: #42A5F5; --cr-bg: #E3F2FD; --cr-dark: #0D47A1;
+      --ch: #C62828; --ch-l: #EF5350; --ch-bg: #FFEBEE; --ch-dark: #7F0000;
+      --es: #F57F17; --es-l: #FFD54F; --es-bg: #FFF8E1; --es-dark: #E65100;
+      --bg: #F7F8FA; --card: #FFFFFF; --card2: #F1F4F8; --border: #E2E8F0;
+      --text: #0F172A; --muted: #475569; --muted2: #64748B;
+      --warn: #F59E0B; --warn-dark: #B45309; --ok: #10B981; --ok-dark: #047857;
+      --r: 14px; --r-sm: 8px;
+      --shadow: 0 1px 2px rgba(15,23,42,.04), 0 4px 14px rgba(15,23,42,.06);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(255,255,255,0.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand { font-weight: 800; font-size: 1rem; letter-spacing: -0.02em; }
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-links a { color: var(--muted2); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+    @media (max-width: 640px) { .nav-links { display: none; } }
+
+    /* ─── HERO ─── */
+    #hero {
+      min-height: 100vh; padding: 100px 2rem 80px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(21,101,192,0.08) 0%, transparent 70%),
+                  radial-gradient(ellipse 60% 40% at 80% 100%, rgba(245,127,23,0.07) 0%, transparent 60%),
+                  var(--bg);
+      position: relative; overflow: hidden;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(15,23,42,0.04); border: 1px solid var(--border);
+      border-radius: 100px; padding: .35rem 1rem; font-size: .78rem; font-weight: 600;
+      color: var(--muted2); letter-spacing: .04em; text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .hero-eyebrow span { display: inline-block; width: 6px; height: 6px; background: var(--ok-dark); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+    h1 {
+      font-size: clamp(2.8rem, 8vw, 5.5rem); font-weight: 900; letter-spacing: -0.04em; line-height: 1.05;
+      background: linear-gradient(135deg, #0F172A 30%, #475569 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 1.2rem;
+    }
+    .hero-sub { font-size: 1.15rem; color: var(--muted2); max-width: 560px; margin: 0 auto 2rem; }
+    .country-flags { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2.5rem; }
+    .flag-badge {
+      display: flex; align-items: center; gap: .5rem;
+      background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow);
+      border-radius: 100px; padding: .45rem 1rem; font-size: .9rem; font-weight: 600;
+      transition: transform .2s, border-color .2s;
+    }
+    .flag-badge:hover { transform: translateY(-2px); }
+    .flag-badge.cr { border-color: var(--cr); }
+    .flag-badge.ch { border-color: var(--ch); }
+    .flag-badge.es { border-color: var(--es); }
+    .hero-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border-radius: var(--r); overflow: hidden; max-width: 600px; width: 100%; }
+    .stat { background: var(--card); padding: 1.25rem 1rem; text-align: center; }
+    .stat-num { font-size: 2rem; font-weight: 900; letter-spacing: -0.03em; }
+    .stat-label { font-size: .72rem; color: var(--muted2); font-weight: 500; text-transform: uppercase; letter-spacing: .06em; margin-top: .1rem; }
+    @media (max-width: 480px) { .hero-stats { grid-template-columns: repeat(2, 1fr); } }
+
+    /* ─── SECTION COMMON ─── */
+    section { padding: 80px 2rem; max-width: 1200px; margin: 0 auto; }
+    .section-label { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: .5rem; }
+    h2 { font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1rem; }
+    h2 span { opacity: .35; }
+    .section-intro { color: var(--muted2); font-size: .9rem; max-width: 640px; margin-bottom: 2.5rem; }
+
+    /* ─── CRONOGRAMA (Gantt hora × día) ─── */
+    .cal-legend { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; font-size: .8rem; color: var(--muted2); }
+    .cal-leg-item { display: flex; align-items: center; gap: .45rem; }
+    .cal-leg-item .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex-shrink: 0; }
+    .cal-leg-item .dot.es { background: var(--es); }
+    .cal-leg-item .dot.cr { background: var(--cr-l); }
+    .cal-leg-item .dot.ch { background: var(--ch-l); }
+    .cal-leg-item .dot.transit { background: var(--muted); }
+    .cal-leg-item .dot.flight { background: rgba(245,158,11,.35); border: 1px solid var(--warn); }
+    .cal-leg-item .dot.activity { background: rgba(16,185,129,.3); border: 1px solid var(--ok); }
+    .cal-leg-item .dot.pick { background: var(--card2); border: 1px dashed var(--muted2); }
+    .cal-leg-item .dot.picked { background: rgba(124,58,237,.15); border: 1px solid #7C3AED; }
+
+    .gantt-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r); background: var(--card); box-shadow: var(--shadow); }
+    .gantt {
+      display: grid;
+      grid-template-columns: 58px repeat(18, 112px);
+      grid-template-rows: 54px repeat(24, 22px);
+      min-width: max-content; position: relative;
+    }
+    .gantt-corner {
+      grid-column: 1; grid-row: 1; position: sticky; top: 0; left: 0; z-index: 4;
+      background: var(--card); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border);
+    }
+    .gantt-hour {
+      grid-column: 1; position: sticky; left: 0; z-index: 2;
+      background: var(--card); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      font-size: .62rem; color: var(--muted2); display: flex; align-items: center; justify-content: flex-end; padding-right: .4rem;
+    }
+    .gantt-hour.daytime { background: var(--card2); }
+    .gantt-day-head {
+      grid-row: 1; position: sticky; top: 0; z-index: 3; cursor: pointer;
+      background: var(--card); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: .3rem; text-align: center; transition: background .15s;
+    }
+    .gantt-day-head:hover { background: var(--card2); }
+    .gantt-day-head.es { box-shadow: inset 0 3px 0 var(--es); }
+    .gantt-day-head.cr { box-shadow: inset 0 3px 0 var(--cr); }
+    .gantt-day-head.ch { box-shadow: inset 0 3px 0 var(--ch); }
+    .gantt-day-head.transit { box-shadow: inset 0 3px 0 var(--muted); }
+    .gantt-day-head .wd { font-size: .6rem; font-weight: 600; color: var(--muted2); text-transform: uppercase; letter-spacing: .04em; }
+    .gantt-day-head .num { font-size: 1rem; font-weight: 800; line-height: 1.3; }
+    .gantt-col-bg {
+      grid-row: 2 / 26; border-right: 1px solid var(--border); z-index: 0;
+      background-image: repeating-linear-gradient(to bottom, var(--border) 0 1px, transparent 1px 22px);
+    }
+    .gseg {
+      position: relative; z-index: 1; display: flex; align-items: center; gap: .25rem;
+      font-size: .66rem; line-height: 1.15; overflow: hidden;
+    }
+    .gseg.flight, .gseg.activity {
+      margin: 1px 3px; padding: .15rem .35rem; border-radius: 6px; font-weight: 700;
+    }
+    .gseg.flight { background: rgba(245,158,11,.16); border: 1px solid rgba(245,158,11,.4); color: var(--warn-dark); }
+    .gseg.activity { background: rgba(16,185,129,.14); border: 1px solid rgba(16,185,129,.38); color: var(--ok-dark); }
+    .gseg.city { padding-left: .45rem; font-weight: 700; color: var(--text); }
+    .gseg.hotel { padding-left: .45rem; font-style: italic; color: var(--muted2); }
+    .gseg.escala, .gseg.transit { padding-left: .45rem; color: var(--muted2); }
+    .gseg.arrival { padding-left: .45rem; font-weight: 700; color: var(--ok-dark); }
+    .gseg.pick {
+      margin: 1px 3px; padding: .2rem .35rem; border-radius: 6px; cursor: pointer;
+      background: var(--card2); border: 1px dashed var(--border); color: var(--muted2);
+      align-items: flex-start; transition: background .15s, border-color .15s, color .15s;
+    }
+    .gseg.pick:hover { border-color: var(--muted2); color: var(--text); }
+    .gseg.pick .chk { flex-shrink: 0; font-size: .72rem; line-height: 1.2; }
+    .gseg.pick .txt { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+    .gseg.pick.picked { background: rgba(124,58,237,.12); border: 1px solid #7C3AED; color: #5B21B6; font-weight: 600; }
+    @media (max-width: 640px) {
+      .gantt { grid-template-columns: 46px repeat(18, 92px); grid-template-rows: 48px repeat(24, 20px); }
+      .gantt-col-bg { background-image: repeating-linear-gradient(to bottom, var(--border) 0 1px, transparent 1px 20px); }
+      .gantt-hour { font-size: .56rem; }
+      .gantt-day-head .num { font-size: .85rem; }
+      .gseg { font-size: .6rem; }
+    }
+
+    /* ─── CITY CARDS ─── */
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem; }
+    .city-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--r); box-shadow: var(--shadow);
+      overflow: hidden; transition: transform .25s, border-color .25s; position: relative;
+    }
+    .city-card:hover { transform: translateY(-4px); }
+    .city-card.cr { border-top: 3px solid var(--cr); }
+    .city-card.cr:hover { border-color: var(--cr); }
+    .city-card.ch { border-top: 3px solid var(--ch); }
+    .city-card.ch:hover { border-color: var(--ch); }
+    .city-card.es { border-top: 3px solid var(--es); }
+    .city-card.es:hover { border-color: var(--es); }
+    .card-header { padding: 1.25rem 1.25rem 1rem; border-bottom: 1px solid var(--border); }
+    .card-meta { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: .5rem; }
+    .card-flag { font-size: 1.5rem; }
+    .card-dates { font-size: .72rem; color: var(--muted2); background: var(--card2); padding: .2rem .6rem; border-radius: 4px; font-weight: 600; }
+    .card-title { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; }
+    .card-country { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-top: .1rem; }
+    .card-country.cr { color: var(--cr); }
+    .card-country.ch { color: var(--ch); }
+    .card-country.es { color: var(--es-dark); }
+    .card-body { padding: 1.25rem; }
+    .card-section-title { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: .6rem; margin-top: 1rem; }
+    .card-section-title:first-child { margin-top: 0; }
+    .activity-list { list-style: none; display: flex; flex-direction: column; gap: .35rem; }
+    .activity-list li { display: flex; align-items: baseline; gap: .5rem; font-size: .85rem; }
+    .activity-list li .ico { flex-shrink: 0; width: 1.4rem; text-align: center; }
+    .activity-list li .note { margin-left: auto; font-size: .74rem; color: var(--muted2); white-space: nowrap; }
+    .activity-list li.optional { opacity: .65; }
+    .activity-list li.optional::after { content: 'Opcional'; font-size: .65rem; background: rgba(100,116,139,.2); color: var(--muted2); padding: .1rem .4rem; border-radius: 3px; margin-left: .25rem; }
+    .resto-row { display: flex; justify-content: space-between; align-items: center; font-size: .83rem; padding: .3rem 0; border-bottom: 1px solid var(--border); }
+    .resto-row:last-child { border-bottom: none; }
+    .tip-box { background: var(--card2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: .75rem 1rem; font-size: .82rem; color: var(--muted2); margin-top: .5rem; }
+    .tip-box .tip-icon { margin-right: .35rem; }
+    .transport-badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: var(--card2); border: 1px solid var(--border);
+      border-radius: 6px; padding: .35rem .75rem; font-size: .78rem; font-weight: 600;
+      margin-top: .75rem;
+    }
+
+    /* ─── WEATHER ─── */
+    .weather-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+    .weather-card { background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: var(--r); padding: 1.5rem; }
+    .weather-header { display: flex; align-items: center; gap: .75rem; margin-bottom: 1rem; }
+    .weather-flag { font-size: 2rem; }
+    .weather-country { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+    .weather-temp { font-size: 2rem; font-weight: 900; letter-spacing: -0.03em; }
+    .temp-range { font-size: .8rem; color: var(--muted2); margin-top: .1rem; }
+    .weather-items { list-style: none; display: flex; flex-direction: column; gap: .4rem; margin-top: 1rem; }
+    .weather-items li { font-size: .82rem; display: flex; gap: .5rem; }
+
+    /* ─── RECOMMENDATIONS ─── */
+    .rec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+    .rec-card {
+      background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: var(--r);
+      padding: 1.5rem; border-left: 3px solid transparent;
+    }
+    .rec-card.warning { border-left-color: var(--warn); }
+    .rec-card.success { border-left-color: var(--ok); }
+    .rec-card.info { border-left-color: var(--cr); }
+    .rec-icon { font-size: 1.5rem; margin-bottom: .75rem; display: block; }
+    .rec-title { font-size: .95rem; font-weight: 700; margin-bottom: .4rem; }
+    .rec-text { font-size: .83rem; color: var(--muted2); line-height: 1.6; }
+    .rec-text strong { color: var(--text); }
+
+    .book-list { display: flex; flex-direction: column; gap: .75rem; margin-top: 1.5rem; }
+    .book-item {
+      background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: var(--r-sm);
+      padding: 1rem 1.25rem; display: flex; gap: 1rem; align-items: flex-start;
+    }
+    .book-num { width: 28px; height: 28px; border-radius: 50%; background: var(--card2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; flex-shrink: 0; margin-top: .1rem; }
+    .book-info .book-title { font-size: .9rem; font-weight: 700; margin-bottom: .2rem; }
+    .book-info .book-desc { font-size: .8rem; color: var(--muted2); }
+    .urgency { display: inline-block; font-size: .65rem; font-weight: 700; text-transform: uppercase; padding: .15rem .5rem; border-radius: 4px; margin-left: .5rem; }
+    .urgency.high { background: #FEE2E2; color: #B91C1C; }
+    .urgency.med { background: #FEF3C7; color: #B45309; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border); background: var(--card);
+      padding: 2.5rem 2rem; text-align: center;
+      max-width: 100%;
+    }
+    footer p { font-size: .8rem; color: var(--muted); margin-bottom: .4rem; }
+    footer a { color: var(--muted2); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+    .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+
+    @media (max-width: 768px) {
+      section { padding: 60px 1.25rem; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .rec-grid { grid-template-columns: 1fr; }
+      .weather-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ─── DAY MODAL ─── */
+    #day-modal {
+      display: none; position: fixed; inset: 0; z-index: 999;
+      background: rgba(15, 23, 42, .55); backdrop-filter: blur(6px);
+      padding: 1.5rem 1rem 4rem; overflow-y: auto;
+    }
+    #day-modal.open { display: flex; align-items: flex-start; justify-content: center; }
+    .modal-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 18px; width: 100%; max-width: 640px;
+      overflow: hidden; box-shadow: 0 20px 50px rgba(15,23,42,.18);
+      animation: mIn .24s cubic-bezier(.16,1,.3,1);
+    }
+    @keyframes mIn { from{opacity:0;transform:translateY(32px) scale(.96)} to{opacity:1;transform:none} }
+    .modal-hd {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 1.6rem 1.25rem; border-bottom: 1px solid var(--border); gap: 1rem;
+    }
+    .modal-city-name { font-size: 1.55rem; font-weight: 900; letter-spacing: -0.03em; }
+    .modal-city-sub { font-size: .78rem; color: var(--muted2); margin-top: .2rem; }
+    .modal-x {
+      flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%;
+      background: var(--card2); border: 1px solid var(--border);
+      cursor: pointer; color: var(--muted2); font-size: 1.05rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s, color .2s; font-family: inherit;
+    }
+    .modal-x:hover { background: var(--border); color: var(--text); }
+
+    /* ─── DAY MODAL CONTENT ─── */
+    .day-section { padding: 1.15rem 1.6rem; }
+    .day-section + .day-section { border-top: 1px solid var(--border); }
+    .day-section h4 { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: .7rem; }
+    .day-section.fijo h4 { color: var(--ok-dark); }
+    .day-section.propuesta h4 { color: var(--warn-dark); }
+    .day-list { list-style: none; display: flex; flex-direction: column; gap: .55rem; }
+    .day-list li { font-size: .87rem; line-height: 1.55; color: var(--text); }
+    .day-list.picks { gap: .4rem; }
+    .pick-row {
+      display: flex; align-items: flex-start; gap: .55rem; cursor: pointer;
+      padding: .5rem .6rem; border-radius: var(--r-sm); border: 1px solid var(--border);
+      background: var(--card2); color: var(--muted2); font-size: .85rem; line-height: 1.5;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .pick-row:hover { border-color: var(--muted2); }
+    .pick-row .chk { flex-shrink: 0; font-size: .95rem; margin-top: .05rem; }
+    .pick-row.picked { background: rgba(124,58,237,.1); border-color: #7C3AED; color: #5B21B6; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <span class="nav-brand">✈️ Europa Oct 2026</span>
+  <ul class="nav-links">
+    <li><a href="#itinerario">Calendario</a></li>
+    <li><a href="#destinos">Destinos</a></li>
+    <li><a href="#clima">Clima</a></li>
+    <li><a href="#recomendaciones">Recomendaciones</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero" style="padding-top:120px">
+  <div class="hero-eyebrow">
+    <span></span> Vuelos comprados · Octubre 2026
+  </div>
+  <h1>Europa<br>en Octubre</h1>
+  <p class="hero-sub">18 días recorriendo Sevilla, los Balcanes croatas y los Alpes suizos en pleno otoño europeo. Bogotá → Madrid → Sevilla → Zagreb → Plitvice → Dubrovnik → Suiza → Bogotá.</p>
+  <div class="country-flags">
+    <div class="flag-badge es">🇪🇸 España</div>
+    <div class="flag-badge cr">🇭🇷 Croacia</div>
+    <div class="flag-badge ch">🇨🇭 Suiza</div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">18</div><div class="stat-label">Días</div></div>
+    <div class="stat"><div class="stat-num">3</div><div class="stat-label">Países</div></div>
+    <div class="stat"><div class="stat-num">10</div><div class="stat-label">Destinos</div></div>
+    <div class="stat"><div class="stat-num">Oct 3</div><div class="stat-label">→ Oct 20</div></div>
+  </div>
+</section>
+
+<!-- ── CRONOGRAMA INTERACTIVO ── -->
+<section id="itinerario">
+  <p class="section-label">Vuelos ya comprados</p>
+  <h2>Cronograma <span>hora a hora</span></h2>
+  <p class="section-intro">Cada columna es un día del viaje (desplázate horizontalmente) y cada fila una hora. Los recuadros punteados son propuestas de actividades — tócalos (en el Gantt o en el detalle del día) para marcarlas como elegidas; tu selección queda guardada en este navegador. Grupo: Nub, Her, Seb.</p>
+
+  <div class="cal-legend">
+    <span class="cal-leg-item"><i class="dot flight"></i> Vuelo</span>
+    <span class="cal-leg-item"><i class="dot activity"></i> Actividad / excursión</span>
+    <span class="cal-leg-item"><i class="dot pick"></i> Propuesta</span>
+    <span class="cal-leg-item"><i class="dot picked"></i> Elegida</span>
+    <span class="cal-leg-item"><i class="dot es"></i> España</span>
+    <span class="cal-leg-item"><i class="dot cr"></i> Croacia</span>
+    <span class="cal-leg-item"><i class="dot ch"></i> Suiza</span>
+    <span class="cal-leg-item"><i class="dot transit"></i> Tránsito Bogotá</span>
+  </div>
+
+  <div class="gantt-wrap">
+    <div class="gantt" id="gantt"></div>
+  </div>
+</section>
+
+<!-- ── CITY CARDS ── -->
+<section id="destinos">
+  <p class="section-label">10 destinos</p>
+  <h2>Destinos <span>del viaje</span></h2>
+
+  <div class="cards-grid">
+
+    <!-- ─ SEVILLA ─ -->
+    <div class="city-card es">
+      <div class="card-header">
+        <div class="card-meta">
+          <span class="card-flag">🇪🇸</span>
+          <span class="card-dates">Oct 4 – 6 · 2 noches</span>
+        </div>
+        <div class="card-title">Sevilla</div>
+        <div class="card-country es">🇪🇸 España · Capital de Andalucía</div>
+      </div>
+      <div class="card-body">
+        <div class="transport-badge">✈️ Madrid → Sevilla · llegan 4 oct, 11:00am</div>
+        <div class="card-section-title">Atracciones</div>
+        <ul class="activity-list">
+          <li><span class="ico">🏰</span> Real Alcázar de Sevilla <span class="note">reservar con antelación</span></li>
+          <li><span class="ico">⛪</span> Catedral de Sevilla + subida a la Giralda</li>
+          <li><span class="ico">🏛️</span> Plaza de España</li>
+          <li><span class="ico">🌳</span> Parque de María Luisa</li>
+          <li><span class="ico">🏘️</span> Barrio de Santa Cruz</li>
+          <li><span class="ico">🌉</span> Triana — Puente de Isabel II y cerámica</li>
+          <li><span class="ico">💃</span> Show de flamenco en un tablao</li>
+          <li><span class="ico">🛍️</span> Mercado de Triana</li>
+        </ul>
+        <div class="tip-box"><span class="tip-icon">🍂</span> Sevilla en octubre: clima suave (~24°C de día), ideal para caminar sin el calor extremo del verano andaluz. El Alcázar y la Catedral tienen mucha demanda — comprar entrada online con horario.</div>
+        <div class="tip-box" style="margin-top:.5rem"><span class="tip-icon">💃</span> Vale la pena reservar un tablao flamenco con cena la primera o segunda noche — se llenan rápido en temporada alta.</div>
+      </div>
+    </div>
+
+    <!-- ─ ZAGREB ─ -->
+    <div class="city-card cr">
+      <div class="card-header">
+        <div class="card-meta">
+          <span class="card-flag">🏰</span>
+          <span class="card-dates">Oct 6 – 9 · 3 noches</span>
+        </div>
+        <div class="card-title">Zagreb</div>
+        <div class="card-country cr">🇭🇷 Croacia · Capital</div>
+      </div>
+      <div class="card-body">
+        <div class="transport-badge">✈️ Sevilla → Palma → Zagreb · llegan 6 oct, 3:00pm</div>
+        <div class="card-section-title">Atracciones</div>
+        <ul class="activity-list">
+          <li><span class="ico">⛪</span> Iglesia de San Marcos (Upper Town)</li>
+          <li><span class="ico">🗼</span> Torre Lotrščak + Funicular</li>
+          <li><span class="ico">🚪</span> Puerta de Piedra (Kamenita Vrata)</li>
+          <li><span class="ico">🏛️</span> Plaza Ban Jelačić</li>
+          <li><span class="ico">🛒</span> Mercado Dolac</li>
+          <li><span class="ico">💔</span> Museo de las Relaciones Rotas</li>
+          <li><span class="ico">🚶</span> Calle Tkalčićeva (vida nocturna)</li>
+          <li><span class="ico">⛪</span> Catedral de Zagreb</li>
+          <li><span class="ico">🚇</span> Túnel de Grič</li>
+          <li><span class="ico">⚡</span> Museo Nikola Tesla</li>
+          <li><span class="ico">🌿</span> Herradura de Lenuci (Parque Zrinjevac)</li>
+        </ul>
+        <div class="card-section-title">Restaurantes</div>
+        <div class="resto-row"><span>🥩 Batak</span></div>
+        <div class="resto-row"><span>🥗 Submarine</span></div>
+        <div class="tip-box"><span class="tip-icon">🍂</span> Zagreb en octubre: clima fresco y agradable (~17°C). Las calles de Upper Town son hermosas con el follaje otoñal. El funicular (150m) une Donji Grad con Gornji Grad en segundos.</div>
+      </div>
+    </div>
+
+    <!-- ─ PLITVICE ─ -->
+    <div class="city-card cr">
+      <div class="card-header">
+        <div class="card-meta">
+          <span class="card-flag">🌊</span>
+          <span class="card-dates">Oct 7 · Día completo (Pendiente)</span>
+        </div>
+        <div class="card-title">Lagos de Plitvice</div>
+        <div class="card-country cr">🇭🇷 Croacia · Excursión desde Zagreb</div>
+      </div>
+      <div class="card-body">
+        <div class="transport-badge">🚌 Tour organizado Civitatis <span style="margin-left:.4rem;color:var(--warn-dark);font-weight:700;font-size:.72rem">PENDIENTE DE RESERVAR</span></div>
+        <div class="card-section-title">¿Por qué ir en octubre?</div>
+        <ul class="activity-list">
+          <li><span class="ico">🍁</span> Colores otoñales en su punto máximo (~15 oct)</li>
+          <li><span class="ico">👥</span> Muchos menos turistas que en verano</li>
+          <li><span class="ico">💧</span> Cascadas con buen caudal por lluvias de otoño</li>
+          <li><span class="ico">🌡️</span> Temperatura ideal para caminar (~16°C día)</li>
+          <li><span class="ico">💰</span> Entrada reducida desde oct 1 respecto a temporada alta</li>
+        </ul>
+        <div class="card-section-title">Consejos</div>
+        <ul class="activity-list">
+          <li><span class="ico">⏰</span> Salir muy temprano de Zagreb (6-7am)</li>
+          <li><span class="ico">👟</span> Calzado impermeable — caminos pueden estar mojados</li>
+          <li><span class="ico">📷</span> Llevar cámara — es de las más fotogénicas de Europa</li>
+        </ul>
+        <div class="tip-box"><span class="tip-icon">⭐</span> <strong>Punto álgido del viaje.</strong> Plitvice en octubre con los colores del otoño es espectacular. Madrugar para ver los lagos en calma antes de que lleguen los grupos.</div>
+      </div>
+    </div>
+
+    <!-- ─ DUBROVNIK ─ -->
+    <div class="city-card cr">
+      <div class="card-header">
+        <div class="card-meta">
+          <span class="card-flag">🏛️</span>
+          <span class="card-dates">Oct 9 – 13 · 4 noches</span>
+        </div>
+        <div class="card-title">Dubrovnik</div>
+        <div class="card-country cr">🇭🇷 Croacia · Ciudad Patrimonio UNESCO</div>
+      </div>
+      <div class="card-body">
+        <div class="transport-badge">✈️ Zagreb → Dubrovnik · vuelo 8:00–11:00pm (9 oct)</div>
+        <div class="card-section-title">Atracciones</div>
+        <ul class="activity-list">
+          <li><span class="ico">🏰</span> Murallas de Dubrovnik</li>
+          <li><span class="ico">🚶</span> Ciudad Vieja — Stradun</li>
+          <li><span class="ico">🏛️</span> Palacio del Rector</li>
+          <li><span class="ico">⛪</span> Catedral de Dubrovnik</li>
+          <li><span class="ico">⛪</span> Monasterio Franciscano</li>
+          <li><span class="ico">🏛️</span> Plaza de Luza</li>
+          <li><span class="ico">🪜</span> Escaleras Jesuitas</li>
+          <li><span class="ico">🚡</span> Teleférico Mount Srđ</li>
+          <li><span class="ico">🏝️</span> Isla Lokrum</li>
+          <li><span class="ico">🏰</span> Fortaleza de San Lorenzo</li>
+        </ul>
+        <div class="card-section-title">Restaurantes</div>
+        <div class="resto-row"><span>🐟 Konoba Nava</span></div>
+        <div class="resto-row"><span>🍷 Dundo Maroje</span></div>
+        <div class="resto-row"><span>🍕 Pizzeria Oliva</span></div>
+        <div class="card-section-title">Con 4 días, hay margen para</div>
+        <div class="tip-box"><span class="tip-icon">🗺️</span> Con 4 noches sobran medio día o un día completo para una excursión fuera de la ciudad: <strong>Kotor (Montenegro)</strong> o <strong>Mostar (Bosnia)</strong> son clásicos de un día desde Dubrovnik.</div>
+        <div class="tip-box" style="margin-top:.5rem"><span class="tip-icon">⏰</span> Visitar las murallas al amanecer (abren 8am) para evitar calor y aglomeraciones. En octubre hace ~20°C, ideal para caminar los 2km de muralla.</div>
+        <div class="tip-box" style="margin-top:.5rem"><span class="tip-icon">🎉</span> <strong>Festival del Buen Comer de Dubrovnik</strong> — se celebra en octubre con mesas en el Stradun y degustaciones especiales.</div>
+      </div>
+    </div>
+
+    <!-- ─ ZURICH ─ -->
+    <div class="city-card ch">
+      <div class="card-header">
+        <div class="card-meta">
+          <span class="card-flag">🇨🇭</span>
+          <span class="card-dates">Oct 13 – 14 · 1 noche</span>
+        </div>
+        <div class="card-title">Zúrich</div>
+        <div class="card-country ch">🇨🇭 Suiza · Ciudad financiera</div>
+      </div>
+      <div class="card-body">
+        <div class="transport-badge">✈️ Dubrovnik → Zúrich · vuelo 7:00–10:00pm (13 oct)</div>
+        <div class="card-section-title">Atracciones</div>
+        <ul class="activity-list">
+          <li><span class="ico">🏘️</span> Altstadt (Ciudad Vieja)</li>
+          <li><span class="ico">⛪</span> Grossmünster</li>
+          <li><span class="ico">⛪</span> Fraumünster (vitrales Chagall)</li>
+          <li><span class="ico">🌳</span> Lindenhof (mirador)</li>
+          <li><span class="ico">🛍️</span> Bahnhofstrasse (calle comercial)</li>
+          <li><span class="ico">🍫</span> Museo del Chocolate Lindt</li>
+          <li><span class="ico">🏔️</span> Uetliberg (mirador) <span class="note">opcional</span></li>
+          <li><span class="ico">🌊</span> Lago de Zúrich <span class="note">opcional</span></li>
+        </ul>
+        <div class="tip-box"><span class="tip-icon">🌡️</span> Octubre en Zúrich: 10-14°C, posibles lluvias. Llevar abrigo. El Fraumünster cierra los lunes. El Lindt Museum puede comprarse online con descuento.</div>
+        <div class="tip-box" style="margin-top:.5rem"><span class="tip-icon">🛒</span> Zúrich es una ciudad cara. Aprovechar los supermercados Migros o Coop para desayunos y snacks.</div>
+      </div>
+    </div>
+
+    <!-- ─ LUCERNE ─ -->
+    <div class="city-card ch">
+      <div class="card-header">
+        <div class="card-meta">
+          <span class="card-flag">🌉</span>
+          <span class="card-dates">Oct 14 – 15 · 1 noche</span>
+        </div>
+        <div class="card-title">Lucerna</div>
+        <div class="card-country ch">🇨🇭 Suiza · Lago y montañas</div>
+      </div>
+      <div class="card-body">
+        <div class="transport-badge">🚄 Zúrich → Lucerna · tren ~50 min</div>
+        <div class="card-section-title">Atracciones</div>
+        <ul class="activity-list">
+          <li><span class="ico">🌉</span> Puente de la Capilla (Chapel Bridge, s. XIV)</li>
+          <li><span class="ico">🚶</span> Luzern Bahnhofquai (orilla del lago)</li>
+          <li><span class="ico">🦁</span> Monumento del León (Löwendenkmal)</li>
+          <li><span class="ico">⛪</span> Iglesia de St. Leodegar</li>
+          <li><span class="ico">🏔️</span> Monte Pilatus <span class="note">opcional · teleférico</span></li>
+          <li><span class="ico">🏔️</span> Monte Rigi <span class="note">opcional · "reina de las montañas"</span></li>
+        </ul>
+        <div class="tip-box"><span class="tip-icon">🌁</span> El Puente de la Capilla (construido en 1333) es el puente de madera cubierto más antiguo de Europa. En octubre el lago refleja los colores otoñales.</div>
+        <div class="tip-box" style="margin-top:.5rem"><span class="tip-icon">🏔️</span> Monte Pilatus opera plenamente en octubre. Desde Kriens (bus desde centro) por teleférico, ofrece vistas espectaculares de los Alpes. Reservar con tiempo.</div>
+      </div>
+    </div>
+
+    <!-- ─ INTERLAKEN ─ -->
+    <div class="city-card ch">
+      <div class="card-header">
+        <div class="card-meta">
+          <span class="card-flag">⛰️</span>
+          <span class="card-dates">Oct 15 – 16 · 1 noche</span>
+        </div>
+        <div class="card-title">Interlaken</div>
+        <div class="card-country ch">🇨🇭 Suiza · Entre dos lagos</div>
+      </div>
+      <div class="card-body">
+        <div class="transport-badge">🚞 Lucerna → Interlaken · tren panorámico 2h</div>
+        <div class="card-section-title">El trayecto ES el destino</div>
+        <div class="tip-box" style="margin-bottom:.75rem"><span class="tip-icon">🚞</span> <strong>Luzern–Interlaken Express:</strong> tren panorámico de 2 horas con ventanales gigantes. Atraviesa el Paso de Brünig y bordea 5 lagos. Sentarse del lado derecho para mejores vistas.</div>
+        <div class="card-section-title">Atracciones</div>
+        <ul class="activity-list">
+          <li><span class="ico">🌿</span> Hohenmatte Park (pradera central)</li>
+          <li><span class="ico">🏔️</span> Harder Kulm (mirador 1.322m) <span class="note">teleférico</span></li>
+          <li><span class="ico">🚶</span> Hoheweg (avenida principal)</li>
+          <li><span class="ico">🌊</span> Lago Brienz <span class="note">opcional — aguas turquesa</span></li>
+          <li><span class="ico">🌊</span> Lago Thun <span class="note">opcional</span></li>
+        </ul>
+        <div class="tip-box"><span class="tip-icon">🍁</span> Harder Kulm en octubre ofrece vistas del Jungfrau, Mönch y Eiger con colores otoñales. Amanecer o atardecer son los mejores momentos.</div>
+      </div>
+    </div>
+
+    <!-- ─ LAUTERBRUNNEN ─ -->
+    <div class="city-card ch">
+      <div class="card-header">
+        <div class="card-meta">
+          <span class="card-flag">💧</span>
+          <span class="card-dates">Oct 16 – 17 · 1 noche</span>
+        </div>
+        <div class="card-title">Lauterbrunnen</div>
+        <div class="card-country ch">🇨🇭 Suiza · Valle de las 72 cascadas</div>
+      </div>
+      <div class="card-body">
+        <div class="transport-badge">🚞 Interlaken → Lauterbrunnen · tren 20 min</div>
+        <div class="card-section-title">Atracciones</div>
+        <ul class="activity-list">
+          <li><span class="ico">💧</span> Cataratas Staubbachfall (300m de caída)</li>
+          <li><span class="ico">🏘️</span> Mürren (pueblo sin carros, acceso por teleférico)</li>
+          <li><span class="ico">🏘️</span> Wengen (otro pueblo alpino encantador)</li>
+          <li><span class="ico">🏔️</span> Jungfraujoch "Top of Europe" <span class="note">opcional · reserva obligatoria</span></li>
+        </ul>
+        <div class="card-section-title">¿Vale Jungfraujoch?</div>
+        <div class="tip-box"><span class="tip-icon">❄️</span> <strong>Jungfraujoch en octubre:</strong> -2°C a -7°C en la cumbre (3.454m). Menos turistas que en verano. Snow Fun Park abierto hasta mediados de octubre. <strong>Requiere reserva anticipada</strong> en jungfrau.ch. Subida en tren: ~2h. Si el cielo está despejado, las vistas son únicas.</div>
+        <div class="tip-box" style="margin-top:.5rem"><span class="tip-icon">🌈</span> El Valle de Lauterbrunnen tiene 72 cascadas visibles desde el sendero principal. En octubre el valle se cubre de colores dorados.</div>
+      </div>
+    </div>
+
+    <!-- ─ BERN ─ -->
+    <div class="city-card ch">
+      <div class="card-header">
+        <div class="card-meta">
+          <span class="card-flag">🐻</span>
+          <span class="card-dates">Oct 17 – 18 · 1 noche</span>
+        </div>
+        <div class="card-title">Berna</div>
+        <div class="card-country ch">🇨🇭 Suiza · Capital federal</div>
+      </div>
+      <div class="card-body">
+        <div class="transport-badge">🚞 Lauterbrunnen → Berna · tren ~1h</div>
+        <div class="card-section-title">Atracciones</div>
+        <ul class="activity-list">
+          <li><span class="ico">🏘️</span> Ciudad Vieja (Patrimonio UNESCO)</li>
+          <li><span class="ico">🕰️</span> Zytglogge (torre del reloj astronómico)</li>
+          <li><span class="ico">🏛️</span> Bundeshaus (Parlamento federal)</li>
+          <li><span class="ico">🌹</span> Rosengarten — atardecer con vistas de la ciudad</li>
+          <li><span class="ico">🔬</span> Casa Einstein</li>
+        </ul>
+        <div class="tip-box"><span class="tip-icon">🌅</span> Con 1 día completo alcanza para ver todo lo esencial: Old Town, Zytglogge, Bundeshaus y el Rosengarten al atardecer, antes de tomar el tren nocturno a Ginebra.</div>
+      </div>
+    </div>
+
+    <!-- ─ GENEVA ─ -->
+    <div class="city-card ch">
+      <div class="card-header">
+        <div class="card-meta">
+          <span class="card-flag">⛲</span>
+          <span class="card-dates">Oct 18 – 19 · 1 noche</span>
+        </div>
+        <div class="card-title">Ginebra</div>
+        <div class="card-country ch">🇨🇭 Suiza · Ciudad internacional</div>
+      </div>
+      <div class="card-body">
+        <div class="transport-badge">🚄 Berna → Ginebra · tren ~1h 45min</div>
+        <div class="card-section-title">Atracciones (según tiempo disponible)</div>
+        <ul class="activity-list">
+          <li><span class="ico">⛲</span> Jet d'Eau (surtidor de 140m en el lago)</li>
+          <li><span class="ico">🌊</span> Lago Léman (Lake Geneva)</li>
+          <li><span class="ico">⛪</span> Catedral de Saint-Pierre (vista ciudad)</li>
+          <li><span class="ico">🇺🇳</span> Oficina de las Naciones Unidas</li>
+          <li><span class="ico">🏘️</span> Barrio Pâquis (multicultural, a pie del lago)</li>
+        </ul>
+        <div class="tip-box"><span class="tip-icon">⚠️</span> Ginebra es, sobre todo, el punto de salida: llegan la noche del 18 y el vuelo a Madrid sale a las 9:00am del 19. Con suerte alcanza un paseo corto al Jet d'Eau si el hotel queda cerca del lago — si no, priorizar llegar con margen al aeropuerto.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── WEATHER ── -->
+<section id="clima">
+  <p class="section-label">Octubre en Europa</p>
+  <h2>Clima <span>por país</span></h2>
+  <div class="weather-grid">
+    <div class="weather-card" style="border-top:3px solid var(--es)">
+      <div class="weather-header">
+        <span class="weather-flag">🇪🇸</span>
+        <div>
+          <div class="weather-country" style="color:var(--es-dark)">España (Sevilla)</div>
+          <div class="weather-temp">20–25°C</div>
+          <div class="temp-range">Noches: 14–16°C</div>
+        </div>
+      </div>
+      <ul class="weather-items">
+        <li>☀️ Octubre es de los mejores meses — sin el calor extremo del verano</li>
+        <li>🌧️ Lluvia poco probable, algún chubasco aislado</li>
+        <li>👕 Ropa: camiseta + chaqueta ligera para las noches</li>
+        <li>🏃 Ideal para caminar el Alcázar, Santa Cruz y Triana sin agobio</li>
+      </ul>
+    </div>
+    <div class="weather-card" style="border-top:3px solid var(--cr)">
+      <div class="weather-header">
+        <span class="weather-flag">🇭🇷</span>
+        <div>
+          <div class="weather-country" style="color:var(--cr)">Croacia</div>
+          <div class="weather-temp">17–22°C</div>
+          <div class="temp-range">Noches: 10–12°C</div>
+        </div>
+      </div>
+      <ul class="weather-items">
+        <li>☀️ Clima ideal — temporada baja sin calor extremo</li>
+        <li>🌧️ ~11 días de lluvia al mes — llevar chubasquero</li>
+        <li>🌊 Mar a 20°C en Dubrovnik (posible baño)</li>
+        <li>🍁 Plitvice: colores otoñales al máximo ~15 oct</li>
+        <li>👕 Ropa: capas — camiseta + chaqueta ligera</li>
+      </ul>
+    </div>
+    <div class="weather-card" style="border-top:3px solid var(--ch)">
+      <div class="weather-header">
+        <span class="weather-flag">🇨🇭</span>
+        <div>
+          <div class="weather-country" style="color:var(--ch)">Suiza</div>
+          <div class="weather-temp">8–14°C</div>
+          <div class="temp-range">Montaña: -2 a -7°C</div>
+        </div>
+      </div>
+      <ul class="weather-items">
+        <li>🌤️ Días claros posibles con vistas alpinas perfectas</li>
+        <li>🌧️ 3-8 días de lluvia — llevar impermeable</li>
+        <li>❄️ Lauterbrunnen/Jungfraujoch: nieve posible</li>
+        <li>🧥 Ropa: abrigo, bufanda, botas impermeables</li>
+        <li>🍁 Follaje alpino: dorados y rojos espectaculares</li>
+        <li>⚠️ Jungfraujoch: capas térmicas obligatorias</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ── RECOMMENDATIONS ── -->
+<section id="recomendaciones">
+  <p class="section-label">Análisis del itinerario</p>
+  <h2>Recomendaciones <span>y notas</span></h2>
+
+  <h3 style="font-size:1rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">Puntos a tener en cuenta</h3>
+  <div class="rec-grid" style="margin-bottom:2.5rem">
+    <div class="rec-card warning">
+      <span class="rec-icon">🔀</span>
+      <div class="rec-title">Escala en Palma — margen ajustado</div>
+      <div class="rec-text">El 6 de octubre: vuelo Sevilla→Palma 09:00-10:00am, escala hasta las 12:00pm, y vuelo Palma→Zagreb a las 2:00pm. Es una conexión relativamente corta con equipaje — <strong>verificar si el check-in del equipaje es directo hasta Zagreb</strong> para no tener que retirarlo y facturarlo de nuevo en Palma.</div>
+    </div>
+    <div class="rec-card info">
+      <span class="rec-icon">🗺️</span>
+      <div class="rec-title">Dubrovnik — 4 noches dan margen extra</div>
+      <div class="rec-text">Con 4 noches en Dubrovnik (9-13 oct) hay tiempo de sobra para la ciudad amurallada y aún queda espacio para una excursión de día completo a <strong>Kotor (Montenegro)</strong> o <strong>Mostar (Bosnia)</strong>, dos clásicos muy recomendados desde la zona.</div>
+    </div>
+    <div class="rec-card warning">
+      <span class="rec-icon">🏔️</span>
+      <div class="rec-title">Jungfraujoch — decidir y reservar pronto</div>
+      <div class="rec-text">El "Top of Europe" (3.454m) es una experiencia única. Octubre es buena época: menos aglomeraciones y nieve activa. <strong>Requiere reserva anticipada en línea</strong> y conviene revisar el pronóstico el día anterior — si hay niebla cerrada, no vale la pena subir.</div>
+    </div>
+    <div class="rec-card info">
+      <span class="rec-icon">⛲</span>
+      <div class="rec-title">Ginebra — solo punto de salida</div>
+      <div class="rec-text">Llegan a Ginebra la noche del 18 y el vuelo a Madrid sale a las 9:00am del 19 — <strong>no hay un día completo libre allí</strong>. Priorizar cenar cerca del hotel y salir con margen hacia el aeropuerto en vez de intentar hacer turismo esa mañana.</div>
+    </div>
+    <div class="rec-card success">
+      <span class="rec-icon">🍁</span>
+      <div class="rec-title">Plitvice — timing perfecto</div>
+      <div class="rec-text">La excursión a Plitvice cae el <strong>7 de octubre</strong>, justo antes del pico de color otoñal (~15 de octubre) — ya habrá follaje precioso. Madrugar (salida 6-7am de Zagreb) para ver los lagos antes de los grupos de tour. <strong>Aún está pendiente de reservar.</strong></div>
+    </div>
+    <div class="rec-card success">
+      <span class="rec-icon">🐻</span>
+      <div class="rec-title">Berna a 1 día — bien aprovechado</div>
+      <div class="rec-text">Berna queda con 1 noche/1 día completo, suficiente para Old Town, Zytglogge, Bundeshaus y el Rosengarten al atardecer antes del tren nocturno a Ginebra.</div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">Qué reservar con anticipación</h3>
+  <div class="book-list">
+    <div class="book-item">
+      <div class="book-num">1</div>
+      <div class="book-info">
+        <div class="book-title">Excursión Lagos de Plitvice <span class="urgency high">Alta prioridad</span></div>
+        <div class="book-desc">Via Civitatis desde Zagreb, para el 7 de octubre. Reservar en línea con tiempo — los cupos se llenan en temporada alta.</div>
+      </div>
+    </div>
+    <div class="book-item">
+      <div class="book-num">2</div>
+      <div class="book-info">
+        <div class="book-title">Real Alcázar de Sevilla <span class="urgency high">Alta prioridad</span></div>
+        <div class="book-desc">Entrada con horario asignado — se agota con frecuencia en fechas de alta demanda. Reservar online antes de viajar.</div>
+      </div>
+    </div>
+    <div class="book-item">
+      <div class="book-num">3</div>
+      <div class="book-info">
+        <div class="book-title">Jungfraujoch <span class="urgency high">Alta prioridad si van</span></div>
+        <div class="book-desc">Reserva online en jungfrau.ch. Subida desde Lauterbrunnen toma ~2h. Llevar ropa de invierno.</div>
+      </div>
+    </div>
+    <div class="book-item">
+      <div class="book-num">4</div>
+      <div class="book-info">
+        <div class="book-title">Dubrovnik Pass <span class="urgency med">Prioridad media</span></div>
+        <div class="book-desc">En dubrovnikpass.com. Incluye murallas, transporte ilimitado y descuentos en museos.</div>
+      </div>
+    </div>
+    <div class="book-item">
+      <div class="book-num">5</div>
+      <div class="book-info">
+        <div class="book-title">Hoteles Sevilla y Suiza <span class="urgency high">Alta prioridad</span></div>
+        <div class="book-desc">Faltan por confirmar los hoteles de Sevilla, Zúrich, Lucerna, Interlaken, Lauterbrunnen, Berna y Ginebra. Octubre es temporada media-alta — reservar cuanto antes.</div>
+      </div>
+    </div>
+    <div class="book-item">
+      <div class="book-num">6</div>
+      <div class="book-info">
+        <div class="book-title">Excursión Kotor o Mostar (opcional) <span class="urgency med">Decidir antes de viajar</span></div>
+        <div class="book-desc">Con 4 noches en Dubrovnik, se puede añadir un día completo a Kotor (Montenegro) o Mostar (Bosnia). Si se elige, reservar el tour con anticipación.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:2.5rem;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem">
+    <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem">Consejos generales del viaje</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.75rem">
+      <div class="tip-box"><span class="tip-icon">💳</span> <strong>Dinero:</strong> España y Croacia usan euro. Suiza usa el Franco Suizo (CHF). Llevar siempre algo de efectivo para mercados y lugares pequeños.</div>
+      <div class="tip-box"><span class="tip-icon">📱</span> <strong>Conectividad:</strong> Tarjeta SIM europea o plan de datos internacional. En Suiza el roaming puede ser costoso fuera del espacio Schengen.</div>
+      <div class="tip-box"><span class="tip-icon">🧳</span> <strong>Equipaje:</strong> Con varios vuelos y trenes seguidos, maleta de cabina + mochila pequeña agiliza mucho los traslados, sobre todo en la escala de Palma.</div>
+      <div class="tip-box"><span class="tip-icon">👟</span> <strong>Calzado:</strong> Zapatos impermeables de caminar para Plitvice, murallas de Dubrovnik y los valles suizos. Octubre puede ser húmedo.</div>
+      <div class="tip-box"><span class="tip-icon">🧥</span> <strong>Ropa:</strong> Sistema de capas. Suiza en alturas requiere chaqueta de plumas o similar. Sevilla y Croacia más relajado pero llevar algo abrigado para las noches.</div>
+      <div class="tip-box"><span class="tip-icon">📸</span> <strong>Momentos fotográficos clave:</strong> Plaza de España al atardecer, Plitvice al amanecer, murallas de Dubrovnik, Valle de Lauterbrunnen, Rosengarten en Berna.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── DAY MODAL ── -->
+<div id="day-modal" role="dialog" aria-modal="true" aria-labelledby="day-modal-name">
+  <div class="modal-box" id="day-modal-box">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-city-name" id="day-modal-name"></div>
+        <div class="modal-city-sub" id="day-modal-sub"></div>
+      </div>
+      <button class="modal-x" id="day-modal-close" aria-label="Cerrar día">✕</button>
+    </div>
+    <div id="day-modal-body"></div>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <p style="font-size:1rem;font-weight:700;margin-bottom:.5rem">Viaje Europa · Octubre 3–20, 2026</p>
+  <p>🇪🇸 Sevilla &nbsp;|&nbsp; 🇭🇷 Zagreb · Plitvice · Dubrovnik &nbsp;|&nbsp; 🇨🇭 Zúrich · Lucerna · Interlaken · Lauterbrunnen · Berna · Ginebra</p>
+  <div class="footer-links">
+    <a href="https://www.civitatis.com/es/zagreb/excursion-lagos-plitvice/" target="_blank" rel="noopener">Civitatis Plitvice →</a>
+    <a href="https://www.dubrovnikpass.com/" target="_blank" rel="noopener">Dubrovnik Pass →</a>
+    <a href="https://www.jungfrau.ch/" target="_blank" rel="noopener">Jungfraujoch →</a>
+  </div>
+  <p style="margin-top:1.5rem;font-size:.72rem">Vuelos confirmados · Grupo Nub, Her, Seb · Generado con Claude Code · Julio 2026</p>
+</footer>
+
+<script>
+  // ── NAV HIGHLIGHT ──
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(a => a.style.color = '');
+        const a = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+        if (a) a.style.color = 'var(--text)';
+      }
+    });
+  }, { rootMargin: '-40% 0px -50% 0px' });
+  sections.forEach(s => io.observe(s));
+
+  // ── DAY-BY-DAY DATA ──
+  // Oct 1, 2026 falls on a Thursday (weekday index 4, 0=Domingo)
+  const MONTH_START_WEEKDAY = 4;
+  const WD_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const WD_FULL  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+  const DAYS = {
+    3:  { leg:'transit', icon:'✈️', short:'Bogotá→Madrid', title:'Bogotá → Madrid', sub:'Sábado 3 de octubre · Vuelo nocturno',
+          fijo:['✈️ 12:00pm — Vuelo Bogotá → Madrid (nocturno, llega 5:00am del día 4)'],
+          propuesta:['Llegar con margen al aeropuerto El Dorado', 'Dormir en el vuelo para llegar con energía a Sevilla'] },
+    4:  { leg:'es', icon:'🇪🇸', short:'Sevilla', title:'Madrid → Sevilla', sub:'Domingo 4 de octubre · Llegada a Sevilla',
+          fijo:['🛬 5:00am — Llegada a Madrid', '✈️ 9:00–11:00am — Vuelo Madrid → Sevilla', '🏨 Check-in hotel en Sevilla ~10:00pm'],
+          propuesta:['Tarde/noche libre en Sevilla: Barrio de Santa Cruz', 'Catedral y Giralda iluminada de noche (vista exterior)', 'Primera tapeada en el centro o Triana'] },
+    5:  { leg:'es', icon:'🇪🇸', short:'Sevilla', title:'Sevilla', sub:'Lunes 5 de octubre · Día completo',
+          fijo:['Día completo en Sevilla', '🏨 Hotel en Sevilla'],
+          propuesta:['Real Alcázar de Sevilla (reservar entrada con antelación)', 'Catedral de Sevilla + subida a la Giralda', 'Plaza de España y Parque de María Luisa', 'Barrio de Triana — cerámica y orilla del Guadalquivir', 'Noche: show de flamenco en un tablao'] },
+    6:  { leg:'cr', icon:'✈️', short:'Sevilla→Zagreb', title:'Sevilla → Palma → Zagreb', sub:'Martes 6 de octubre · Día de viaje',
+          fijo:['✈️ 9:00–10:00am — Vuelo Sevilla → Palma', '🛫 12:00pm — Escala en el aeropuerto de Palma', '✈️ 2:00–3:00pm — Vuelo Palma → Zagreb (llegan 3:00pm)', '🏨 Hotel en Zagreb'],
+          propuesta:['Escala en Palma: aprovechar para comer algo y descansar en el aeropuerto', 'Tarde/noche en Zagreb: Plaza Ban Jelačić y calle Tkalčićeva para cenar'] },
+    7:  { leg:'cr', icon:'🌊', short:'Plitvice', title:'Lagos de Plitvice', sub:'Miércoles 7 de octubre · Excursión (Pendiente de reservar)',
+          fijo:['🌊 8:00am–5:00pm — Excursión a Lagos de Plitvice (Pendiente)', '🏨 Hotel en Zagreb'],
+          propuesta:['Reservar con Civitatis desde Zagreb', 'Llevar calzado impermeable y cámara', 'Cena tranquila en Zagreb al volver'] },
+    8:  { leg:'cr', icon:'🏰', short:'Zagreb', title:'Zagreb', sub:'Jueves 8 de octubre · Día completo',
+          fijo:['Día completo en Zagreb', '🏨 Hotel en Zagreb'],
+          propuesta:['Upper Town: Iglesia de San Marcos, Torre Lotrščak + funicular', 'Catedral de Zagreb y Puerta de Piedra', 'Mercado Dolac y Museo de las Relaciones Rotas', 'Museo Nikola Tesla, Túnel de Grič'] },
+    9:  { leg:'cr', icon:'✈️', short:'Zagreb→Dubrovnik', title:'Zagreb → Dubrovnik', sub:'Viernes 9 de octubre · Vuelo nocturno',
+          fijo:['Zagreb durante el día', '✈️ 8:00–11:00pm — Vuelo Zagreb → Dubrovnik'],
+          propuesta:['Mañana libre: Herradura de Lenuci (Parque Zrinjevac)', 'Tarde: preparar maletas antes del vuelo nocturno'] },
+    10: { leg:'cr', icon:'🏛️', short:'Dubrovnik', title:'Dubrovnik', sub:'Sábado 10 de octubre · Día 1 de 4',
+          fijo:['Día completo en Dubrovnik', '🏨 Hotel en Dubrovnik'],
+          propuesta:['Murallas de Dubrovnik al amanecer (abren 8am)', 'Ciudad Vieja — Stradun', 'Plaza de Luza y Escaleras Jesuitas'] },
+    11: { leg:'cr', icon:'🏛️', short:'Dubrovnik', title:'Dubrovnik', sub:'Domingo 11 de octubre · Día 2 de 4',
+          fijo:['Día completo en Dubrovnik', '🏨 Hotel en Dubrovnik'],
+          propuesta:['Palacio del Rector y Catedral de Dubrovnik', 'Monasterio Franciscano', 'Fortaleza de San Lorenzo'] },
+    12: { leg:'cr', icon:'🏛️', short:'Dubrovnik', title:'Dubrovnik', sub:'Lunes 12 de octubre · Día 3 de 4',
+          fijo:['Día completo en Dubrovnik', '🏨 Hotel en Dubrovnik'],
+          propuesta:['Teleférico al Monte Srđ (ideal al atardecer)', 'Día completo opcional a Kotor (Montenegro) o Mostar (Bosnia)', 'Tarde de playa / relax en la ciudad'] },
+    13: { leg:'cr', icon:'✈️', short:'Dubrovnik→Zúrich', title:'Dubrovnik → Zúrich', sub:'Martes 13 de octubre · Vuelo nocturno',
+          fijo:['Dubrovnik durante el día', '✈️ 7:00–10:00pm — Vuelo Dubrovnik → Zúrich', '🏨 Hotel en Zúrich'],
+          propuesta:['Mañana: Isla Lokrum en ferry (10 min) si da tiempo', 'Tarde: rumbo al aeropuerto con calma'] },
+    14: { leg:'ch', icon:'🇨🇭', short:'Zúrich', title:'Zúrich', sub:'Miércoles 14 de octubre · Día completo',
+          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Zúrich → tren a Lucerna'],
+          propuesta:['Altstadt, Grossmünster y Fraumünster', 'Bahnhofstrasse y Museo del Chocolate Lindt', 'Tren a Lucerna al final de la tarde (~50 min)'] },
+    15: { leg:'ch', icon:'🌉', short:'Lucerna', title:'Lucerna', sub:'Jueves 15 de octubre · Día completo',
+          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Lucerna → tren a Interlaken'],
+          propuesta:['Puente de la Capilla y Monumento del León', 'Opcional: Monte Pilatus en teleférico', 'Tren panorámico a Interlaken (2h)'] },
+    16: { leg:'ch', icon:'⛰️', short:'Interlaken', title:'Interlaken', sub:'Viernes 16 de octubre · Día completo',
+          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Interlaken → tren a Lauterbrunnen'],
+          propuesta:['Harder Kulm (mirador con vista al Jungfrau)', 'Hohenmatte Park', 'Tren corto a Lauterbrunnen (20 min)'] },
+    17: { leg:'ch', icon:'💧', short:'Lauterbrunnen', title:'Lauterbrunnen', sub:'Sábado 17 de octubre · Día completo',
+          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Lauterbrunnen → tren a Berna'],
+          propuesta:['Cascada Staubbachfall y valle de las 72 cascadas', 'Pueblos de Mürren o Wengen', 'Opcional: Jungfraujoch "Top of Europe" (reserva obligatoria)', 'Tren a Berna (~1h)'] },
+    18: { leg:'ch', icon:'🐻', short:'Berna→Ginebra', title:'Berna → Ginebra', sub:'Domingo 18 de octubre · Día completo',
+          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Berna → tren a Ginebra por la noche'],
+          propuesta:['Ciudad Vieja UNESCO y Zytglogge', 'Bundeshaus (Parlamento federal)', 'Rosengarten al atardecer', 'Tren nocturno a Ginebra (~1h45)'] },
+    19: { leg:'ch', icon:'✈️', short:'Ginebra→Bogotá', title:'Ginebra → Madrid → Bogotá', sub:'Lunes 19 de octubre · Regreso',
+          fijo:['✈️ 9:00am–12:00pm — Vuelo Ginebra → Madrid', '✈️ 4:00pm — Vuelo Madrid → Bogotá (nocturno, llega 6:00am del día 20)'],
+          propuesta:['Si el horario lo permite: paseo corto al lago Léman / Jet d\'Eau antes de ir al aeropuerto', 'Traslado con margen a Ginebra-Aeropuerto'] },
+    20: { leg:'transit', icon:'🛬', short:'Bogotá', title:'Llegada a Bogotá', sub:'Martes 20 de octubre · Fin del viaje',
+          fijo:['🛬 6:00am — Llegada a Bogotá'],
+          propuesta:['Descanso — fin del viaje 🎉'] }
+  };
+
+  // ── HOUR-BY-HOUR SEGMENTS (mirrors the cronograma spreadsheet) ──
+  // type: flight/activity → colored block spanning startHour–endHour (24h clock, end exclusive)
+  // type: city/hotel/escala/transit/arrival → single-row plain-text marker at `hour`
+  const TRIP_DAYS = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+  const GRID_DAYS = {
+    3:  [ { type:'flight', start:12, end:24, label:'Bogotá → Madrid', icon:'✈️' } ],
+    4:  [ { type:'flight', start:9, end:11, label:'Madrid → Sevilla', icon:'✈️' },
+          { type:'hotel', hour:22, label:'Hotel' } ],
+    5:  [ { type:'city', hour:1, label:'Sevilla' },
+          { type:'hotel', hour:22, label:'Hotel' } ],
+    6:  [ { type:'flight', start:9, end:10, label:'Sevilla → Palma', icon:'✈️' },
+          { type:'escala', hour:12, label:'Escala' },
+          { type:'flight', start:14, end:15, label:'Palma → Zagreb', icon:'✈️' },
+          { type:'hotel', hour:22, label:'Hotel' } ],
+    7:  [ { type:'activity', start:8, end:17, label:'Lagos de Plitvice', icon:'🌊' },
+          { type:'hotel', hour:22, label:'Hotel' } ],
+    8:  [ { type:'city', hour:1, label:'Zagreb' },
+          { type:'hotel', hour:22, label:'Hotel' } ],
+    9:  [ { type:'city', hour:1, label:'Zagreb' },
+          { type:'flight', start:20, end:23, label:'Zagreb → Dubrovnik', icon:'✈️' } ],
+    10: [ { type:'city', hour:1, label:'Dubrovnik' },
+          { type:'hotel', hour:22, label:'Hotel' } ],
+    11: [ { type:'city', hour:1, label:'Dubrovnik' },
+          { type:'hotel', hour:22, label:'Hotel' } ],
+    12: [ { type:'city', hour:1, label:'Dubrovnik' },
+          { type:'hotel', hour:22, label:'Hotel' } ],
+    13: [ { type:'city', hour:1, label:'Dubrovnik' },
+          { type:'flight', start:19, end:22, label:'Dubrovnik → Zúrich', icon:'✈️' },
+          { type:'hotel', hour:22, label:'Hotel' } ],
+    14: [ { type:'city', hour:1, label:'Zúrich' },
+          { type:'transit', hour:18, label:'Tren a Lucerna' },
+          { type:'hotel', hour:22, label:'Hotel' } ],
+    15: [ { type:'city', hour:1, label:'Lucerna' },
+          { type:'transit', hour:18, label:'Tren a Interlaken' },
+          { type:'hotel', hour:22, label:'Hotel' } ],
+    16: [ { type:'city', hour:1, label:'Interlaken' },
+          { type:'transit', hour:18, label:'Tren a Lauterbrunnen' },
+          { type:'hotel', hour:22, label:'Hotel' } ],
+    17: [ { type:'city', hour:1, label:'Lauterbrunnen' },
+          { type:'transit', hour:18, label:'Tren a Berna' },
+          { type:'hotel', hour:22, label:'Hotel' } ],
+    18: [ { type:'city', hour:1, label:'Berna' },
+          { type:'transit', hour:19, label:'Tren a Ginebra' },
+          { type:'hotel', hour:22, label:'Hotel' } ],
+    19: [ { type:'flight', start:9, end:12, label:'Ginebra → Madrid', icon:'✈️' },
+          { type:'flight', start:16, end:24, label:'Madrid → Bogotá', icon:'✈️' } ],
+    20: [ { type:'arrival', hour:6, label:'🛬 Llegada Bogotá' } ]
+  };
+
+  // ── PICKS (elegir propuestas) — persisted in localStorage ──
+  const PICKS_KEY = 'viajeEuropaPicks2026';
+  let PICKS = {};
+  try { PICKS = JSON.parse(localStorage.getItem(PICKS_KEY)) || {}; } catch (e) { PICKS = {}; }
+  function savePicks() {
+    try { localStorage.setItem(PICKS_KEY, JSON.stringify(PICKS)); } catch (e) { /* storage unavailable, keep in-memory only */ }
+  }
+  function togglePick(key) {
+    PICKS[key] = !PICKS[key];
+    savePicks();
+    document.querySelectorAll(`[data-pickkey="${key}"]`).forEach(el => {
+      el.classList.toggle('picked', !!PICKS[key]);
+      const chk = el.querySelector('.chk');
+      if (chk) chk.textContent = PICKS[key] ? '☑' : '☐';
+    });
+  }
+
+  // Figures out free (unscheduled) hours in a day, inside a realistic waking window,
+  // so proposal chips never overlap a real flight/activity block.
+  const WORK_START = 7, WORK_END = 23;
+  function freeWindows(day) {
+    const segs = GRID_DAYS[day] || [];
+    let windows = [[WORK_START, WORK_END]];
+    segs.forEach(s => {
+      const os = s.type === 'flight' || s.type === 'activity' ? s.start : s.hour;
+      const oe = s.type === 'flight' || s.type === 'activity' ? s.end : s.hour + 1;
+      const cs = Math.max(os, WORK_START), ce = Math.min(oe, WORK_END);
+      if (cs >= ce) return;
+      const next = [];
+      windows.forEach(([ws, we]) => {
+        if (ce <= ws || cs >= we) { next.push([ws, we]); return; }
+        if (cs > ws) next.push([ws, cs]);
+        if (ce < we) next.push([ce, we]);
+      });
+      windows = next;
+    });
+    return windows.filter(([s, e]) => e - s > 0);
+  }
+
+  // Slots each propuesta item into the free windows, in order, without splitting
+  // an item across a gap. Returns null when there isn't enough free room to show
+  // them on the Gantt (the modal is still available in that case).
+  function layoutPicks(day, items) {
+    if (!items || !items.length) return null;
+    const windows = freeWindows(day);
+    const totalFree = windows.reduce((a, [s, e]) => a + (e - s), 0);
+    if (!windows.length || totalFree < Math.min(items.length, 3)) return null;
+    const shares = windows.map(([s, e]) => (e - s) / totalFree * items.length);
+    const counts = shares.map(x => Math.floor(x));
+    let remainder = items.length - counts.reduce((a, b) => a + b, 0);
+    const byFrac = shares.map((x, i) => ({ i, frac: x - Math.floor(x) })).sort((a, b) => b.frac - a.frac);
+    for (let k = 0; k < remainder; k++) counts[byFrac[k % byFrac.length].i]++;
+
+    const result = [];
+    let itemIdx = 0;
+    windows.forEach(([s, e], wi) => {
+      const c = counts[wi];
+      if (c <= 0 || itemIdx >= items.length) return;
+      const per = (e - s) / c;
+      for (let k = 0; k < c && itemIdx < items.length; k++) {
+        const start = Math.round(s + per * k);
+        const end = (k === c - 1) ? Math.round(e) : Math.round(s + per * (k + 1));
+        result.push({ item: items[itemIdx], idx: itemIdx, start, end: Math.max(end, start + 1) });
+        itemIdx++;
+      }
+    });
+    return result;
+  }
+
+  // ── BUILD GANTT ──
+  const gantt = document.getElementById('gantt');
+
+  const corner = document.createElement('div');
+  corner.className = 'gantt-corner';
+  gantt.appendChild(corner);
+
+  for (let h = 0; h < 24; h++) {
+    const el = document.createElement('div');
+    el.className = 'gantt-hour' + (h >= 8 && h <= 22 ? ' daytime' : '');
+    el.style.gridRow = (h + 2);
+    el.textContent = String(h).padStart(2, '0') + ':00';
+    gantt.appendChild(el);
+  }
+
+  TRIP_DAYS.forEach((d, i) => {
+    const data = DAYS[d];
+    const col = i + 2;
+
+    const colBg = document.createElement('div');
+    colBg.className = 'gantt-col-bg';
+    colBg.style.gridColumn = col;
+    gantt.appendChild(colBg);
+
+    const head = document.createElement('div');
+    head.className = 'gantt-day-head ' + data.leg;
+    head.style.gridColumn = col;
+    head.innerHTML = `<span class="wd">${WD_SHORT[(MONTH_START_WEEKDAY + d - 1) % 7]}</span><span class="num">${d}</span>`;
+    head.addEventListener('click', () => openDayModal(d, data));
+    gantt.appendChild(head);
+
+    (GRID_DAYS[d] || []).forEach(seg => {
+      const el = document.createElement('div');
+      if (seg.type === 'flight' || seg.type === 'activity') {
+        el.className = 'gseg ' + seg.type;
+        el.style.gridColumn = col;
+        el.style.gridRow = (seg.start + 2) + ' / ' + (seg.end + 2);
+        el.innerHTML = `<span>${seg.icon}</span><span>${seg.label}</span>`;
+      } else {
+        el.className = 'gseg ' + seg.type;
+        el.style.gridColumn = col;
+        el.style.gridRow = (seg.hour + 2) + ' / ' + (seg.hour + 3);
+        el.textContent = seg.label;
+      }
+      gantt.appendChild(el);
+    });
+
+    const picks = layoutPicks(d, data.propuesta);
+    if (picks) {
+      picks.forEach(p => {
+        const key = d + '-' + p.idx;
+        const el = document.createElement('div');
+        el.className = 'gseg pick' + (PICKS[key] ? ' picked' : '');
+        el.style.gridColumn = col;
+        el.style.gridRow = (p.start + 2) + ' / ' + (p.end + 2);
+        el.dataset.pickkey = key;
+        el.title = p.item;
+        el.innerHTML = `<span class="chk">${PICKS[key] ? '☑' : '☐'}</span><span class="txt">${p.item}</span>`;
+        el.addEventListener('click', () => togglePick(key));
+        gantt.appendChild(el);
+      });
+    }
+  });
+
+  // ── DAY MODAL ──
+  const dayModal = document.getElementById('day-modal');
+  const dName = document.getElementById('day-modal-name');
+  const dSub  = document.getElementById('day-modal-sub');
+  const dBody = document.getElementById('day-modal-body');
+  const dClose = document.getElementById('day-modal-close');
+
+  function openDayModal(dayNum, data) {
+    dName.textContent = data.title;
+    dSub.textContent = data.sub;
+    dBody.innerHTML = '';
+
+    const fijoSec = document.createElement('div');
+    fijoSec.className = 'day-section fijo';
+    fijoSec.innerHTML = '<h4>✅ Fijo — confirmado</h4>';
+    const fList = document.createElement('ul');
+    fList.className = 'day-list';
+    data.fijo.forEach(t => {
+      const li = document.createElement('li');
+      li.textContent = t;
+      fList.appendChild(li);
+    });
+    fijoSec.appendChild(fList);
+    dBody.appendChild(fijoSec);
+
+    if (data.propuesta && data.propuesta.length) {
+      const propSec = document.createElement('div');
+      propSec.className = 'day-section propuesta';
+      propSec.innerHTML = '<h4>💡 Propuesta de actividades — toca para elegir</h4>';
+      const pList = document.createElement('ul');
+      pList.className = 'day-list picks';
+      data.propuesta.forEach((t, idx) => {
+        const key = dayNum + '-' + idx;
+        const li = document.createElement('li');
+        li.className = 'pick-row' + (PICKS[key] ? ' picked' : '');
+        li.dataset.pickkey = key;
+        li.innerHTML = `<span class="chk">${PICKS[key] ? '☑' : '☐'}</span><span class="txt">${t}</span>`;
+        li.addEventListener('click', () => togglePick(key));
+        pList.appendChild(li);
+      });
+      propSec.appendChild(pList);
+      dBody.appendChild(propSec);
+    }
+
+    dayModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => dClose.focus(), 60);
+  }
+
+  function closeDayModal() {
+    dayModal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  dClose.addEventListener('click', closeDayModal);
+  dayModal.addEventListener('click', e => { if (e.target === dayModal) closeDayModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && dayModal.classList.contains('open')) closeDayModal(); });
+
+</script>
+</body>
+</html>
