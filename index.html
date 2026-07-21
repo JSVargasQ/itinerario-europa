@@ -378,6 +378,27 @@
       margin-top: .75rem;
     }
 
+    /* ─── ESTIMACIONES DE HOSPEDAJE ─── */
+    .lodge-list { display: flex; flex-direction: column; gap: .6rem; }
+    .lodge-row {
+      display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: .75rem; align-items: center;
+      background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--border);
+      border-radius: var(--r-sm); box-shadow: var(--shadow); padding: .8rem 1.1rem;
+    }
+    .lodge-row.es { border-left-color: var(--es); }
+    .lodge-row.cr { border-left-color: var(--cr-l); }
+    .lodge-row.ch { border-left-color: var(--ch-l); }
+    .lodge-city { font-weight: 800; font-size: .95rem; line-height: 1.3; }
+    .lodge-city small { display: block; font-weight: 600; font-size: .72rem; color: var(--muted2); }
+    .lodge-cell { font-size: .85rem; font-weight: 700; }
+    .lodge-cell small { display: block; font-weight: 600; font-size: .66rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+    .lodge-cell.sub { text-align: right; }
+    .lodge-cell.sub b { font-size: .95rem; }
+    @media (max-width: 640px) {
+      .lodge-row { grid-template-columns: 1fr 1fr; row-gap: .5rem; }
+      .lodge-cell.sub { text-align: left; }
+    }
+
     /* ─── WEATHER ─── */
     .clima-subhead { font-size: 1rem; font-weight: 700; color: var(--muted2); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 1rem; }
     .dayw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: .75rem; margin-bottom: 2.5rem; }
@@ -516,6 +537,7 @@
   <ul class="nav-links">
     <li><a href="#itinerario">Calendario</a></li>
     <li><a href="#destinos">Destinos</a></li>
+    <li><a href="#estimaciones">Estimaciones</a></li>
     <li><a href="#clima">Clima</a></li>
     <li><a href="#recomendaciones">Recomendaciones</a></li>
   </ul>
@@ -892,6 +914,31 @@
     </div>
 
   </div>
+</section>
+
+<!-- ── ESTIMACIONES HOSPEDAJE ── -->
+<section id="estimaciones">
+  <p class="section-label">Presupuesto de referencia</p>
+  <h2>Estimaciones <span>de hospedaje</span></h2>
+  <p class="section-intro">Cuánto cuesta la noche <strong>por persona</strong> en cada sitio, asumiendo que los 3 comparten habitación triple o apartamento (rango medio: hotel 3★ o apartamento bien ubicado, precios de referencia de julio 2026 para octubre 2026). Verificar en Booking/Airbnb — Sevilla y Suiza suben rápido, reservar cuanto antes.</p>
+
+  <div class="budget-bar">
+    <div class="budget-item">
+      <div class="budget-label">Noches de hotel</div>
+      <div class="budget-value" id="est-nights">—</div>
+    </div>
+    <div class="budget-item">
+      <div class="budget-label">Total hospedaje por persona</div>
+      <div class="budget-value" id="est-cur">—</div>
+    </div>
+    <div class="budget-item accent">
+      <div class="budget-label">≈ COP por persona</div>
+      <div class="budget-value" id="est-cop">—</div>
+    </div>
+  </div>
+  <p class="budget-note">Mismo tipo de cambio referencial de la página: 1€ ≈ $4.000 COP · 1 CHF ≈ $4.800 COP. Las noches del 3 y 19 de octubre se duermen en el avión. No incluye vuelos, comidas ni actividades.</p>
+
+  <div class="lodge-list" id="lodge-list"></div>
 </section>
 
 <!-- ── WEATHER ── -->
@@ -1691,6 +1738,40 @@
       el.addEventListener('click', () => openDayModal(d, data));
       daywGrid.appendChild(el);
     });
+  }
+
+  // ── ESTIMACIONES DE HOSPEDAJE (por persona / noche, 3 compartiendo) ──
+  const LODGING = [
+    { city:'Sevilla',       leg:'es', flag:'🇪🇸', dates:'Oct 4–6',   nights:2, perNight:50, cur:'EUR', zone:'Centro / Santa Cruz' },
+    { city:'Zagreb',        leg:'cr', flag:'🇭🇷', dates:'Oct 6–9',   nights:3, perNight:35, cur:'EUR', zone:'Donji Grad (centro)' },
+    { city:'Dubrovnik',     leg:'cr', flag:'🇭🇷', dates:'Oct 9–13',  nights:4, perNight:45, cur:'EUR', zone:'Lapad o Ploče (Old Town es más caro)' },
+    { city:'Zúrich',        leg:'ch', flag:'🇨🇭', dates:'Oct 13–14', nights:1, perNight:80, cur:'CHF', zone:'Cerca de la estación central (HB)' },
+    { city:'Lucerna',       leg:'ch', flag:'🇨🇭', dates:'Oct 14–15', nights:1, perNight:70, cur:'CHF', zone:'Casco antiguo / estación' },
+    { city:'Interlaken',    leg:'ch', flag:'🇨🇭', dates:'Oct 15–16', nights:1, perNight:65, cur:'CHF', zone:'Centro, entre las dos estaciones' },
+    { city:'Lauterbrunnen', leg:'ch', flag:'🇨🇭', dates:'Oct 16–17', nights:1, perNight:65, cur:'CHF', zone:'El pueblo — pocas opciones, reservar YA' },
+    { city:'Berna',         leg:'ch', flag:'🇨🇭', dates:'Oct 17–18', nights:1, perNight:70, cur:'CHF', zone:'Old Town / cerca de la estación' },
+    { city:'Ginebra',       leg:'ch', flag:'🇨🇭', dates:'Oct 18–19', nights:1, perNight:75, cur:'CHF', zone:'Pâquis o cerca de Cornavin (tren directo al aeropuerto)' }
+  ];
+  const lodgeList = document.getElementById('lodge-list');
+  if (lodgeList) {
+    let nightsTotal = 0, eurTotal = 0, chfTotal = 0;
+    const curSym = c => c === 'EUR' ? '€' : ' CHF';
+    LODGING.forEach(l => {
+      const sub = l.perNight * l.nights;
+      nightsTotal += l.nights;
+      if (l.cur === 'EUR') eurTotal += sub; else chfTotal += sub;
+      const el = document.createElement('div');
+      el.className = 'lodge-row ' + l.leg;
+      el.innerHTML = `
+        <div class="lodge-city">${l.flag} ${l.city}<small>${l.zone}</small></div>
+        <div class="lodge-cell">${l.dates}<small>${l.nights} ${l.nights === 1 ? 'noche' : 'noches'}</small></div>
+        <div class="lodge-cell">${l.perNight}${curSym(l.cur)}<small>por persona / noche</small></div>
+        <div class="lodge-cell sub"><b>${sub}${curSym(l.cur)}</b><small>subtotal por persona</small></div>`;
+      lodgeList.appendChild(el);
+    });
+    document.getElementById('est-nights').textContent = nightsTotal;
+    document.getElementById('est-cur').textContent = eurTotal + '€ + ' + chfTotal + ' CHF';
+    document.getElementById('est-cop').textContent = fmtCOP(eurTotal * FX.EUR + chfTotal * FX.CHF) + ' COP';
   }
 
   // ── GANTT HORIZONTAL SCROLL — nav buttons + edge fade ──
