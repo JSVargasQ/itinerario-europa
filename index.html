@@ -103,6 +103,26 @@
     .cal-leg-item .dot.pick { background: var(--card2); border: 1px dashed var(--muted2); }
     .cal-leg-item .dot.picked { background: rgba(124,58,237,.15); border: 1px solid #7C3AED; }
 
+    .budget-bar {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+      background: var(--border); border: 1px solid var(--border); border-radius: var(--r);
+      overflow: hidden; margin-bottom: .75rem; box-shadow: var(--shadow);
+    }
+    .budget-item { background: var(--card); padding: 1rem 1.1rem; border-top: 3px solid transparent; }
+    .budget-item.person-nub { border-top-color: #7C3AED; }
+    .budget-item.person-her { border-top-color: #DB2777; }
+    .budget-item.person-seb { border-top-color: #0891B2; }
+    .budget-item.accent { background: rgba(124,58,237,.06); }
+    .budget-label { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: .3rem; }
+    .budget-value { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
+    .budget-sub { font-size: .72rem; color: var(--muted2); margin-top: .25rem; }
+    .budget-item.accent .budget-value { color: #7C3AED; }
+    .budget-note { font-size: .74rem; color: var(--muted); margin-bottom: 1.25rem; }
+    @media (max-width: 640px) {
+      .budget-bar { grid-template-columns: repeat(2, 1fr); }
+      .budget-value { font-size: 1.05rem; }
+    }
+
     .gantt-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r); background: var(--card); box-shadow: var(--shadow); }
     .gantt {
       display: grid;
@@ -151,14 +171,38 @@
     .gseg.escala, .gseg.transit { padding-left: .45rem; color: var(--muted2); }
     .gseg.arrival { padding-left: .45rem; font-weight: 700; color: var(--ok-dark); }
     .gseg.pick {
-      margin: 1px 3px; padding: .2rem .35rem; border-radius: 6px; cursor: pointer;
+      margin: 1px 3px; padding: .2rem .35rem; border-radius: 6px;
       background: var(--card2); border: 1px dashed var(--border); color: var(--muted2);
       align-items: flex-start; transition: background .15s, border-color .15s, color .15s;
     }
-    .gseg.pick:hover { border-color: var(--muted2); color: var(--text); }
-    .gseg.pick .chk { flex-shrink: 0; font-size: .72rem; line-height: 1.2; }
+    .gseg.pick .pp { flex-shrink: 0; display: flex; gap: 2px; }
     .gseg.pick .txt { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
-    .gseg.pick.picked { background: rgba(124,58,237,.12); border: 1px solid #7C3AED; color: #5B21B6; font-weight: 600; }
+    .gseg.pick.picked { background: rgba(124,58,237,.08); border: 1px solid #7C3AED; color: var(--text); }
+
+    /* Expand truncated chip text on hover/keyboard focus so it's fully readable */
+    .gseg.flight, .gseg.activity, .gseg.pick { outline: none; }
+    .gseg.flight:hover, .gseg.flight:focus, .gseg.flight:focus-within,
+    .gseg.activity:hover, .gseg.activity:focus, .gseg.activity:focus-within,
+    .gseg.pick:hover, .gseg.pick:focus, .gseg.pick:focus-within {
+      position: absolute; z-index: 40; width: auto; min-width: 100%; max-width: 220px;
+      height: auto; box-shadow: 0 10px 24px rgba(15,23,42,.22);
+    }
+    .gseg.flight:hover .txt, .gseg.flight:focus .txt, .gseg.flight:focus-within .txt,
+    .gseg.activity:hover .txt, .gseg.activity:focus .txt, .gseg.activity:focus-within .txt,
+    .gseg.pick:hover .txt, .gseg.pick:focus .txt, .gseg.pick:focus-within .txt {
+      -webkit-line-clamp: unset; white-space: normal;
+    }
+
+    /* Per-person pick toggles (Nub / Her / Seb) */
+    .person-toggle {
+      width: 15px; height: 15px; border-radius: 50%; flex-shrink: 0; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: .56rem; font-weight: 800; line-height: 1;
+      border: 1.5px solid var(--pc, var(--muted2)); color: var(--pc, var(--muted2));
+      background: var(--card); transition: background .15s, color .15s;
+    }
+    .person-toggle.on { background: var(--pc, var(--muted2)); color: #fff; }
+    .person-toggle:hover { filter: brightness(0.95); }
     @media (max-width: 640px) {
       .gantt { grid-template-columns: 46px repeat(18, 92px); grid-template-rows: 48px repeat(24, 20px); }
       .gantt-col-bg { background-image: repeating-linear-gradient(to bottom, var(--border) 0 1px, transparent 1px 20px); }
@@ -303,14 +347,16 @@
     .day-list li { font-size: .87rem; line-height: 1.55; color: var(--text); }
     .day-list.picks { gap: .4rem; }
     .pick-row {
-      display: flex; align-items: flex-start; gap: .55rem; cursor: pointer;
+      display: flex; align-items: flex-start; gap: .65rem;
       padding: .5rem .6rem; border-radius: var(--r-sm); border: 1px solid var(--border);
       background: var(--card2); color: var(--muted2); font-size: .85rem; line-height: 1.5;
       transition: background .15s, border-color .15s, color .15s;
     }
-    .pick-row:hover { border-color: var(--muted2); }
-    .pick-row .chk { flex-shrink: 0; font-size: .95rem; margin-top: .05rem; }
-    .pick-row.picked { background: rgba(124,58,237,.1); border-color: #7C3AED; color: #5B21B6; font-weight: 600; }
+    .pick-row .pp { flex-shrink: 0; display: flex; gap: 4px; margin-top: .1rem; }
+    .pick-row .pp .person-toggle { width: 20px; height: 20px; font-size: .68rem; }
+    .pick-row.picked { background: rgba(124,58,237,.08); border-color: #7C3AED; color: var(--text); }
+    .pick-row .meta { font-size: .72rem; font-weight: 500; color: var(--muted2); }
+    .pick-row.picked .meta { color: #7C3AED; }
   </style>
 </head>
 <body>
@@ -350,7 +396,7 @@
 <section id="itinerario">
   <p class="section-label">Vuelos ya comprados</p>
   <h2>Cronograma <span>hora a hora</span></h2>
-  <p class="section-intro">Cada columna es un día del viaje (desplázate horizontalmente) y cada fila una hora. Los recuadros punteados son propuestas de actividades — tócalos (en el Gantt o en el detalle del día) para marcarlas como elegidas; tu selección queda guardada en este navegador. Grupo: Nub, Her, Seb.</p>
+  <p class="section-intro">Cada columna es un día del viaje (desplázate horizontalmente) y cada fila una hora, con la duración real de cada tramo en tren. Los recuadros punteados son propuestas de actividades — toca la inicial de cada persona (N/H/S) para marcarla como elegida por esa persona; no todos tienen que elegir lo mismo. La selección queda guardada en este navegador.</p>
 
   <div class="cal-legend">
     <span class="cal-leg-item"><i class="dot flight"></i> Vuelo</span>
@@ -362,6 +408,29 @@
     <span class="cal-leg-item"><i class="dot ch"></i> Suiza</span>
     <span class="cal-leg-item"><i class="dot transit"></i> Tránsito Bogotá</span>
   </div>
+
+  <div class="budget-bar">
+    <div class="budget-item person-nub">
+      <div class="budget-label">🟣 Nub</div>
+      <div class="budget-value" id="bud-cop-nub">$0 COP</div>
+      <div class="budget-sub"><span id="bud-count-nub">0</span> elegidas · <span id="bud-curr-nub">sin elegir</span></div>
+    </div>
+    <div class="budget-item person-her">
+      <div class="budget-label">🩷 Her</div>
+      <div class="budget-value" id="bud-cop-her">$0 COP</div>
+      <div class="budget-sub"><span id="bud-count-her">0</span> elegidas · <span id="bud-curr-her">sin elegir</span></div>
+    </div>
+    <div class="budget-item person-seb">
+      <div class="budget-label">🔵 Seb</div>
+      <div class="budget-value" id="bud-cop-seb">$0 COP</div>
+      <div class="budget-sub"><span id="bud-count-seb">0</span> elegidas · <span id="bud-curr-seb">sin elegir</span></div>
+    </div>
+    <div class="budget-item accent">
+      <div class="budget-label">≈ COP total grupo (los 3)</div>
+      <div class="budget-value" id="bud-group-total">$0 COP</div>
+    </div>
+  </div>
+  <p class="budget-note">Cada quien elige sus propias actividades tocando su inicial (N/H/S) — no todos tienen que hacer lo mismo. Tipo de cambio referencial jul 2026: 1€ ≈ $4.000 COP · 1 CHF ≈ $4.800 COP. Precios estimados por persona — verifica antes de reservar. No incluye vuelos ni hoteles.</p>
 
   <div class="gantt-wrap">
     <div class="gantt" id="gantt"></div>
@@ -618,7 +687,7 @@
         <div class="card-country ch">🇨🇭 Suiza · Capital federal</div>
       </div>
       <div class="card-body">
-        <div class="transport-badge">🚞 Lauterbrunnen → Berna · tren ~1h</div>
+        <div class="transport-badge">🚞 Lauterbrunnen → Berna · tren ~1h 30min (con trasbordo en Interlaken Ost)</div>
         <div class="card-section-title">Atracciones</div>
         <ul class="activity-list">
           <li><span class="ico">🏘️</span> Ciudad Vieja (Patrimonio UNESCO)</li>
@@ -642,7 +711,7 @@
         <div class="card-country ch">🇨🇭 Suiza · Ciudad internacional</div>
       </div>
       <div class="card-body">
-        <div class="transport-badge">🚄 Berna → Ginebra · tren ~1h 45min</div>
+        <div class="transport-badge">🚄 Berna → Ginebra · tren directo ~1h 50min</div>
         <div class="card-section-title">Atracciones (según tiempo disponible)</div>
         <ul class="activity-list">
           <li><span class="ico">⛲</span> Jet d'Eau (surtidor de 140m en el lago)</li>
@@ -862,61 +931,66 @@
   const WD_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
   const WD_FULL  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 
+  // Propuesta item: A = actividad programable (aparece en el Gantt con su duración real)
+  //                 T = tip logístico (sin bloque en el Gantt, solo checklist en el modal)
+  function A(text, hours, amount, cur) { return { text, hours, cost: amount ? { amount, cur } : null, layout: true }; }
+  function T(text) { return { text, hours: 0, cost: null, layout: false }; }
+
   const DAYS = {
     3:  { leg:'transit', icon:'✈️', short:'Bogotá→Madrid', title:'Bogotá → Madrid', sub:'Sábado 3 de octubre · Vuelo nocturno',
           fijo:['✈️ 12:00pm — Vuelo Bogotá → Madrid (nocturno, llega 5:00am del día 4)'],
-          propuesta:['Llegar con margen al aeropuerto El Dorado', 'Dormir en el vuelo para llegar con energía a Sevilla'] },
+          propuesta:[T('Llegar con margen al aeropuerto El Dorado'), T('Dormir en el vuelo para llegar con energía a Sevilla')] },
     4:  { leg:'es', icon:'🇪🇸', short:'Sevilla', title:'Madrid → Sevilla', sub:'Domingo 4 de octubre · Llegada a Sevilla',
           fijo:['🛬 5:00am — Llegada a Madrid', '✈️ 9:00–11:00am — Vuelo Madrid → Sevilla', '🏨 Check-in hotel en Sevilla ~10:00pm'],
-          propuesta:['Tarde/noche libre en Sevilla: Barrio de Santa Cruz', 'Catedral y Giralda iluminada de noche (vista exterior)', 'Primera tapeada en el centro o Triana'] },
+          propuesta:[A('Tarde/noche libre en Sevilla: Barrio de Santa Cruz', 1.5), A('Catedral y Giralda iluminada de noche (vista exterior)', 1), A('Primera tapeada en el centro o Triana', 1.5, 15, 'EUR')] },
     5:  { leg:'es', icon:'🇪🇸', short:'Sevilla', title:'Sevilla', sub:'Lunes 5 de octubre · Día completo',
           fijo:['Día completo en Sevilla', '🏨 Hotel en Sevilla'],
-          propuesta:['Real Alcázar de Sevilla (reservar entrada con antelación)', 'Catedral de Sevilla + subida a la Giralda', 'Plaza de España y Parque de María Luisa', 'Barrio de Triana — cerámica y orilla del Guadalquivir', 'Noche: show de flamenco en un tablao'] },
+          propuesta:[A('Real Alcázar de Sevilla (reservar entrada con antelación)', 2.5, 16, 'EUR'), A('Catedral de Sevilla + subida a la Giralda', 1.5, 13, 'EUR'), A('Plaza de España y Parque de María Luisa', 1.5), A('Barrio de Triana — cerámica y orilla del Guadalquivir', 1.5), A('Noche: show de flamenco en un tablao', 2, 40, 'EUR')] },
     6:  { leg:'cr', icon:'✈️', short:'Sevilla→Zagreb', title:'Sevilla → Palma → Zagreb', sub:'Martes 6 de octubre · Día de viaje',
           fijo:['✈️ 9:00–10:00am — Vuelo Sevilla → Palma', '🛫 12:00pm — Escala en el aeropuerto de Palma', '✈️ 2:00–3:00pm — Vuelo Palma → Zagreb (llegan 3:00pm)', '🏨 Hotel en Zagreb'],
-          propuesta:['Escala en Palma: aprovechar para comer algo y descansar en el aeropuerto', 'Tarde/noche en Zagreb: Plaza Ban Jelačić y calle Tkalčićeva para cenar'] },
+          propuesta:[T('Escala en Palma: aprovechar para comer algo y descansar en el aeropuerto'), A('Tarde/noche en Zagreb: Plaza Ban Jelačić y calle Tkalčićeva para cenar', 1.5, 15, 'EUR')] },
     7:  { leg:'cr', icon:'🌊', short:'Plitvice', title:'Lagos de Plitvice', sub:'Miércoles 7 de octubre · Excursión (Pendiente de reservar)',
           fijo:['🌊 8:00am–5:00pm — Excursión a Lagos de Plitvice (Pendiente)', '🏨 Hotel en Zagreb'],
-          propuesta:['Reservar con Civitatis desde Zagreb', 'Llevar calzado impermeable y cámara', 'Cena tranquila en Zagreb al volver'] },
+          propuesta:[T('Reservar con Civitatis desde Zagreb'), T('Llevar calzado impermeable y cámara'), A('Cena tranquila en Zagreb al volver', 1.5, 15, 'EUR')] },
     8:  { leg:'cr', icon:'🏰', short:'Zagreb', title:'Zagreb', sub:'Jueves 8 de octubre · Día completo',
           fijo:['Día completo en Zagreb', '🏨 Hotel en Zagreb'],
-          propuesta:['Upper Town: Iglesia de San Marcos, Torre Lotrščak + funicular', 'Catedral de Zagreb y Puerta de Piedra', 'Mercado Dolac y Museo de las Relaciones Rotas', 'Museo Nikola Tesla, Túnel de Grič'] },
+          propuesta:[A('Upper Town: Iglesia de San Marcos, Torre Lotrščak + funicular', 2, 3, 'EUR'), A('Catedral de Zagreb y Puerta de Piedra', 1), A('Mercado Dolac y Museo de las Relaciones Rotas', 1.5, 8, 'EUR'), A('Museo Nikola Tesla, Túnel de Grič', 1.5, 2, 'EUR')] },
     9:  { leg:'cr', icon:'✈️', short:'Zagreb→Dubrovnik', title:'Zagreb → Dubrovnik', sub:'Viernes 9 de octubre · Vuelo nocturno',
           fijo:['Zagreb durante el día', '✈️ 8:00–11:00pm — Vuelo Zagreb → Dubrovnik'],
-          propuesta:['Mañana libre: Herradura de Lenuci (Parque Zrinjevac)', 'Tarde: preparar maletas antes del vuelo nocturno'] },
+          propuesta:[A('Mañana libre: Herradura de Lenuci (Parque Zrinjevac)', 1.5), T('Tarde: preparar maletas antes del vuelo nocturno')] },
     10: { leg:'cr', icon:'🏛️', short:'Dubrovnik', title:'Dubrovnik', sub:'Sábado 10 de octubre · Día 1 de 4',
           fijo:['Día completo en Dubrovnik', '🏨 Hotel en Dubrovnik'],
-          propuesta:['Murallas de Dubrovnik al amanecer (abren 8am)', 'Ciudad Vieja — Stradun', 'Plaza de Luza y Escaleras Jesuitas'] },
+          propuesta:[A('Murallas de Dubrovnik al amanecer (abren 8am)', 2.5, 35, 'EUR'), A('Ciudad Vieja — Stradun', 1), A('Plaza de Luza y Escaleras Jesuitas', 1)] },
     11: { leg:'cr', icon:'🏛️', short:'Dubrovnik', title:'Dubrovnik', sub:'Domingo 11 de octubre · Día 2 de 4',
           fijo:['Día completo en Dubrovnik', '🏨 Hotel en Dubrovnik'],
-          propuesta:['Palacio del Rector y Catedral de Dubrovnik', 'Monasterio Franciscano', 'Fortaleza de San Lorenzo'] },
+          propuesta:[A('Palacio del Rector y Catedral de Dubrovnik', 1.5, 10, 'EUR'), A('Monasterio Franciscano', 1, 5, 'EUR'), A('Fortaleza de San Lorenzo', 1.5, 10, 'EUR')] },
     12: { leg:'cr', icon:'🏛️', short:'Dubrovnik', title:'Dubrovnik', sub:'Lunes 12 de octubre · Día 3 de 4',
           fijo:['Día completo en Dubrovnik', '🏨 Hotel en Dubrovnik'],
-          propuesta:['Teleférico al Monte Srđ (ideal al atardecer)', 'Día completo opcional a Kotor (Montenegro) o Mostar (Bosnia)', 'Tarde de playa / relax en la ciudad'] },
+          propuesta:[A('Día completo opcional a Kotor (Montenegro) o Mostar (Bosnia)', 9, 65, 'EUR'), A('Teleférico al Monte Srđ (ideal al atardecer)', 2, 27, 'EUR'), A('Tarde de playa / relax en la ciudad', 2.5)] },
     13: { leg:'cr', icon:'✈️', short:'Dubrovnik→Zúrich', title:'Dubrovnik → Zúrich', sub:'Martes 13 de octubre · Vuelo nocturno',
           fijo:['Dubrovnik durante el día', '✈️ 7:00–10:00pm — Vuelo Dubrovnik → Zúrich', '🏨 Hotel en Zúrich'],
-          propuesta:['Mañana: Isla Lokrum en ferry (10 min) si da tiempo', 'Tarde: rumbo al aeropuerto con calma'] },
+          propuesta:[A('Mañana: Isla Lokrum en ferry (10 min) si da tiempo', 3, 27, 'EUR'), T('Tarde: rumbo al aeropuerto con calma')] },
     14: { leg:'ch', icon:'🇨🇭', short:'Zúrich', title:'Zúrich', sub:'Miércoles 14 de octubre · Día completo',
-          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Zúrich → tren a Lucerna'],
-          propuesta:['Altstadt, Grossmünster y Fraumünster', 'Bahnhofstrasse y Museo del Chocolate Lindt', 'Tren a Lucerna al final de la tarde (~50 min)'] },
+          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Zúrich → tren a Lucerna, ~50 min'],
+          propuesta:[A('Altstadt, Grossmünster y Fraumünster', 2.5), A('Bahnhofstrasse y Museo del Chocolate Lindt', 2, 15, 'CHF')] },
     15: { leg:'ch', icon:'🌉', short:'Lucerna', title:'Lucerna', sub:'Jueves 15 de octubre · Día completo',
-          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Lucerna → tren a Interlaken'],
-          propuesta:['Puente de la Capilla y Monumento del León', 'Opcional: Monte Pilatus en teleférico', 'Tren panorámico a Interlaken (2h)'] },
+          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Lucerna → tren panorámico a Interlaken, ~2h'],
+          propuesta:[A('Puente de la Capilla y Monumento del León', 1.5), A('Opcional: Monte Pilatus en teleférico', 4, 84, 'CHF')] },
     16: { leg:'ch', icon:'⛰️', short:'Interlaken', title:'Interlaken', sub:'Viernes 16 de octubre · Día completo',
-          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Interlaken → tren a Lauterbrunnen'],
-          propuesta:['Harder Kulm (mirador con vista al Jungfrau)', 'Hohenmatte Park', 'Tren corto a Lauterbrunnen (20 min)'] },
+          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Interlaken → tren a Lauterbrunnen, ~20 min'],
+          propuesta:[A('Harder Kulm (mirador con vista al Jungfrau)', 2, 32, 'CHF'), A('Hohenmatte Park', 1)] },
     17: { leg:'ch', icon:'💧', short:'Lauterbrunnen', title:'Lauterbrunnen', sub:'Sábado 17 de octubre · Día completo',
-          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Lauterbrunnen → tren a Berna'],
-          propuesta:['Cascada Staubbachfall y valle de las 72 cascadas', 'Pueblos de Mürren o Wengen', 'Opcional: Jungfraujoch "Top of Europe" (reserva obligatoria)', 'Tren a Berna (~1h)'] },
+          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Lauterbrunnen → tren a Berna, ~1h 30min (trasbordo en Interlaken Ost)'],
+          propuesta:[A('Opcional: Jungfraujoch "Top of Europe" — sale muy temprano (~6:30am), reserva obligatoria', 7, 271, 'CHF'), A('Cascada Staubbachfall y valle de las 72 cascadas', 1), A('Pueblos de Mürren o Wengen', 2)] },
     18: { leg:'ch', icon:'🐻', short:'Berna→Ginebra', title:'Berna → Ginebra', sub:'Domingo 18 de octubre · Día completo',
-          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Berna → tren a Ginebra por la noche'],
-          propuesta:['Ciudad Vieja UNESCO y Zytglogge', 'Bundeshaus (Parlamento federal)', 'Rosengarten al atardecer', 'Tren nocturno a Ginebra (~1h45)'] },
+          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Berna → tren directo a Ginebra por la noche, ~1h 50min'],
+          propuesta:[A('Ciudad Vieja UNESCO y Zytglogge', 2), A('Bundeshaus (Parlamento federal)', 1), A('Rosengarten al atardecer', 1)] },
     19: { leg:'ch', icon:'✈️', short:'Ginebra→Bogotá', title:'Ginebra → Madrid → Bogotá', sub:'Lunes 19 de octubre · Regreso',
           fijo:['✈️ 9:00am–12:00pm — Vuelo Ginebra → Madrid', '✈️ 4:00pm — Vuelo Madrid → Bogotá (nocturno, llega 6:00am del día 20)'],
-          propuesta:['Si el horario lo permite: paseo corto al lago Léman / Jet d\'Eau antes de ir al aeropuerto', 'Traslado con margen a Ginebra-Aeropuerto'] },
+          propuesta:[A('Si el horario lo permite: paseo corto al lago Léman / Jet d\'Eau antes de ir al aeropuerto', 1), T('Traslado con margen a Ginebra-Aeropuerto')] },
     20: { leg:'transit', icon:'🛬', short:'Bogotá', title:'Llegada a Bogotá', sub:'Martes 20 de octubre · Fin del viaje',
           fijo:['🛬 6:00am — Llegada a Bogotá'],
-          propuesta:['Descanso — fin del viaje 🎉'] }
+          propuesta:[T('Descanso — fin del viaje 🎉')] }
   };
 
   // ── HOUR-BY-HOUR SEGMENTS (mirrors the cronograma spreadsheet) ──
@@ -968,26 +1042,88 @@
     20: [ { type:'arrival', hour:6, label:'🛬 Llegada Bogotá' } ]
   };
 
-  // ── PICKS (elegir propuestas) — persisted in localStorage ──
-  const PICKS_KEY = 'viajeEuropaPicks2026';
-  let PICKS = {};
+  // ── PICKS individuales por persona (elegir propuestas) — persisted in localStorage ──
+  const PEOPLE = [
+    { id: 'nub', name: 'Nub', dot: '🟣', color: '#7C3AED' },
+    { id: 'her', name: 'Her', dot: '🩷', color: '#DB2777' },
+    { id: 'seb', name: 'Seb', dot: '🔵', color: '#0891B2' }
+  ];
+  const PICKS_KEY = 'viajeEuropaPicks2026v2';
+  let PICKS = {}; // { "day-idx": { nub: true, her: false, seb: true } }
   try { PICKS = JSON.parse(localStorage.getItem(PICKS_KEY)) || {}; } catch (e) { PICKS = {}; }
   function savePicks() {
     try { localStorage.setItem(PICKS_KEY, JSON.stringify(PICKS)); } catch (e) { /* storage unavailable, keep in-memory only */ }
   }
-  function togglePick(key) {
-    PICKS[key] = !PICKS[key];
+  function isPicked(key, pid) { return !!(PICKS[key] && PICKS[key][pid]); }
+  function togglePick(key, pid) {
+    if (!PICKS[key]) PICKS[key] = {};
+    PICKS[key][pid] = !PICKS[key][pid];
     savePicks();
     document.querySelectorAll(`[data-pickkey="${key}"]`).forEach(el => {
-      el.classList.toggle('picked', !!PICKS[key]);
-      const chk = el.querySelector('.chk');
-      if (chk) chk.textContent = PICKS[key] ? '☑' : '☐';
+      const badge = el.querySelector(`[data-person="${pid}"]`);
+      if (badge) badge.classList.toggle('on', !!PICKS[key][pid]);
+      const anyOn = PEOPLE.some(p => isPicked(key, p.id));
+      el.classList.toggle('picked', anyOn);
     });
+    updateBudgetSummary();
   }
 
   // Figures out free (unscheduled) hours in a day, inside a realistic waking window,
   // so proposal chips never overlap a real flight/activity block.
   const WORK_START = 7, WORK_END = 23;
+
+  // Tipo de cambio referencial (jul 2026) — solo para orientar el presupuesto, no para reservar.
+  const FX = { EUR: 4000, CHF: 4800 };
+  function fmtCost(cost) {
+    if (!cost) return '';
+    return cost.cur === 'EUR' ? (cost.amount + '€') : (cost.amount + ' CHF');
+  }
+  function fmtCOP(n) {
+    return '$' + Math.round(n).toLocaleString('es-CO');
+  }
+
+  // ── PRESUPUESTO DE ACTIVIDADES ELEGIDAS — individual por persona ──
+  function updateBudgetSummary() {
+    const totals = {};
+    PEOPLE.forEach(p => totals[p.id] = { count: 0, eur: 0, chf: 0 });
+
+    Object.keys(PICKS).forEach(key => {
+      const sel = PICKS[key];
+      if (!sel) return;
+      const [dayStr, idxStr] = key.split('-');
+      const day = DAYS[dayStr];
+      const item = day && day.propuesta[idxStr];
+      if (!item) return;
+      PEOPLE.forEach(p => {
+        if (!sel[p.id]) return;
+        totals[p.id].count++;
+        if (item.cost) {
+          if (item.cost.cur === 'EUR') totals[p.id].eur += item.cost.amount;
+          else totals[p.id].chf += item.cost.amount;
+        }
+      });
+    });
+
+    let groupCOP = 0;
+    PEOPLE.forEach(p => {
+      const t = totals[p.id];
+      const cop = t.eur * FX.EUR + t.chf * FX.CHF;
+      groupCOP += cop;
+      const elCount = document.getElementById('bud-count-' + p.id);
+      const elCurr  = document.getElementById('bud-curr-' + p.id);
+      const elCop   = document.getElementById('bud-cop-' + p.id);
+      if (elCount) elCount.textContent = t.count;
+      if (elCurr) {
+        const parts = [];
+        if (t.eur > 0) parts.push(t.eur + '€');
+        if (t.chf > 0) parts.push(t.chf + ' CHF');
+        elCurr.textContent = parts.length ? parts.join(' + ') : 'sin elegir';
+      }
+      if (elCop) elCop.textContent = fmtCOP(cop) + ' COP';
+    });
+    const elGroup = document.getElementById('bud-group-total');
+    if (elGroup) elGroup.textContent = fmtCOP(groupCOP) + ' COP';
+  }
   function freeWindows(day) {
     const segs = GRID_DAYS[day] || [];
     let windows = [[WORK_START, WORK_END]];
@@ -1007,34 +1143,35 @@
     return windows.filter(([s, e]) => e - s > 0);
   }
 
-  // Slots each propuesta item into the free windows, in order, without splitting
-  // an item across a gap. Returns null when there isn't enough free room to show
-  // them on the Gantt (the modal is still available in that case).
+  // Places each schedulable propuesta item (A(), not T()) into the free windows
+  // in array order, respecting its real duration — big activities (e.g. Jungfraujoch,
+  // a full-day excursion) get their actual hours instead of an even split, and an
+  // item that doesn't fully fit in the current window rolls into the next one.
+  // Tips (T()) are never placed — they only show as a checklist in the day modal.
+  // Returns null when there's no free room at all (modal checklist still works).
   function layoutPicks(day, items) {
-    if (!items || !items.length) return null;
-    const windows = freeWindows(day);
-    const totalFree = windows.reduce((a, [s, e]) => a + (e - s), 0);
-    if (!windows.length || totalFree < Math.min(items.length, 3)) return null;
-    const shares = windows.map(([s, e]) => (e - s) / totalFree * items.length);
-    const counts = shares.map(x => Math.floor(x));
-    let remainder = items.length - counts.reduce((a, b) => a + b, 0);
-    const byFrac = shares.map((x, i) => ({ i, frac: x - Math.floor(x) })).sort((a, b) => b.frac - a.frac);
-    for (let k = 0; k < remainder; k++) counts[byFrac[k % byFrac.length].i]++;
+    const schedulable = (items || []).map((it, idx) => ({ it, idx })).filter(x => x.it.layout);
+    if (!schedulable.length) return null;
+    const windows = freeWindows(day).slice().sort((a, b) => a[0] - b[0]);
+    if (!windows.length) return null;
 
     const result = [];
-    let itemIdx = 0;
-    windows.forEach(([s, e], wi) => {
-      const c = counts[wi];
-      if (c <= 0 || itemIdx >= items.length) return;
-      const per = (e - s) / c;
-      for (let k = 0; k < c && itemIdx < items.length; k++) {
-        const start = Math.round(s + per * k);
-        const end = (k === c - 1) ? Math.round(e) : Math.round(s + per * (k + 1));
-        result.push({ item: items[itemIdx], idx: itemIdx, start, end: Math.max(end, start + 1) });
-        itemIdx++;
+    let wi = 0;
+    let cursor = windows[0][0];
+    for (const { it, idx } of schedulable) {
+      const dur = Math.max(0.5, it.hours || 1);
+      while (wi < windows.length && cursor + dur > windows[wi][1] + 1e-9) {
+        if (wi + 1 < windows.length) { wi++; cursor = windows[wi][0]; }
+        else break;
       }
-    });
-    return result;
+      if (wi >= windows.length) break;
+      const start = cursor;
+      const end = Math.min(cursor + dur, windows[wi][1]);
+      if (end - start < 0.25) break;
+      result.push({ idx, start: Math.round(start), end: Math.max(Math.round(end), Math.round(start) + 1) });
+      cursor = end;
+    }
+    return result.length ? result : null;
   }
 
   // ── BUILD GANTT ──
@@ -1074,7 +1211,9 @@
         el.className = 'gseg ' + seg.type;
         el.style.gridColumn = col;
         el.style.gridRow = (seg.start + 2) + ' / ' + (seg.end + 2);
-        el.innerHTML = `<span>${seg.icon}</span><span>${seg.label}</span>`;
+        el.tabIndex = 0;
+        el.title = seg.label;
+        el.innerHTML = `<span>${seg.icon}</span><span class="txt">${seg.label}</span>`;
       } else {
         el.className = 'gseg ' + seg.type;
         el.style.gridColumn = col;
@@ -1088,18 +1227,30 @@
     if (picks) {
       picks.forEach(p => {
         const key = d + '-' + p.idx;
+        const item = data.propuesta[p.idx];
+        const costTxt = fmtCost(item.cost);
+        const anyOn = PEOPLE.some(pp => isPicked(key, pp.id));
         const el = document.createElement('div');
-        el.className = 'gseg pick' + (PICKS[key] ? ' picked' : '');
+        el.className = 'gseg pick' + (anyOn ? ' picked' : '');
         el.style.gridColumn = col;
         el.style.gridRow = (p.start + 2) + ' / ' + (p.end + 2);
         el.dataset.pickkey = key;
-        el.title = p.item;
-        el.innerHTML = `<span class="chk">${PICKS[key] ? '☑' : '☐'}</span><span class="txt">${p.item}</span>`;
-        el.addEventListener('click', () => togglePick(key));
+        el.tabIndex = 0;
+        el.title = item.text + (costTxt ? ' — ' + costTxt + '/pers' : '');
+        const badges = PEOPLE.map(pp => `<i class="person-toggle${isPicked(key, pp.id) ? ' on' : ''}" data-person="${pp.id}" style="--pc:${pp.color}" tabindex="0" role="button" aria-label="${pp.name}">${pp.name[0]}</i>`).join('');
+        el.innerHTML = `<span class="pp">${badges}</span><span class="txt">${item.text}${costTxt ? ' · <b>' + costTxt + '</b>' : ''}</span>`;
+        PEOPLE.forEach(pp => {
+          const badge = el.querySelector(`[data-person="${pp.id}"]`);
+          const fire = e => { e.stopPropagation(); togglePick(key, pp.id); };
+          badge.addEventListener('click', fire);
+          badge.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fire(e); } });
+        });
         gantt.appendChild(el);
       });
     }
   });
+
+  updateBudgetSummary();
 
   // ── DAY MODAL ──
   const dayModal = document.getElementById('day-modal');
@@ -1132,13 +1283,25 @@
       propSec.innerHTML = '<h4>💡 Propuesta de actividades — toca para elegir</h4>';
       const pList = document.createElement('ul');
       pList.className = 'day-list picks';
-      data.propuesta.forEach((t, idx) => {
+      data.propuesta.forEach((item, idx) => {
         const key = dayNum + '-' + idx;
+        const costTxt = fmtCost(item.cost);
+        const meta = [
+          item.layout ? (item.hours + 'h aprox.') : null,
+          costTxt ? costTxt + '/pers' : (item.layout ? 'Gratis' : null)
+        ].filter(Boolean).join(' · ');
+        const anyOn = PEOPLE.some(pp => isPicked(key, pp.id));
+        const badges = PEOPLE.map(pp => `<i class="person-toggle${isPicked(key, pp.id) ? ' on' : ''}" data-person="${pp.id}" style="--pc:${pp.color}" tabindex="0" role="button" aria-label="${pp.name}">${pp.name[0]}</i>`).join('');
         const li = document.createElement('li');
-        li.className = 'pick-row' + (PICKS[key] ? ' picked' : '');
+        li.className = 'pick-row' + (anyOn ? ' picked' : '');
         li.dataset.pickkey = key;
-        li.innerHTML = `<span class="chk">${PICKS[key] ? '☑' : '☐'}</span><span class="txt">${t}</span>`;
-        li.addEventListener('click', () => togglePick(key));
+        li.innerHTML = `<span class="pp">${badges}</span><span class="txt">${item.text}${meta ? `<br><span class="meta">${meta}</span>` : ''}</span>`;
+        PEOPLE.forEach(pp => {
+          const badge = li.querySelector(`[data-person="${pp.id}"]`);
+          const fire = e => { e.stopPropagation(); togglePick(key, pp.id); };
+          badge.addEventListener('click', fire);
+          badge.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fire(e); } });
+        });
         pList.appendChild(li);
       });
       propSec.appendChild(pList);
