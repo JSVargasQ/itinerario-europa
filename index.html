@@ -104,20 +104,55 @@
     .cal-leg-item .dot.picked { background: rgba(124,58,237,.15); border: 1px solid #7C3AED; }
 
     .budget-bar {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
       background: var(--border); border: 1px solid var(--border); border-radius: var(--r);
       overflow: hidden; margin-bottom: .75rem; box-shadow: var(--shadow);
     }
-    .budget-item { background: var(--card); padding: 1rem 1.1rem; border-top: 3px solid transparent; }
-    .budget-item.person-nub { border-top-color: #7C3AED; }
-    .budget-item.person-her { border-top-color: #DB2777; }
-    .budget-item.person-seb { border-top-color: #0891B2; }
+    .budget-item { background: var(--card); padding: 1rem 1.1rem; }
     .budget-item.accent { background: rgba(124,58,237,.06); }
     .budget-label { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: .3rem; }
     .budget-value { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
-    .budget-sub { font-size: .72rem; color: var(--muted2); margin-top: .25rem; }
     .budget-item.accent .budget-value { color: #7C3AED; }
     .budget-note { font-size: .74rem; color: var(--muted); margin-bottom: 1.25rem; }
+
+    /* ─── VIEW TOGGLE (Calendario / Cronograma) ─── */
+    .view-toggle {
+      display: inline-flex; background: var(--card2); border: 1px solid var(--border);
+      border-radius: 100px; padding: 3px; gap: 2px; margin-bottom: 1.25rem;
+    }
+    .view-toggle button {
+      border: none; background: transparent; padding: .5rem 1.1rem; border-radius: 100px;
+      font-size: .82rem; font-weight: 700; color: var(--muted2); cursor: pointer;
+      font-family: inherit; transition: background .15s, color .15s;
+    }
+    .view-toggle button.active { background: var(--card); color: var(--text); box-shadow: var(--shadow); }
+    .view-panel { display: none; }
+    .view-panel.active { display: block; }
+
+    /* ─── CALENDARIO MENSUAL ─── */
+    .month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .month-wd { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); text-align: center; padding-bottom: .5rem; }
+    .month-cell { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-sm); min-height: 96px; padding: .6rem .55rem; display: flex; flex-direction: column; gap: .25rem; position: relative; }
+    .month-cell.empty { background: transparent; border-color: transparent; }
+    .month-cell.trip { cursor: pointer; box-shadow: var(--shadow); transition: transform .15s ease, box-shadow .15s ease; }
+    .month-cell.trip:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(15,23,42,.12); }
+    .month-cell.trip.es { border-top: 3px solid var(--es); }
+    .month-cell.trip.cr { border-top: 3px solid var(--cr-l); }
+    .month-cell.trip.ch { border-top: 3px solid var(--ch-l); }
+    .month-cell.trip.transit { border-top: 3px solid var(--muted); }
+    .month-daynum { font-size: .78rem; font-weight: 700; color: var(--text); }
+    .month-icon { font-size: 1.2rem; line-height: 1; }
+    .month-where { font-size: .76rem; font-weight: 700; color: var(--text); line-height: 1.2; }
+    .month-pick-dot {
+      position: absolute; top: .5rem; right: .5rem; width: 8px; height: 8px; border-radius: 50%;
+      background: #7C3AED; display: none;
+    }
+    @media (max-width: 640px) {
+      .month-grid { gap: 4px; }
+      .month-cell { min-height: 66px; padding: .4rem .35rem; }
+      .month-icon { font-size: .95rem; }
+      .month-where { font-size: .64rem; }
+    }
     @media (max-width: 640px) {
       .budget-bar { grid-template-columns: repeat(2, 1fr); }
       .budget-value { font-size: 1.05rem; }
@@ -127,7 +162,7 @@
     .gantt {
       display: grid;
       grid-template-columns: 58px repeat(18, 112px);
-      grid-template-rows: 54px repeat(24, 22px);
+      grid-template-rows: 66px repeat(24, 22px);
       min-width: max-content; position: relative;
     }
     .gantt-corner {
@@ -152,7 +187,8 @@
     .gantt-day-head.ch { box-shadow: inset 0 3px 0 var(--ch); }
     .gantt-day-head.transit { box-shadow: inset 0 3px 0 var(--muted); }
     .gantt-day-head .wd { font-size: .6rem; font-weight: 600; color: var(--muted2); text-transform: uppercase; letter-spacing: .04em; }
-    .gantt-day-head .num { font-size: 1rem; font-weight: 800; line-height: 1.3; }
+    .gantt-day-head .num { font-size: 1rem; font-weight: 800; line-height: 1.2; }
+    .gantt-day-head .where { font-size: .6rem; font-weight: 600; color: var(--muted2); line-height: 1.15; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .gantt-col-bg {
       grid-row: 2 / 26; border-right: 1px solid var(--border); z-index: 0;
       background-image: repeating-linear-gradient(to bottom, var(--border) 0 1px, transparent 1px 22px);
@@ -175,7 +211,9 @@
       background: var(--card2); border: 1px dashed var(--border); color: var(--muted2);
       align-items: flex-start; transition: background .15s, border-color .15s, color .15s;
     }
-    .gseg.pick .pp { flex-shrink: 0; display: flex; gap: 2px; }
+    .gseg.pick { cursor: pointer; }
+    .gseg.pick:hover { border-color: var(--muted2); color: var(--text); }
+    .gseg.pick .chk { flex-shrink: 0; font-size: .72rem; line-height: 1.2; }
     .gseg.pick .txt { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
     .gseg.pick.picked { background: rgba(124,58,237,.08); border: 1px solid #7C3AED; color: var(--text); }
 
@@ -193,21 +231,12 @@
       -webkit-line-clamp: unset; white-space: normal;
     }
 
-    /* Per-person pick toggles (Nub / Her / Seb) */
-    .person-toggle {
-      width: 15px; height: 15px; border-radius: 50%; flex-shrink: 0; cursor: pointer;
-      display: inline-flex; align-items: center; justify-content: center;
-      font-size: .56rem; font-weight: 800; line-height: 1;
-      border: 1.5px solid var(--pc, var(--muted2)); color: var(--pc, var(--muted2));
-      background: var(--card); transition: background .15s, color .15s;
-    }
-    .person-toggle.on { background: var(--pc, var(--muted2)); color: #fff; }
-    .person-toggle:hover { filter: brightness(0.95); }
     @media (max-width: 640px) {
-      .gantt { grid-template-columns: 46px repeat(18, 92px); grid-template-rows: 48px repeat(24, 20px); }
+      .gantt { grid-template-columns: 46px repeat(18, 92px); grid-template-rows: 58px repeat(24, 20px); }
       .gantt-col-bg { background-image: repeating-linear-gradient(to bottom, var(--border) 0 1px, transparent 1px 20px); }
       .gantt-hour { font-size: .56rem; }
       .gantt-day-head .num { font-size: .85rem; }
+      .gantt-day-head .where { font-size: .55rem; }
       .gseg { font-size: .6rem; }
     }
 
@@ -347,13 +376,13 @@
     .day-list li { font-size: .87rem; line-height: 1.55; color: var(--text); }
     .day-list.picks { gap: .4rem; }
     .pick-row {
-      display: flex; align-items: flex-start; gap: .65rem;
+      display: flex; align-items: flex-start; gap: .55rem; cursor: pointer;
       padding: .5rem .6rem; border-radius: var(--r-sm); border: 1px solid var(--border);
       background: var(--card2); color: var(--muted2); font-size: .85rem; line-height: 1.5;
       transition: background .15s, border-color .15s, color .15s;
     }
-    .pick-row .pp { flex-shrink: 0; display: flex; gap: 4px; margin-top: .1rem; }
-    .pick-row .pp .person-toggle { width: 20px; height: 20px; font-size: .68rem; }
+    .pick-row:hover { border-color: var(--muted2); }
+    .pick-row .chk { flex-shrink: 0; font-size: .95rem; margin-top: .05rem; }
     .pick-row.picked { background: rgba(124,58,237,.08); border-color: #7C3AED; color: var(--text); }
     .pick-row .meta { font-size: .72rem; font-weight: 500; color: var(--muted2); }
     .pick-row.picked .meta { color: #7C3AED; }
@@ -396,7 +425,7 @@
 <section id="itinerario">
   <p class="section-label">Vuelos ya comprados</p>
   <h2>Cronograma <span>hora a hora</span></h2>
-  <p class="section-intro">Cada columna es un día del viaje (desplázate horizontalmente) y cada fila una hora, con la duración real de cada tramo en tren. Los recuadros punteados son propuestas de actividades — toca la inicial de cada persona (N/H/S) para marcarla como elegida por esa persona; no todos tienen que elegir lo mismo. La selección queda guardada en este navegador.</p>
+  <p class="section-intro">Toca cualquier día (en el Calendario o en el Cronograma) para ver el detalle completo y elegir propuestas de actividades. La selección queda guardada en este navegador.</p>
 
   <div class="cal-legend">
     <span class="cal-leg-item"><i class="dot flight"></i> Vuelo</span>
@@ -410,30 +439,34 @@
   </div>
 
   <div class="budget-bar">
-    <div class="budget-item person-nub">
-      <div class="budget-label">🟣 Nub</div>
-      <div class="budget-value" id="bud-cop-nub">$0 COP</div>
-      <div class="budget-sub"><span id="bud-count-nub">0</span> elegidas · <span id="bud-curr-nub">sin elegir</span></div>
+    <div class="budget-item">
+      <div class="budget-label">Actividades elegidas</div>
+      <div class="budget-value" id="bud-count">0</div>
     </div>
-    <div class="budget-item person-her">
-      <div class="budget-label">🩷 Her</div>
-      <div class="budget-value" id="bud-cop-her">$0 COP</div>
-      <div class="budget-sub"><span id="bud-count-her">0</span> elegidas · <span id="bud-curr-her">sin elegir</span></div>
-    </div>
-    <div class="budget-item person-seb">
-      <div class="budget-label">🔵 Seb</div>
-      <div class="budget-value" id="bud-cop-seb">$0 COP</div>
-      <div class="budget-sub"><span id="bud-count-seb">0</span> elegidas · <span id="bud-curr-seb">sin elegir</span></div>
+    <div class="budget-item">
+      <div class="budget-label">Total por persona</div>
+      <div class="budget-value" id="bud-currencies">—</div>
     </div>
     <div class="budget-item accent">
-      <div class="budget-label">≈ COP total grupo (los 3)</div>
-      <div class="budget-value" id="bud-group-total">$0 COP</div>
+      <div class="budget-label">≈ COP por persona</div>
+      <div class="budget-value" id="bud-per-person">$0 COP</div>
     </div>
   </div>
-  <p class="budget-note">Cada quien elige sus propias actividades tocando su inicial (N/H/S) — no todos tienen que hacer lo mismo. Tipo de cambio referencial jul 2026: 1€ ≈ $4.000 COP · 1 CHF ≈ $4.800 COP. Precios estimados por persona — verifica antes de reservar. No incluye vuelos ni hoteles.</p>
+  <p class="budget-note">Tipo de cambio referencial jul 2026: 1€ ≈ $4.000 COP · 1 CHF ≈ $4.800 COP. Precios de actividades son estimados por persona — verifica antes de reservar. No incluye vuelos ni hoteles.</p>
 
-  <div class="gantt-wrap">
-    <div class="gantt" id="gantt"></div>
+  <div class="view-toggle">
+    <button id="btn-view-calendar" class="active" type="button">📅 Calendario</button>
+    <button id="btn-view-gantt" type="button">🗓️ Cronograma por horas</button>
+  </div>
+
+  <div class="view-panel active" id="view-calendar">
+    <div class="month-grid" id="month-grid"></div>
+  </div>
+
+  <div class="view-panel" id="view-gantt">
+    <div class="gantt-wrap">
+      <div class="gantt" id="gantt"></div>
+    </div>
   </div>
 </section>
 
@@ -907,7 +940,7 @@
     <a href="https://www.dubrovnikpass.com/" target="_blank" rel="noopener">Dubrovnik Pass →</a>
     <a href="https://www.jungfrau.ch/" target="_blank" rel="noopener">Jungfraujoch →</a>
   </div>
-  <p style="margin-top:1.5rem;font-size:.72rem">Vuelos confirmados · Grupo Nub, Her, Seb · Generado con Claude Code · Julio 2026</p>
+  <p style="margin-top:1.5rem;font-size:.72rem">Vuelos confirmados · Generado con Claude Code · Julio 2026</p>
 </footer>
 
 <script>
@@ -930,6 +963,14 @@
   const MONTH_START_WEEKDAY = 4;
   const WD_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
   const WD_FULL  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+  // Ciudad principal donde están ese día (para el encabezado del Gantt y el calendario)
+  const WHERE = {
+    3: 'Bogotá', 4: 'Madrid', 5: 'Sevilla', 6: 'Zagreb', 7: 'Zagreb', 8: 'Zagreb',
+    9: 'Dubrovnik', 10: 'Dubrovnik', 11: 'Dubrovnik', 12: 'Dubrovnik', 13: 'Zúrich',
+    14: 'Zúrich', 15: 'Lucerna', 16: 'Interlaken', 17: 'Lauterbrunnen', 18: 'Ginebra',
+    19: 'Madrid', 20: 'Bogotá'
+  };
 
   // Propuesta item: A = actividad programable (aparece en el Gantt con su duración real)
   //                 T = tip logístico (sin bloque en el Gantt, solo checklist en el modal)
@@ -999,7 +1040,8 @@
   const TRIP_DAYS = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
   const GRID_DAYS = {
     3:  [ { type:'flight', start:12, end:24, label:'Bogotá → Madrid', icon:'✈️' } ],
-    4:  [ { type:'flight', start:9, end:11, label:'Madrid → Sevilla', icon:'✈️' },
+    4:  [ { type:'flight', start:0, end:5, label:'Bogotá → Madrid (aterriza 5am)', icon:'✈️' },
+          { type:'flight', start:9, end:11, label:'Madrid → Sevilla', icon:'✈️' },
           { type:'hotel', hour:22, label:'Hotel' } ],
     5:  [ { type:'city', hour:1, label:'Sevilla' },
           { type:'hotel', hour:22, label:'Hotel' } ],
@@ -1042,30 +1084,33 @@
     20: [ { type:'arrival', hour:6, label:'🛬 Llegada Bogotá' } ]
   };
 
-  // ── PICKS individuales por persona (elegir propuestas) — persisted in localStorage ──
-  const PEOPLE = [
-    { id: 'nub', name: 'Nub', dot: '🟣', color: '#7C3AED' },
-    { id: 'her', name: 'Her', dot: '🩷', color: '#DB2777' },
-    { id: 'seb', name: 'Seb', dot: '🔵', color: '#0891B2' }
-  ];
-  const PICKS_KEY = 'viajeEuropaPicks2026v2';
-  let PICKS = {}; // { "day-idx": { nub: true, her: false, seb: true } }
+  // ── PICKS (elegir propuestas) — selección compartida, persisted in localStorage ──
+  const PICKS_KEY = 'viajeEuropaPicksShared';
+  let PICKS = {}; // { "day-idx": true }
   try { PICKS = JSON.parse(localStorage.getItem(PICKS_KEY)) || {}; } catch (e) { PICKS = {}; }
   function savePicks() {
     try { localStorage.setItem(PICKS_KEY, JSON.stringify(PICKS)); } catch (e) { /* storage unavailable, keep in-memory only */ }
   }
-  function isPicked(key, pid) { return !!(PICKS[key] && PICKS[key][pid]); }
-  function togglePick(key, pid) {
-    if (!PICKS[key]) PICKS[key] = {};
-    PICKS[key][pid] = !PICKS[key][pid];
+  function togglePick(key) {
+    PICKS[key] = !PICKS[key];
     savePicks();
     document.querySelectorAll(`[data-pickkey="${key}"]`).forEach(el => {
-      const badge = el.querySelector(`[data-person="${pid}"]`);
-      if (badge) badge.classList.toggle('on', !!PICKS[key][pid]);
-      const anyOn = PEOPLE.some(p => isPicked(key, p.id));
-      el.classList.toggle('picked', anyOn);
+      el.classList.toggle('picked', !!PICKS[key]);
+      const chk = el.querySelector('.chk');
+      if (chk) chk.textContent = PICKS[key] ? '☑' : '☐';
     });
     updateBudgetSummary();
+    updateMonthCellDot(key.split('-')[0]);
+  }
+
+  function dayHasAnyPick(d) {
+    const day = DAYS[d];
+    if (!day) return false;
+    return day.propuesta.some((_, idx) => !!PICKS[d + '-' + idx]);
+  }
+  function updateMonthCellDot(d) {
+    const dot = document.querySelector(`.month-cell[data-day="${d}"] .month-pick-dot`);
+    if (dot) dot.style.display = dayHasAnyPick(d) ? 'block' : 'none';
   }
 
   // Figures out free (unscheduled) hours in a day, inside a realistic waking window,
@@ -1082,47 +1127,33 @@
     return '$' + Math.round(n).toLocaleString('es-CO');
   }
 
-  // ── PRESUPUESTO DE ACTIVIDADES ELEGIDAS — individual por persona ──
+  // ── PRESUPUESTO DE ACTIVIDADES ELEGIDAS — monto por persona (genérico) ──
   function updateBudgetSummary() {
-    const totals = {};
-    PEOPLE.forEach(p => totals[p.id] = { count: 0, eur: 0, chf: 0 });
-
+    let count = 0, eur = 0, chf = 0;
     Object.keys(PICKS).forEach(key => {
-      const sel = PICKS[key];
-      if (!sel) return;
+      if (!PICKS[key]) return;
       const [dayStr, idxStr] = key.split('-');
       const day = DAYS[dayStr];
       const item = day && day.propuesta[idxStr];
       if (!item) return;
-      PEOPLE.forEach(p => {
-        if (!sel[p.id]) return;
-        totals[p.id].count++;
-        if (item.cost) {
-          if (item.cost.cur === 'EUR') totals[p.id].eur += item.cost.amount;
-          else totals[p.id].chf += item.cost.amount;
-        }
-      });
-    });
-
-    let groupCOP = 0;
-    PEOPLE.forEach(p => {
-      const t = totals[p.id];
-      const cop = t.eur * FX.EUR + t.chf * FX.CHF;
-      groupCOP += cop;
-      const elCount = document.getElementById('bud-count-' + p.id);
-      const elCurr  = document.getElementById('bud-curr-' + p.id);
-      const elCop   = document.getElementById('bud-cop-' + p.id);
-      if (elCount) elCount.textContent = t.count;
-      if (elCurr) {
-        const parts = [];
-        if (t.eur > 0) parts.push(t.eur + '€');
-        if (t.chf > 0) parts.push(t.chf + ' CHF');
-        elCurr.textContent = parts.length ? parts.join(' + ') : 'sin elegir';
+      count++;
+      if (item.cost) {
+        if (item.cost.cur === 'EUR') eur += item.cost.amount;
+        else chf += item.cost.amount;
       }
-      if (elCop) elCop.textContent = fmtCOP(cop) + ' COP';
     });
-    const elGroup = document.getElementById('bud-group-total');
-    if (elGroup) elGroup.textContent = fmtCOP(groupCOP) + ' COP';
+    const perPersonCOP = eur * FX.EUR + chf * FX.CHF;
+
+    const elCount = document.getElementById('bud-count');
+    const elCurr  = document.getElementById('bud-currencies');
+    const elPer   = document.getElementById('bud-per-person');
+    if (!elCount) return;
+    elCount.textContent = count;
+    const parts = [];
+    if (eur > 0) parts.push(eur + '€');
+    if (chf > 0) parts.push(chf + ' CHF');
+    elCurr.textContent = parts.length ? parts.join(' + ') + ' /persona' : '—';
+    elPer.textContent = fmtCOP(perPersonCOP) + ' COP';
   }
   function freeWindows(day) {
     const segs = GRID_DAYS[day] || [];
@@ -1201,7 +1232,7 @@
     const head = document.createElement('div');
     head.className = 'gantt-day-head ' + data.leg;
     head.style.gridColumn = col;
-    head.innerHTML = `<span class="wd">${WD_SHORT[(MONTH_START_WEEKDAY + d - 1) % 7]}</span><span class="num">${d}</span>`;
+    head.innerHTML = `<span class="wd">${WD_SHORT[(MONTH_START_WEEKDAY + d - 1) % 7]}</span><span class="num">${d}</span><span class="where">${WHERE[d] || ''}</span>`;
     head.addEventListener('click', () => openDayModal(d, data));
     gantt.appendChild(head);
 
@@ -1229,28 +1260,88 @@
         const key = d + '-' + p.idx;
         const item = data.propuesta[p.idx];
         const costTxt = fmtCost(item.cost);
-        const anyOn = PEOPLE.some(pp => isPicked(key, pp.id));
         const el = document.createElement('div');
-        el.className = 'gseg pick' + (anyOn ? ' picked' : '');
+        el.className = 'gseg pick' + (PICKS[key] ? ' picked' : '');
         el.style.gridColumn = col;
         el.style.gridRow = (p.start + 2) + ' / ' + (p.end + 2);
         el.dataset.pickkey = key;
         el.tabIndex = 0;
         el.title = item.text + (costTxt ? ' — ' + costTxt + '/pers' : '');
-        const badges = PEOPLE.map(pp => `<i class="person-toggle${isPicked(key, pp.id) ? ' on' : ''}" data-person="${pp.id}" style="--pc:${pp.color}" tabindex="0" role="button" aria-label="${pp.name}">${pp.name[0]}</i>`).join('');
-        el.innerHTML = `<span class="pp">${badges}</span><span class="txt">${item.text}${costTxt ? ' · <b>' + costTxt + '</b>' : ''}</span>`;
-        PEOPLE.forEach(pp => {
-          const badge = el.querySelector(`[data-person="${pp.id}"]`);
-          const fire = e => { e.stopPropagation(); togglePick(key, pp.id); };
-          badge.addEventListener('click', fire);
-          badge.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fire(e); } });
-        });
+        el.innerHTML = `<span class="chk">${PICKS[key] ? '☑' : '☐'}</span><span class="txt">${item.text}${costTxt ? ' · <b>' + costTxt + '</b>' : ''}</span>`;
+        el.addEventListener('click', () => togglePick(key));
         gantt.appendChild(el);
       });
     }
   });
 
   updateBudgetSummary();
+
+  // ── BUILD MONTH CALENDAR ──
+  const monthGrid = document.getElementById('month-grid');
+  WD_SHORT.forEach(w => {
+    const el = document.createElement('div');
+    el.className = 'month-wd';
+    el.textContent = w;
+    monthGrid.appendChild(el);
+  });
+  for (let i = 0; i < MONTH_START_WEEKDAY; i++) {
+    const el = document.createElement('div');
+    el.className = 'month-cell empty';
+    monthGrid.appendChild(el);
+  }
+  for (let d = 1; d <= 31; d++) {
+    const data = DAYS[d];
+    const cell = document.createElement('div');
+    cell.className = 'month-cell' + (data ? ' trip ' + data.leg : '');
+    const num = document.createElement('div');
+    num.className = 'month-daynum';
+    num.textContent = d;
+    cell.appendChild(num);
+    if (data) {
+      cell.dataset.day = d;
+      const ic = document.createElement('div');
+      ic.className = 'month-icon';
+      ic.textContent = data.icon;
+      cell.appendChild(ic);
+      const where = document.createElement('div');
+      where.className = 'month-where';
+      where.textContent = WHERE[d] || '';
+      cell.appendChild(where);
+      const dot = document.createElement('div');
+      dot.className = 'month-pick-dot';
+      dot.style.display = dayHasAnyPick(d) ? 'block' : 'none';
+      cell.appendChild(dot);
+      cell.addEventListener('click', () => openDayModal(d, data));
+    }
+    monthGrid.appendChild(cell);
+  }
+  const monthTotalCells = MONTH_START_WEEKDAY + 31;
+  const monthTrailing = (7 - (monthTotalCells % 7)) % 7;
+  for (let i = 0; i < monthTrailing; i++) {
+    const el = document.createElement('div');
+    el.className = 'month-cell empty';
+    monthGrid.appendChild(el);
+  }
+
+  // ── VIEW TOGGLE (Calendario / Cronograma) ──
+  const VIEW_KEY = 'viajeEuropaView';
+  const btnViewCalendar = document.getElementById('btn-view-calendar');
+  const btnViewGantt = document.getElementById('btn-view-gantt');
+  const viewCalendarPanel = document.getElementById('view-calendar');
+  const viewGanttPanel = document.getElementById('view-gantt');
+  function setView(view) {
+    const isCal = view === 'calendar';
+    viewCalendarPanel.classList.toggle('active', isCal);
+    viewGanttPanel.classList.toggle('active', !isCal);
+    btnViewCalendar.classList.toggle('active', isCal);
+    btnViewGantt.classList.toggle('active', !isCal);
+    try { localStorage.setItem(VIEW_KEY, view); } catch (e) { /* ignore */ }
+  }
+  btnViewCalendar.addEventListener('click', () => setView('calendar'));
+  btnViewGantt.addEventListener('click', () => setView('gantt'));
+  let savedView = 'calendar';
+  try { savedView = localStorage.getItem(VIEW_KEY) || 'calendar'; } catch (e) { /* ignore */ }
+  setView(savedView);
 
   // ── DAY MODAL ──
   const dayModal = document.getElementById('day-modal');
@@ -1290,18 +1381,11 @@
           item.layout ? (item.hours + 'h aprox.') : null,
           costTxt ? costTxt + '/pers' : (item.layout ? 'Gratis' : null)
         ].filter(Boolean).join(' · ');
-        const anyOn = PEOPLE.some(pp => isPicked(key, pp.id));
-        const badges = PEOPLE.map(pp => `<i class="person-toggle${isPicked(key, pp.id) ? ' on' : ''}" data-person="${pp.id}" style="--pc:${pp.color}" tabindex="0" role="button" aria-label="${pp.name}">${pp.name[0]}</i>`).join('');
         const li = document.createElement('li');
-        li.className = 'pick-row' + (anyOn ? ' picked' : '');
+        li.className = 'pick-row' + (PICKS[key] ? ' picked' : '');
         li.dataset.pickkey = key;
-        li.innerHTML = `<span class="pp">${badges}</span><span class="txt">${item.text}${meta ? `<br><span class="meta">${meta}</span>` : ''}</span>`;
-        PEOPLE.forEach(pp => {
-          const badge = li.querySelector(`[data-person="${pp.id}"]`);
-          const fire = e => { e.stopPropagation(); togglePick(key, pp.id); };
-          badge.addEventListener('click', fire);
-          badge.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fire(e); } });
-        });
+        li.innerHTML = `<span class="chk">${PICKS[key] ? '☑' : '☐'}</span><span class="txt">${item.text}${meta ? `<br><span class="meta">${meta}</span>` : ''}</span>`;
+        li.addEventListener('click', () => togglePick(key));
         pList.appendChild(li);
       });
       propSec.appendChild(pList);
