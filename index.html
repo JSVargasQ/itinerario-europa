@@ -102,6 +102,9 @@
     .cal-leg-item .dot.activity { background: rgba(16,185,129,.3); border: 1px solid var(--ok); }
     .cal-leg-item .dot.pick { background: var(--card2); border: 1px dashed var(--muted2); }
     .cal-leg-item .dot.picked { background: rgba(124,58,237,.15); border: 1px solid #7C3AED; }
+    .cal-leg-item .dot.meal { background: rgba(251,146,60,.16); border: 1px dashed rgba(234,88,12,.5); }
+    .cal-leg-item .dot.trans { background: rgba(71,85,105,.14); border: 1px solid rgba(71,85,105,.4); }
+    .cal-leg-item .dot.night { background: rgba(30,58,138,.2); border: 1px solid var(--border); }
 
     .budget-bar {
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
@@ -208,7 +211,7 @@
     .gantt {
       display: grid;
       grid-template-columns: 58px repeat(18, 112px);
-      grid-template-rows: 66px repeat(24, 22px);
+      grid-template-rows: 66px repeat(24, 27px);
       min-width: max-content; position: relative;
     }
     .gantt-corner {
@@ -241,7 +244,23 @@
     .gantt-day-head.transit .where { color: var(--muted); }
     .gantt-col-bg {
       grid-row: 2 / 26; border-right: 1px solid var(--border); z-index: 0;
-      background-image: repeating-linear-gradient(to bottom, var(--border) 0 1px, transparent 1px 22px);
+      /* --sr/--ss = amanecer y atardecer del día (hora decimal, ver SUN en el JS).
+         Pintan un velo muy sutil sobre las horas sin luz, con una transición suave
+         de ~1h alrededor del crepúsculo. */
+      --sr: 7.5; --ss: 19;
+      /* Velo nocturno: azul profundo translúcido (tema "noche") */
+      --night: rgba(30, 58, 138, 0.16);
+      --hourlines: repeating-linear-gradient(to bottom, var(--border) 0 1px, transparent 1px 27px);
+      /* Corte nítido exactamente en el amanecer y el atardecer del día (sin degradado) */
+      background-image:
+        linear-gradient(to bottom,
+          var(--night) 0,
+          var(--night) calc(var(--sr) * 100% / 24),
+          transparent  calc(var(--sr) * 100% / 24),
+          transparent  calc(var(--ss) * 100% / 24),
+          var(--night) calc(var(--ss) * 100% / 24),
+          var(--night) 100%),
+        var(--hourlines);
       scroll-snap-align: start;
     }
     .gantt-col-bg.es { background-color: rgba(245,127,23,.035); }
@@ -255,8 +274,11 @@
     .gseg.flight, .gseg.activity {
       margin: 1px 3px; padding: .15rem .35rem; border-radius: 6px; font-weight: 700; cursor: pointer;
     }
-    .gseg.flight { background: rgba(245,158,11,.16); border: 1px solid rgba(245,158,11,.4); color: var(--warn-dark); }
-    .gseg.activity { background: rgba(16,185,129,.14); border: 1px solid rgba(16,185,129,.38); color: var(--ok-dark); }
+    /* Fondos opacos (equivalentes a los rgba originales compuestos sobre blanco):
+       si fueran translúcidos, el velo nocturno de la columna se vería A TRAVÉS del
+       chip y parecería estar por encima de él. */
+    .gseg.flight { background: #FDEFD8; border: 1px solid rgba(245,158,11,.4); color: var(--warn-dark); }
+    .gseg.activity { background: #DEF5ED; border: 1px solid rgba(16,185,129,.38); color: var(--ok-dark); }
     .gseg.city { padding-left: .45rem; font-weight: 700; color: var(--text); }
     .gseg.hotel { padding-left: .45rem; font-style: italic; color: var(--muted2); }
     .gseg.escala, .gseg.transit { padding-left: .45rem; color: var(--muted2); }
@@ -270,20 +292,32 @@
     .gseg.pick:hover { border-color: var(--muted2); color: var(--text); }
     .gseg.pick .chk { flex-shrink: 0; font-size: .72rem; line-height: 1.2; }
     .gseg.pick .txt { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
-    .gseg.pick.picked { background: rgba(124,58,237,.08); border: 1px solid #7C3AED; color: var(--text); }
+    .gseg.pick.picked { background: #F4EFFE; border: 1px solid #7C3AED; color: var(--text); }
+    .gseg.meal, .gseg.transit.blk {
+      margin: 1px 3px; padding: .15rem .35rem; border-radius: 6px; font-weight: 600; cursor: pointer;
+    }
+    .gseg.meal { background: #FEF2E8; border: 1px dashed rgba(234,88,12,.35); color: #9A3412; }
+    .gseg.transit.blk { background: #EEF0F2; border: 1px solid rgba(71,85,105,.25); color: var(--muted); }
 
     /* Expand truncated chip text on hover/keyboard focus so it's fully readable.
        Only the text label pops out into a small floating card — the chip itself
        (and its real grid height, which can span many hours, e.g. Plitvice 8am-5pm)
        never gets resized, so it can't visually "shrink" while focused. */
-    .gseg.flight, .gseg.activity, .gseg.pick { outline: none; z-index: 1; }
+    .gseg.flight, .gseg.activity, .gseg.pick, .gseg.meal, .gseg.transit.blk { outline: none; z-index: 1; }
     .gseg.flight:hover, .gseg.flight:focus-within,
     .gseg.activity:hover, .gseg.activity:focus-within,
+    .gseg.meal:hover, .gseg.meal:focus-within,
+    .gseg.transit.blk:hover, .gseg.transit.blk:focus-within,
     .gseg.pick:hover, .gseg.pick:focus-within {
       z-index: 40;
+      /* el chip recorta su contenido (overflow hidden); al expandir el texto en un
+         popup flotante hay que dejarlo salir del chip o queda cortado */
+      overflow: visible;
     }
     .gseg.flight:hover .txt, .gseg.flight:focus .txt, .gseg.flight:focus-within .txt,
     .gseg.activity:hover .txt, .gseg.activity:focus .txt, .gseg.activity:focus-within .txt,
+    .gseg.meal:hover .txt, .gseg.meal:focus .txt, .gseg.meal:focus-within .txt,
+    .gseg.transit.blk:hover .txt, .gseg.transit.blk:focus .txt, .gseg.transit.blk:focus-within .txt,
     .gseg.pick:hover .txt, .gseg.pick:focus .txt, .gseg.pick:focus-within .txt {
       position: absolute; top: 0; left: 0; z-index: 45;
       width: max-content; min-width: 90px; max-width: 210px;
@@ -294,8 +328,8 @@
     }
 
     @media (max-width: 640px) {
-      .gantt { grid-template-columns: 46px repeat(18, 92px); grid-template-rows: 58px repeat(24, 20px); }
-      .gantt-col-bg { background-image: repeating-linear-gradient(to bottom, var(--border) 0 1px, transparent 1px 20px); }
+      .gantt { grid-template-columns: 46px repeat(18, 92px); grid-template-rows: 58px repeat(24, 24px); }
+      .gantt-col-bg { --hourlines: repeating-linear-gradient(to bottom, var(--border) 0 1px, transparent 1px 24px); }
       .gantt-hour { font-size: .56rem; }
       .gantt-day-head .num { font-size: .85rem; }
       .gantt-day-head .where { font-size: .55rem; }
@@ -345,6 +379,26 @@
     }
 
     /* ─── WEATHER ─── */
+    .clima-subhead { font-size: 1rem; font-weight: 700; color: var(--muted2); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 1rem; }
+    .dayw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: .75rem; margin-bottom: 2.5rem; }
+    .dayw-card {
+      background: var(--card); border: 1px solid var(--border); border-top: 3px solid var(--border);
+      border-radius: var(--r-sm); box-shadow: var(--shadow); padding: .8rem .9rem;
+      cursor: pointer; transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .dayw-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(15,23,42,.12); }
+    .dayw-card.es { border-top-color: var(--es); }
+    .dayw-card.cr { border-top-color: var(--cr-l); }
+    .dayw-card.ch { border-top-color: var(--ch-l); }
+    .dayw-card.transit { border-top-color: var(--muted); }
+    .dayw-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+    .dayw-day { font-size: .78rem; font-weight: 800; }
+    .dayw-day small { font-weight: 600; color: var(--muted2); text-transform: uppercase; letter-spacing: .04em; font-size: .62rem; }
+    .dayw-temp { font-size: .95rem; font-weight: 800; white-space: nowrap; }
+    .dayw-temp small { font-weight: 600; color: var(--muted2); }
+    .dayw-city { font-size: .74rem; font-weight: 700; color: var(--muted2); margin-top: .1rem; }
+    .dayw-desc { font-size: .74rem; color: var(--muted2); line-height: 1.45; margin-top: .35rem; }
+    .dayw-wear { font-size: .74rem; color: var(--text); line-height: 1.45; background: var(--card2); border: 1px solid var(--border); border-radius: 6px; padding: .4rem .55rem; margin-top: .5rem; }
     .weather-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
     .weather-card { background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: var(--r); padding: 1.5rem; }
     .weather-header { display: flex; align-items: center; gap: .75rem; margin-bottom: 1rem; }
@@ -434,6 +488,8 @@
     .day-section h4 { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: .7rem; }
     .day-section.fijo h4 { color: var(--ok-dark); }
     .day-section.propuesta h4 { color: var(--warn-dark); }
+    .day-section.clima h4 { color: #0369A1; }
+    .day-clima { font-size: .85rem; line-height: 1.5; margin-bottom: .5rem; }
     .day-list { list-style: none; display: flex; flex-direction: column; gap: .55rem; }
     .day-list li { font-size: .87rem; line-height: 1.55; color: var(--text); }
     .day-list.picks { gap: .4rem; }
@@ -489,13 +545,16 @@
 <section id="itinerario">
   <p class="section-label">Vuelos ya comprados</p>
   <h2>Cronograma <span>hora a hora</span></h2>
-  <p class="section-intro">Toca cualquier día (en el Calendario o en el Cronograma) para ver el detalle completo y elegir propuestas de actividades. La selección queda guardada en este navegador.</p>
+  <p class="section-intro">Toca cualquier día (en el Calendario o en el Cronograma) para ver el detalle completo y elegir propuestas de actividades. La selección queda guardada en este navegador. El fondo gris tenue de cada columna marca las horas <strong>sin luz solar</strong> de esa ciudad (amanecer y atardecer reales de octubre).</p>
 
   <div class="cal-legend">
     <span class="cal-leg-item"><i class="dot flight"></i> Vuelo</span>
     <span class="cal-leg-item"><i class="dot activity"></i> Actividad / excursión</span>
+    <span class="cal-leg-item"><i class="dot trans"></i> Traslado</span>
+    <span class="cal-leg-item"><i class="dot meal"></i> Comida tentativa</span>
     <span class="cal-leg-item"><i class="dot pick"></i> Propuesta</span>
     <span class="cal-leg-item"><i class="dot picked"></i> Elegida</span>
+    <span class="cal-leg-item"><i class="dot night"></i> Sin luz solar</span>
     <span class="cal-leg-item"><i class="dot es"></i> España</span>
     <span class="cal-leg-item"><i class="dot cr"></i> Croacia</span>
     <span class="cal-leg-item"><i class="dot ch"></i> Suiza</span>
@@ -838,7 +897,10 @@
 <!-- ── WEATHER ── -->
 <section id="clima">
   <p class="section-label">Octubre en Europa</p>
-  <h2>Clima <span>por país</span></h2>
+  <h2>Clima <span>día a día</span></h2>
+  <p class="section-intro">Pronóstico según promedios históricos de octubre en cada ciudad, con la recomendación específica de qué llevar cada día. Toca una tarjeta para abrir el detalle del día.</p>
+  <div class="dayw-grid" id="dayw-grid"></div>
+  <h3 class="clima-subhead">Promedio del mes, por país</h3>
   <div class="weather-grid">
     <div class="weather-card" style="border-top:3px solid var(--es)">
       <div class="weather-header">
@@ -1047,6 +1109,76 @@
     19: 'Madrid', 20: 'Bogotá'
   };
 
+  // Amanecer y atardecer aproximados (hora local, decimal) de la ciudad principal de
+  // cada día, para octubre 2026 — pintan el velo nocturno del Gantt y se muestran en
+  // el modal del día. Europa sigue en horario de verano (CEST) hasta el 25 de octubre,
+  // así que no hay cambio de hora durante el viaje.
+  const SUN = {
+    3:  [5.70, 17.80],  // Bogotá
+    4:  [8.07, 19.73],  // Sevilla (~8:04 / 19:44)
+    5:  [8.08, 19.70],
+    6:  [6.98, 18.40],  // Zagreb
+    7:  [7.00, 18.37],
+    8:  [7.03, 18.33],
+    9:  [7.05, 18.30],
+    10: [6.80, 18.12],  // Dubrovnik
+    11: [6.82, 18.10],
+    12: [6.83, 18.07],
+    13: [6.87, 18.03],
+    14: [7.70, 18.75],  // Zúrich
+    15: [7.72, 18.72],  // Lucerna
+    16: [7.77, 18.73],  // Interlaken
+    17: [7.80, 18.70],  // Lauterbrunnen
+    18: [7.83, 18.72],  // Berna
+    19: [7.88, 18.77],  // Ginebra
+    20: [5.68, 17.77]   // Bogotá
+  };
+  function fmtHourMin(h) {
+    const hh = Math.floor(h), mm = Math.round((h - hh) * 60);
+    return hh + ':' + String(mm).padStart(2, '0');
+  }
+
+  // Clima esperado por día (promedios históricos de octubre por ciudad) y qué llevar
+  // ese día en concreto, según las actividades previstas. hi/lo en °C.
+  const DAY_WEATHER = {
+    3:  { icon:'🌧️', hi:19, lo:9,  desc:'Bogotá: lluvias posibles por la tarde',
+          wear:'Capas para el avión: el vuelo nocturno enfría — chaqueta ligera o buzo a la mano y medias gruesas.' },
+    4:  { icon:'☀️', hi:26, lo:15, desc:'Sevilla: soleado y seco, calor suave por la tarde',
+          wear:'Camiseta y pantalón fresco de día; chaqueta ligera para la cena al aire libre. Bloqueador y gafas de sol.' },
+    5:  { icon:'☀️', hi:26, lo:15, desc:'Sevilla: soleado, ~11h de luz',
+          wear:'Ropa fresca y zapatos muy cómodos (día de ~6h caminando); chaqueta ligera para la noche.' },
+    6:  { icon:'⛅', hi:17, lo:9,  desc:'Día de viaje: templado en Sevilla/Palma, fresco al llegar a Zagreb',
+          wear:'Vestirse en capas: salen con calor suave y llegan a ~15°C. Chaqueta a la mano en el avión.' },
+    7:  { icon:'🌦️', hi:15, lo:6,  desc:'Plitvice: fresco y húmedo, niebla matinal posible en el parque',
+          wear:'Calzado impermeable, chubasquero y una capa térmica ligera — el parque está a ~600m y es más frío que Zagreb.' },
+    8:  { icon:'⛅', hi:17, lo:8,  desc:'Zagreb: mañana fría, agradable al mediodía',
+          wear:'Capas: camiseta + suéter + chaqueta ligera. Paraguas plegable por si llovizna.' },
+    9:  { icon:'⛅', hi:18, lo:9,  desc:'Zagreb fresco; Dubrovnik más templado al aterrizar (noche ~15°C)',
+          wear:'Capas para el día en Zagreb; al llegar a Dubrovnik de noche no hace falta abrigo pesado.' },
+    10: { icon:'☀️', hi:21, lo:14, desc:'Dubrovnik: soleado, mar a ~20°C',
+          wear:'Ropa ligera, gorra, bloqueador y agua para las murallas (no hay sombra). Vestido de baño por si cae un chapuzón en Banje.' },
+    11: { icon:'🌤️', hi:21, lo:14, desc:'Dubrovnik: templado y mayormente despejado',
+          wear:'Ropa ligera de día y chaqueta fina para la noche junto al mar.' },
+    12: { icon:'🌤️', hi:20, lo:13, desc:'Templado; algo más fresco tierra adentro si van a Kotor o Mostar',
+          wear:'Capas y calzado cómodo para la excursión. Pasaporte a la mano: hay cruce de frontera.' },
+    13: { icon:'🌦️', hi:20, lo:8,  desc:'Contraste fuerte: ~20°C en Dubrovnik, ~9°C al aterrizar en Zúrich de noche',
+          wear:'Sacar el abrigo de la maleta antes del vuelo — al llegar a Zúrich (10pm) hará frío de verdad.' },
+    14: { icon:'🌧️', hi:14, lo:7,  desc:'Zúrich: fresco, lluvia posible',
+          wear:'Abrigo, bufanda ligera y paraguas; zapatos que aguanten lluvia.' },
+    15: { icon:'⛅', hi:14, lo:6,  desc:'Lucerna: fresco; en la cumbre del Pilatus ~0–5°C',
+          wear:'Abrigo y una capa térmica si suben al Pilatus; guantes ligeros no sobran en la cumbre.' },
+    16: { icon:'⛅', hi:13, lo:5,  desc:'Interlaken: clima de montaña, mañanas frías',
+          wear:'Capas térmicas para Harder Kulm y abrigo todo el día; el funicular arriba es ~5°C más frío.' },
+    17: { icon:'❄️', hi:12, lo:3,  desc:'Lauterbrunnen: valle frío; Jungfraujoch −2 a −7°C con nieve',
+          wear:'Si van a Jungfraujoch: térmica completa — guantes, gorro, bufanda y botas. En el valle, abrigo y capas.' },
+    18: { icon:'🌤️', hi:13, lo:6,  desc:'Berna: fresco y seco; el atardecer en el Rosengarten enfría rápido',
+          wear:'Abrigo y bufanda; para el mirador al atardecer, llevar la chaqueta puesta.' },
+    19: { icon:'✈️', hi:14, lo:7,  desc:'Salida de Ginebra de madrugada (~7°C); Madrid templado al mediodía',
+          wear:'Abrigo puesto para salir a las 6:45am; capas fáciles de quitar para Madrid (~22°C) y el vuelo largo.' },
+    20: { icon:'🌧️', hi:19, lo:9,  desc:'Bogotá: llegada 6:00am, fresco',
+          wear:'Chaqueta a la mano al aterrizar temprano.' }
+  };
+
   // Propuesta item: A = actividad programable (aparece en el Gantt con su duración real)
   //                 T = tip logístico (sin bloque en el Gantt, solo checklist en el modal)
   // opts.hours: duración estimada, para ubicarla en el Gantt
@@ -1067,18 +1199,18 @@
 
   const DAYS = {
     3:  { leg:'transit', icon:'✈️', short:'Bogotá→Madrid', title:'Bogotá → Madrid', sub:'Sábado 3 de octubre · Vuelo nocturno',
-          fijo:['✈️ 12:00pm — Vuelo Bogotá → Madrid (nocturno, llega 5:00am del día 4)'],
+          fijo:['🚕 9:00am — Salida hacia el aeropuerto El Dorado (internacional: estar 2.5–3h antes)', '✈️ 12:00pm — Vuelo Bogotá → Madrid (nocturno, llega 5:00am del día 4)'],
           propuesta:[
             T('Llegar con margen al aeropuerto El Dorado', 'Vuelo internacional — se recomienda estar 2.5–3h antes por chequeo de equipaje y migración.'),
             T('Dormir en el vuelo para llegar con energía a Sevilla', 'Es un vuelo nocturno de ~9-10h; aterrizan a las 5am y siguen de inmediato hacia Sevilla, así que dormir en el aire ayuda a llegar con menos jet lag.')
           ] },
     4:  { leg:'es', icon:'🇪🇸', short:'Sevilla', title:'Madrid → Sevilla', sub:'Domingo 4 de octubre · Llegada a Sevilla',
-          fijo:['🛬 5:00am — Llegada a Madrid', '✈️ 9:00–11:00am — Vuelo Madrid → Sevilla', '🏨 Check-in hotel en Sevilla ~10:00pm'],
+          fijo:['🛬 5:00am — Llegada a Madrid (migración Schengen + conexión)', '✈️ 9:00–11:00am — Vuelo Madrid → Sevilla', '🚕 ~11:15am — Traslado aeropuerto → centro (taxi ~25 min / bus EA ~35 min)', '🏨 ~12:30pm — Dejar maletas en el hotel (check-in oficial suele ser ~3:00pm)'],
           propuesta:[
             T('Llegada con jet lag (vuelo nocturno + conexión)', 'Ritmo tranquilo — el cuerpo llega desfasado después de un vuelo nocturno más una conexión, mejor un plan liviano que uno apretado de museos.'),
             A('Tarde libre en Sevilla: Barrio de Santa Cruz', { hours:1.5, detail:'Antiguo barrio judío, calles estrechas y patios con flores — ideal para una primera caminata sin agenda fija tras el vuelo largo.' }),
-            A('Cena en La Brunilda o Casa Cuesta (Triana)', { hours:1.5, amount:15, cur:'EUR', detail:'Reemplaza la "tapeada" genérica por opciones concretas: La Brunilda (cocina andaluza moderna, C. Galera) y Casa Cuesta (tapas tradicionales junto al mercado de Triana, abierto desde 1880) aparecen entre los bares de tapas mejor valorados de Triana en guías de 2026 (freetourssevilla.com, sevillalover.com).' }),
-            A('Catedral y Giralda iluminada de noche (vista exterior)', { hours:1, after:20, detail:'La fachada se ilumina al caer la noche — gratis, solo para ver/fotografiar desde la Plaza Virgen de los Reyes.' })
+            A('Catedral y Giralda iluminada de noche (vista exterior)', { hours:1, after:20, detail:'La fachada se ilumina al caer la noche — gratis, solo para ver/fotografiar desde la Plaza Virgen de los Reyes. El sol se pone ~7:45pm en Sevilla, así que desde las 8pm ya luce iluminada.' }),
+            A('Cena en La Brunilda o Casa Cuesta (Triana)', { hours:1.5, after:21, amount:15, cur:'EUR', detail:'A horario español (~9:30pm). La Brunilda (cocina andaluza moderna, C. Galera) y Casa Cuesta (tapas tradicionales junto al mercado de Triana, abierto desde 1880) aparecen entre los bares de tapas mejor valorados de Triana en guías de 2026 (freetourssevilla.com, sevillalover.com).' })
           ] },
     5:  { leg:'es', icon:'🇪🇸', short:'Sevilla', title:'Sevilla', sub:'Lunes 5 de octubre · Día completo',
           fijo:['Día completo en Sevilla', '🏨 Hotel en Sevilla'],
@@ -1089,17 +1221,18 @@
             A('Barrio de Triana — cerámica y orilla del Guadalquivir', { hours:1.5, detail:'Cuna del flamenco y la cerámica sevillana; cruzar el Puente de Isabel II al atardecer es el mejor momento para las fotos.' })
           ] },
     6:  { leg:'cr', icon:'✈️', short:'Sevilla→Zagreb', title:'Sevilla → Palma → Zagreb', sub:'Martes 6 de octubre · Día de viaje',
-          fijo:['✈️ 9:00–10:00am — Vuelo Sevilla → Palma', '🛫 12:00pm — Escala en el aeropuerto de Palma', '✈️ 2:00–3:00pm — Vuelo Palma → Zagreb (llegan 3:00pm)', '🏨 Hotel en Zagreb'],
+          fijo:['🚕 7:00am — Salida hacia el aeropuerto de Sevilla', '✈️ 9:00–10:00am — Vuelo Sevilla → Palma', '🛫 12:00pm — Escala en el aeropuerto de Palma (almuerzo en la terminal)', '✈️ 2:00–3:00pm — Vuelo Palma → Zagreb (llegan 3:00pm)', '🚌 ~3:15pm — Bus/taxi aeropuerto → centro (~40 min)', '🏨 ~4:30pm — Check-in hotel en Zagreb'],
           propuesta:[
             T('Escala en Palma: aprovechar para comer algo y descansar en el aeropuerto', 'Conexión de ~4h dentro del aeropuerto — suficiente para almorzar en las cafeterías de la terminal y descansar antes del último vuelo del día.'),
-            A('Cena en Batak Tkalčićeva (parrilla croata)', { hours:1.5, amount:15, cur:'EUR', after:16, detail:'Tkalčićeva es la calle de restaurantes y bares más recomendada del centro histórico de Zagreb (Tripadvisor, guías de Zagreb 2026); Batak destaca por su cocina croata tradicional a la parrilla. Reservar o llegar temprano, se llena rápido.' })
+            A('Primer paseo: Plaza Ban Jelačić y calle Tkalčićeva', { hours:1.5, after:16, detail:'Caminata suave de primera tarde: la plaza central y la calle más animada del casco histórico quedan a pocos minutos a pie de la mayoría de hoteles del centro.' }),
+            A('Cena en Batak Tkalčićeva (parrilla croata)', { hours:1.5, amount:15, cur:'EUR', after:19, detail:'Tkalčićeva es la calle de restaurantes y bares más recomendada del centro histórico de Zagreb (Tripadvisor, guías de Zagreb 2026); Batak destaca por su cocina croata tradicional a la parrilla. Reservar o llegar temprano, se llena rápido.' })
           ] },
     7:  { leg:'cr', icon:'🌊', short:'Plitvice', title:'Lagos de Plitvice', sub:'Miércoles 7 de octubre · Excursión (Pendiente de reservar)',
           fijo:['🌊 8:00am–5:00pm — Excursión a Lagos de Plitvice (Pendiente)', '🏨 Hotel en Zagreb'],
           propuesta:[
             T('Reservar con Civitatis desde Zagreb', 'Tour de día completo a Plitvice, ~125€/persona — reservar con anticipación, los cupos se agotan en temporada alta.'),
             T('Llevar calzado impermeable y cámara', 'Los senderos de madera sobre el agua pueden estar resbalosos, sobre todo después de lluvia de otoño.'),
-            A('Cena en Submarine Burger Tkalčićeva', { hours:1.5, amount:15, cur:'EUR', detail:'Después de un día largo en Plitvice, opción casual y rápida en la misma calle Tkalčićeva — bien valorada entre los restaurantes cerca de esa calle (Tripadvisor).' })
+            A('Cena en Submarine Burger Tkalčićeva', { hours:1.5, after:19, amount:15, cur:'EUR', detail:'Después de un día largo en Plitvice (regresan ~5-6pm), opción casual y rápida en la misma calle Tkalčićeva — bien valorada entre los restaurantes cerca de esa calle (Tripadvisor).' })
           ] },
     8:  { leg:'cr', icon:'🏰', short:'Zagreb', title:'Zagreb', sub:'Jueves 8 de octubre · Día completo',
           fijo:['Día completo en Zagreb', '🏨 Hotel en Zagreb'],
@@ -1110,10 +1243,10 @@
             A('Museo Nikola Tesla, Túnel de Grič', { hours:1.5, amount:2, cur:'EUR', detail:'Tesla nació en Smiljan, en la actual Croacia; el Túnel Grič fue refugio antiaéreo en la Segunda Guerra Mundial y hoy es un paso peatonal abierto al público.' })
           ] },
     9:  { leg:'cr', icon:'✈️', short:'Zagreb→Dubrovnik', title:'Zagreb → Dubrovnik', sub:'Viernes 9 de octubre · Vuelo nocturno',
-          fijo:['Zagreb durante el día', '✈️ 8:00–11:00pm — Vuelo Zagreb → Dubrovnik'],
+          fijo:['Zagreb durante el día', '🚕 6:00pm — Salida hacia el aeropuerto de Zagreb (~40 min) + cena ligera en la terminal', '✈️ 8:00–11:00pm — Vuelo Zagreb → Dubrovnik', '🏨 ~11:45pm — Llegada al hotel en Dubrovnik'],
           propuesta:[
             A('Mañana libre: Herradura de Lenuci (Parque Zrinjevac)', { hours:1.5, detail:'Conjunto de siete parques en forma de U alrededor del centro, diseñado en el siglo XIX — caminata tranquila antes de armar maletas.' }),
-            T('Tarde: preparar maletas antes del vuelo nocturno', 'El vuelo a Dubrovnik sale a las 8pm — dejar tiempo para llegar con calma al aeropuerto de Zagreb.')
+            T('Tarde: preparar maletas antes del vuelo nocturno', 'El vuelo a Dubrovnik sale a las 8pm — salir del centro ~6pm deja margen para el traslado, el check-in y una cena ligera en el aeropuerto.')
           ] },
     10: { leg:'cr', icon:'🏛️', short:'Dubrovnik', title:'Dubrovnik', sub:'Sábado 10 de octubre · Día 1 de 4',
           fijo:['Día completo en Dubrovnik', '🏨 Hotel en Dubrovnik'],
@@ -1132,53 +1265,54 @@
     12: { leg:'cr', icon:'🏛️', short:'Dubrovnik', title:'Dubrovnik', sub:'Lunes 12 de octubre · Día 3 de 4',
           fijo:['Día completo en Dubrovnik', '🏨 Hotel en Dubrovnik'],
           propuesta:[
-            A('Día completo opcional a Kotor (Montenegro) o Mostar (Bosnia)', { hours:9, amount:65, cur:'EUR', detail:'Tours de día completo desde Dubrovnik, populares en plataformas como Civitatis/GetYourGuide — Kotor (bahía tipo fiordo en Montenegro) o Mostar (puente otomano del s. XVI en Bosnia). Con 4 noches en Dubrovnik sobra tiempo para uno de los dos.' }),
-            A('Teleférico al Monte Srđ (ideal al atardecer)', { hours:2, amount:27, cur:'EUR', detail:'Sube en unos 4 minutos hasta 405m sobre la ciudad; el atardecer sobre el Adriático desde ahí es de los planes más recomendados en guías de Dubrovnik.' }),
-            A('Tarde de playa / relax en la ciudad', { hours:2.5, detail:'Sin costo si es una playa pública — buen cierre a las 4 noches en Dubrovnik antes del vuelo a Zúrich.' })
+            A('Día completo opcional a Kotor (Montenegro) o Mostar (Bosnia)', { hours:9, after:8, amount:65, cur:'EUR', detail:'Tours de día completo desde Dubrovnik, populares en plataformas como Civitatis/GetYourGuide — Kotor (bahía tipo fiordo en Montenegro) o Mostar (puente otomano del s. XVI en Bosnia). Salen ~8am e incluyen parada para almorzar. Con 4 noches en Dubrovnik sobra tiempo para uno de los dos.' }),
+            A('Teleférico al Monte Srđ (ideal al atardecer)', { hours:2, after:17, amount:27, cur:'EUR', detail:'Sube en unos 4 minutos hasta 405m sobre la ciudad; en octubre el sol se pone ~6:05pm, así que subir ~5:30pm da el atardecer completo sobre el Adriático — de los planes más recomendados en guías de Dubrovnik.' }),
+            T('Alternativa sin excursión: día de playa / relax en la ciudad', 'Si no hacen Kotor ni Mostar, este día queda libre para playa pública (Banje, a 10 min del casco antiguo) y pasear sin agenda — buen cierre a las 4 noches en Dubrovnik.')
           ] },
     13: { leg:'cr', icon:'✈️', short:'Dubrovnik→Zúrich', title:'Dubrovnik → Zúrich', sub:'Martes 13 de octubre · Vuelo nocturno',
-          fijo:['Dubrovnik durante el día', '✈️ 7:00–10:00pm — Vuelo Dubrovnik → Zúrich', '🏨 Hotel en Zúrich'],
+          fijo:['Dubrovnik durante el día', '🚕 5:00pm — Salida hacia el aeropuerto (~30 min) + cena ligera en la terminal', '✈️ 7:00–10:00pm — Vuelo Dubrovnik → Zúrich', '🚆 ~10:15pm — Tren aeropuerto → centro (~15 min)', '🏨 ~11:00pm — Hotel en Zúrich'],
           propuesta:[
-            A('Mañana: Isla Lokrum en ferry (10 min) si da tiempo', { hours:3, amount:27, cur:'EUR', detail:'10 minutos en ferry desde el puerto viejo; reserva natural con pavos reales y un lago salado. El combo ferry + entrada ronda 27€/persona.' }),
-            T('Tarde: rumbo al aeropuerto con calma', 'El vuelo a Zúrich sale a las 7pm — hay margen suficiente si Lokrum termina a media tarde.')
+            A('Mañana: Isla Lokrum en ferry (10 min) si da tiempo', { hours:3, after:9, amount:27, cur:'EUR', detail:'10 minutos en ferry desde el puerto viejo (primeras salidas ~9am en octubre); reserva natural con pavos reales y un lago salado. El combo ferry + entrada ronda 27€/persona.' }),
+            T('Tarde: rumbo al aeropuerto con calma', 'El vuelo a Zúrich sale a las 7pm — saliendo del casco antiguo a las 5pm queda margen holgado aunque Lokrum termine a media tarde.')
           ] },
     14: { leg:'ch', icon:'🇨🇭', short:'Zúrich', title:'Zúrich', sub:'Miércoles 14 de octubre · Día completo',
-          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Zúrich → tren a Lucerna, ~50 min'],
+          fijo:['Día completo en Zúrich', '🚄 6:00pm — Tren Zúrich → Lucerna (~50 min)', '🏨 Noche en Lucerna'],
           propuesta:[
             A('Altstadt, Grossmünster y Fraumünster', { hours:2.5, detail:'Iglesias emblemáticas de la Reforma protestante; el Fraumünster tiene vitrales diseñados por Marc Chagall (entrada pequeña, unos pocos CHF).' }),
             A('Bahnhofstrasse y Museo del Chocolate Lindt', { hours:2, amount:15, cur:'CHF', detail:'Lindt Home of Chocolate, junto al lago de Zúrich — precio estimado de entrada, verificar valor actualizado en el sitio oficial antes de ir.' })
           ] },
     15: { leg:'ch', icon:'🌉', short:'Lucerna', title:'Lucerna', sub:'Jueves 15 de octubre · Día completo',
-          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Lucerna → tren panorámico a Interlaken, ~2h'],
+          fijo:['Día completo en Lucerna', '🚞 5:00pm — Tren panorámico Lucerna → Interlaken (~2h) — salir con luz: el sol se pone ~6:45pm', '🏨 Noche en Interlaken'],
           propuesta:[
-            A('Puente de la Capilla y Monumento del León', { hours:1.5, detail:'El puente de madera cubierto más antiguo de Europa en uso (1333); el león tallado en roca (1821) conmemora a los guardias suizos caídos en la Revolución Francesa.' }),
-            A('Opcional: Monte Pilatus en teleférico', { hours:4, amount:84, cur:'CHF', detail:'Precio verificado en pilatus.ch: 84 CHF ida y vuelta desde Kriens en temporada de verano/otoño (mayo-octubre). 50% de descuento con Swiss Travel Pass.' })
+            A('Opcional: Monte Pilatus en teleférico (mejor por la mañana)', { hours:3.5, after:9, amount:84, cur:'CHF', detail:'Precio verificado en pilatus.ch: 84 CHF ida y vuelta desde Kriens en temporada de verano/otoño (mayo-octubre). 50% de descuento con Swiss Travel Pass. Por la mañana hay más probabilidad de cielo despejado en la cumbre; subida + cumbre + bajada toman ~3.5h desde el centro.' }),
+            A('Puente de la Capilla y Monumento del León', { hours:1.5, detail:'El puente de madera cubierto más antiguo de Europa en uso (1333); el león tallado en roca (1821) conmemora a los guardias suizos caídos en la Revolución Francesa. Ambos quedan a 10 min a pie entre sí — buena tarde antes del tren.' })
           ] },
     16: { leg:'ch', icon:'⛰️', short:'Interlaken', title:'Interlaken', sub:'Viernes 16 de octubre · Día completo',
-          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Interlaken → tren a Lauterbrunnen, ~20 min'],
+          fijo:['Día completo en Interlaken', '🚞 6:00pm — Tren Interlaken → Lauterbrunnen (~20 min)', '🏨 Noche en Lauterbrunnen'],
           propuesta:[
             A('Harder Kulm (mirador con vista al Jungfrau)', { hours:2, amount:32, cur:'CHF', detail:'Funicular en operación desde 1908; mirador a 1.322m con vista directa al Eiger, Mönch y Jungfrau — de los miradores mejor valorados de Interlaken.' }),
             A('Hohenmatte Park', { hours:1, detail:'Pradera central de Interlaken con vista a la Jungfrau, entrada gratis — punto clásico para descansar entre actividades.' })
           ] },
     17: { leg:'ch', icon:'💧', short:'Lauterbrunnen', title:'Lauterbrunnen', sub:'Sábado 17 de octubre · Día completo',
-          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Lauterbrunnen → tren a Berna, ~1h 30min (trasbordo en Interlaken Ost)'],
+          fijo:['Día completo en Lauterbrunnen', '🚞 6:00pm — Tren Lauterbrunnen → Berna (~1h 30min, trasbordo en Interlaken Ost)', '🏨 Noche en Berna'],
           propuesta:[
-            A('Opcional: Jungfraujoch "Top of Europe" — sale muy temprano (~6:30am), reserva obligatoria', { hours:7, amount:271, cur:'CHF', detail:'Precio verificado en jungfrau.ch: 261,20 CHF ida y vuelta desde Interlaken Ost en temporada mayo-octubre, más 10 CHF de reserva obligatoria de asiento. El primer tren desde Lauterbrunnen sale ~6:30am; subida + tiempo arriba + bajada toma 6-8h en total (myswissalps.com).' }),
+            T('Si van a Jungfraujoch: madrugar — primer tren ~6:30am', 'Desayuno muy temprano o para llevar; el almuerzo de ese día queda arriba en la estación (hay restaurantes en Jungfraujoch) o de vuelta en el valle.'),
+            A('Opcional: Jungfraujoch "Top of Europe" — sale muy temprano (~6:30am), reserva obligatoria', { hours:7, after:7, amount:271, cur:'CHF', detail:'Precio verificado en jungfrau.ch: 261,20 CHF ida y vuelta desde Interlaken Ost en temporada mayo-octubre, más 10 CHF de reserva obligatoria de asiento. El primer tren desde Lauterbrunnen sale ~6:30am; subida + tiempo arriba + bajada toma 6-8h en total (myswissalps.com).' }),
             A('Cascada Staubbachfall y valle de las 72 cascadas', { hours:1, detail:'300m de caída de agua visible desde el pueblo, entrada libre — Lauterbrunnen tiene 72 cascadas en total a lo largo del valle.' }),
             A('Pueblos de Mürren o Wengen', { hours:2, detail:'Ambos son pueblos sin autos, accesibles solo por teleférico o tren de cremallera — Mürren tiene vista frontal al Eiger.' })
           ] },
     18: { leg:'ch', icon:'🐻', short:'Berna→Ginebra', title:'Berna → Ginebra', sub:'Domingo 18 de octubre · Día completo',
-          fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Berna → tren directo a Ginebra por la noche, ~1h 50min'],
+          fijo:['Día completo en Berna', '🚄 7:00pm — Tren directo Berna → Ginebra (~1h 50min)', '🏨 Noche en Ginebra'],
           propuesta:[
             A('Ciudad Vieja UNESCO y Zytglogge', { hours:2, detail:'6km de arcadas medievales, Patrimonio UNESCO desde 1983; el Zytglogge (torre-reloj astronómico del s. XIII) anima sus figuras cada hora en punto.' }),
             A('Bundeshaus (Parlamento federal)', { hours:1, detail:'Sede del gobierno federal suizo — tours gratuitos cuando no hay sesión parlamentaria, conviene verificar horario disponible antes de ir.' }),
-            A('Rosengarten al atardecer', { hours:1, detail:'Mirador con la vista panorámica más recomendada de Berna y el río Aare en curva — entrada libre todo el día.' })
+            A('Rosengarten al atardecer', { hours:1, after:17, detail:'Mirador con la vista panorámica más recomendada de Berna y el río Aare en curva — entrada libre. El sol se pone ~6:45pm: llegar ~5:30pm da la mejor luz antes de bajar a tomar el tren.' })
           ] },
     19: { leg:'ch', icon:'✈️', short:'Ginebra→Bogotá', title:'Ginebra → Madrid → Bogotá', sub:'Lunes 19 de octubre · Regreso',
-          fijo:['✈️ 9:00am–12:00pm — Vuelo Ginebra → Madrid', '✈️ 4:00pm — Vuelo Madrid → Bogotá (nocturno, llega 6:00am del día 20)'],
+          fijo:['🚕 ~6:45am — Salida del hotel hacia Ginebra-Aeropuerto', '✈️ 9:00am–12:00pm — Vuelo Ginebra → Madrid', '🍽️ Almuerzo en Barajas durante la conexión', '✈️ 4:00pm — Vuelo Madrid → Bogotá (nocturno, llega 6:00am del día 20)'],
           propuesta:[
-            A('Si el horario lo permite: paseo corto al lago Léman / Jet d\'Eau antes de ir al aeropuerto', { hours:1, detail:'Depende de qué tan cerca quede el hotel del lago — el surtidor Jet d\'Eau (140m) se ve desde la orilla sin costo.' }),
-            T('Traslado con margen a Ginebra-Aeropuerto', 'El vuelo a Madrid sale a las 9am — conviene salir del hotel con al menos 1h de margen.')
+            T('El Jet d\'Eau queda para otra ocasión', 'Con vuelo a las 9am hay que salir del hotel ~6:45am, aún de noche (amanece ~7:55am en Ginebra) — no da tiempo de turismo. Si quieren verlo, mejor la noche del 18 al llegar, si el hotel queda cerca del lago.'),
+            T('Traslado con margen a Ginebra-Aeropuerto', 'El vuelo a Madrid sale a las 9am — el tren desde Cornavin tarda 7 min; estar en el aeropuerto ~7:15am deja margen tranquilo.')
           ] },
     20: { leg:'transit', icon:'🛬', short:'Bogotá', title:'Llegada a Bogotá', sub:'Martes 20 de octubre · Fin del viaje',
           fijo:['🛬 6:00am — Llegada a Bogotá'],
@@ -1190,47 +1324,82 @@
   // type: city/hotel/escala/transit/arrival → single-row plain-text marker at `hour`
   const TRIP_DAYS = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
   const GRID_DAYS = {
-    3:  [ { type:'flight', start:12, end:24, label:'Bogotá → Madrid', icon:'✈️', buf:[2.5,0] } ],
+    3:  [ { type:'transit', start:9, end:12, label:'Al aeropuerto El Dorado + check-in internacional (3h antes)', icon:'🚕' },
+          { type:'flight', start:12, end:24, label:'Bogotá → Madrid', icon:'✈️', buf:[2.5,0] } ],
     4:  [ { type:'flight', start:0, end:5, label:'Bogotá → Madrid (aterriza 5am)', icon:'✈️', buf:[0,2] },
+          { type:'transit', start:5, end:7, label:'Migración Schengen + conexión', icon:'🛂' },
+          { type:'meal', start:7, end:8, label:'Desayuno en Barajas', icon:'☕' },
           { type:'flight', start:9, end:11, label:'Madrid → Sevilla', icon:'✈️' },
-          { type:'hotel', hour:22, label:'Hotel' } ],
-    5:  [ { type:'city', hour:1, label:'Sevilla' },
-          { type:'hotel', hour:22, label:'Hotel' } ],
-    6:  [ { type:'flight', start:9, end:10, label:'Sevilla → Palma', icon:'✈️' },
-          { type:'escala', hour:12, label:'Escala' },
+          { type:'transit', start:11, end:12, label:'Aeropuerto → centro (~30 min) + dejar maletas', icon:'🚕' },
+          { type:'meal', start:14, end:15, label:'Almuerzo', icon:'🍽️' },
+          { type:'hotel', hour:23, label:'Hotel' } ],
+    5:  [ { type:'meal', start:8, end:9, label:'Desayuno', icon:'☕' },
+          { type:'meal', start:14, end:15, label:'Almuerzo', icon:'🍽️' },
+          { type:'meal', start:21, end:22, label:'Cena (horario español)', icon:'🍷' },
+          { type:'hotel', hour:23, label:'Hotel' } ],
+    6:  [ { type:'transit', start:7, end:8, label:'Al aeropuerto de Sevilla', icon:'🚕' },
+          { type:'flight', start:9, end:10, label:'Sevilla → Palma', icon:'✈️' },
+          { type:'escala', hour:11, label:'Escala en Palma' },
+          { type:'meal', start:12, end:13, label:'Almuerzo en el aeropuerto', icon:'🍽️' },
           { type:'flight', start:14, end:15, label:'Palma → Zagreb', icon:'✈️' },
+          { type:'transit', start:15, end:16, label:'Aeropuerto → centro (~40 min) + check-in', icon:'🚌' },
           { type:'hotel', hour:22, label:'Hotel' } ],
-    7:  [ { type:'activity', start:8, end:17, label:'Lagos de Plitvice', icon:'🌊' },
+    7:  [ { type:'activity', start:8, end:17, label:'Lagos de Plitvice (almuerzo en ruta)', icon:'🌊' },
           { type:'hotel', hour:22, label:'Hotel' } ],
-    8:  [ { type:'city', hour:1, label:'Zagreb' },
+    8:  [ { type:'meal', start:8, end:9, label:'Desayuno', icon:'☕' },
+          { type:'meal', start:13, end:14, label:'Almuerzo', icon:'🍽️' },
+          { type:'meal', start:20, end:21, label:'Cena', icon:'🍷' },
           { type:'hotel', hour:22, label:'Hotel' } ],
-    9:  [ { type:'city', hour:1, label:'Zagreb' },
-          { type:'flight', start:20, end:23, label:'Zagreb → Dubrovnik', icon:'✈️' } ],
-    10: [ { type:'city', hour:1, label:'Dubrovnik' },
+    9:  [ { type:'meal', start:8, end:9, label:'Desayuno', icon:'☕' },
+          { type:'meal', start:13, end:14, label:'Almuerzo', icon:'🍽️' },
+          { type:'transit', start:18, end:19, label:'Al aeropuerto de Zagreb (~40 min)', icon:'🚕' },
+          { type:'meal', start:19, end:20, label:'Cena ligera en el aeropuerto', icon:'🥪' },
+          { type:'flight', start:20, end:23, label:'Zagreb → Dubrovnik', icon:'✈️' },
+          { type:'hotel', hour:23, label:'Hotel (~11:45pm)' } ],
+    10: [ { type:'meal', start:7, end:8, label:'Desayuno temprano', icon:'☕' },
+          { type:'meal', start:13, end:14, label:'Almuerzo', icon:'🍽️' },
+          { type:'meal', start:20, end:21, label:'Cena', icon:'🍷' },
           { type:'hotel', hour:22, label:'Hotel' } ],
-    11: [ { type:'city', hour:1, label:'Dubrovnik' },
+    11: [ { type:'meal', start:8, end:9, label:'Desayuno', icon:'☕' },
+          { type:'meal', start:13, end:14, label:'Almuerzo', icon:'🍽️' },
+          { type:'meal', start:20, end:21, label:'Cena', icon:'🍷' },
           { type:'hotel', hour:22, label:'Hotel' } ],
-    12: [ { type:'city', hour:1, label:'Dubrovnik' },
+    12: [ { type:'meal', start:7, end:8, label:'Desayuno temprano', icon:'☕' },
+          { type:'meal', start:20, end:21, label:'Cena', icon:'🍷' },
           { type:'hotel', hour:22, label:'Hotel' } ],
-    13: [ { type:'city', hour:1, label:'Dubrovnik' },
+    13: [ { type:'meal', start:8, end:9, label:'Desayuno', icon:'☕' },
+          { type:'meal', start:13, end:14, label:'Almuerzo', icon:'🍽️' },
+          { type:'transit', start:17, end:18, label:'Al aeropuerto (~30 min)', icon:'🚕' },
+          { type:'meal', start:18, end:19, label:'Cena ligera en el aeropuerto', icon:'🥪' },
           { type:'flight', start:19, end:22, label:'Dubrovnik → Zúrich', icon:'✈️' },
-          { type:'hotel', hour:22, label:'Hotel' } ],
-    14: [ { type:'city', hour:1, label:'Zúrich' },
-          { type:'transit', hour:18, label:'Tren a Lucerna' },
-          { type:'hotel', hour:22, label:'Hotel' } ],
-    15: [ { type:'city', hour:1, label:'Lucerna' },
-          { type:'transit', hour:18, label:'Tren a Interlaken' },
-          { type:'hotel', hour:22, label:'Hotel' } ],
-    16: [ { type:'city', hour:1, label:'Interlaken' },
-          { type:'transit', hour:18, label:'Tren a Lauterbrunnen' },
-          { type:'hotel', hour:22, label:'Hotel' } ],
-    17: [ { type:'city', hour:1, label:'Lauterbrunnen' },
-          { type:'transit', hour:18, label:'Tren a Berna' },
-          { type:'hotel', hour:22, label:'Hotel' } ],
-    18: [ { type:'city', hour:1, label:'Berna' },
-          { type:'transit', hour:19, label:'Tren a Ginebra' },
-          { type:'hotel', hour:22, label:'Hotel' } ],
-    19: [ { type:'flight', start:9, end:12, label:'Ginebra → Madrid', icon:'✈️' },
+          { type:'transit', start:22, end:23, label:'Tren aeropuerto → centro (~15 min)', icon:'🚆' },
+          { type:'hotel', hour:23, label:'Hotel (~11pm)' } ],
+    14: [ { type:'meal', start:8, end:9, label:'Desayuno', icon:'☕' },
+          { type:'meal', start:13, end:14, label:'Almuerzo', icon:'🍽️' },
+          { type:'transit', start:18, end:19, label:'Tren Zúrich → Lucerna (~50 min)', icon:'🚄' },
+          { type:'meal', start:19, end:20, label:'Cena en Lucerna', icon:'🍷' },
+          { type:'hotel', hour:22, label:'Hotel en Lucerna' } ],
+    15: [ { type:'meal', start:8, end:9, label:'Desayuno', icon:'☕' },
+          { type:'meal', start:13, end:14, label:'Almuerzo', icon:'🍽️' },
+          { type:'transit', start:17, end:19, label:'Tren panorámico Lucerna → Interlaken (~2h, con luz de día)', icon:'🚞' },
+          { type:'meal', start:20, end:21, label:'Cena en Interlaken', icon:'🍷' },
+          { type:'hotel', hour:22, label:'Hotel en Interlaken' } ],
+    16: [ { type:'meal', start:8, end:9, label:'Desayuno', icon:'☕' },
+          { type:'meal', start:13, end:14, label:'Almuerzo', icon:'🍽️' },
+          { type:'transit', start:18, end:19, label:'Tren Interlaken → Lauterbrunnen (~20 min)', icon:'🚞' },
+          { type:'meal', start:19, end:20, label:'Cena en Lauterbrunnen', icon:'🍷' },
+          { type:'hotel', hour:22, label:'Hotel en Lauterbrunnen' } ],
+    17: [ { type:'transit', start:18, end:20, label:'Tren Lauterbrunnen → Berna (~1h30, trasbordo en Interlaken Ost)', icon:'🚞' },
+          { type:'meal', start:20, end:21, label:'Cena en Berna', icon:'🍷' },
+          { type:'hotel', hour:22, label:'Hotel en Berna' } ],
+    18: [ { type:'meal', start:8, end:9, label:'Desayuno', icon:'☕' },
+          { type:'meal', start:13, end:14, label:'Almuerzo', icon:'🍽️' },
+          { type:'transit', start:19, end:21, label:'Tren Berna → Ginebra (~1h50)', icon:'🚄' },
+          { type:'meal', start:21, end:22, label:'Cena cerca del hotel en Ginebra', icon:'🍷' },
+          { type:'hotel', hour:23, label:'Hotel en Ginebra' } ],
+    19: [ { type:'transit', start:7, end:8, label:'Al aeropuerto de Ginebra (salida ~6:45am)', icon:'🚕' },
+          { type:'flight', start:9, end:12, label:'Ginebra → Madrid', icon:'✈️' },
+          { type:'meal', start:13, end:14, label:'Almuerzo en Barajas (conexión)', icon:'🍽️' },
           { type:'flight', start:16, end:24, label:'Madrid → Bogotá', icon:'✈️', buf:[2.5,0] } ],
     20: [ { type:'arrival', hour:6, label:'🛬 Llegada Bogotá' } ]
   };
@@ -1317,10 +1486,13 @@
     const segs = GRID_DAYS[day] || [];
     let windows = [[WORK_START, WORK_END]];
     segs.forEach(s => {
-      const isFlight = s.type === 'flight' || s.type === 'activity';
+      // city/hotel/arrival son marcadores informativos, no ocupan tiempo real del día;
+      // vuelos, actividades, comidas, traslados y escalas sí bloquean su franja.
+      if (s.type === 'city' || s.type === 'hotel' || s.type === 'arrival') return;
+      const ranged = s.start != null;
       const buf = s.type === 'flight' ? (s.buf || DEFAULT_FLIGHT_BUF) : [0, 0];
-      const os = (isFlight ? s.start : s.hour) - buf[0];
-      const oe = (isFlight ? s.end : s.hour + 1) + buf[1];
+      const os = (ranged ? s.start : s.hour) - buf[0];
+      const oe = (ranged ? s.end : s.hour + 1) + buf[1];
       const cs = Math.max(os, WORK_START), ce = Math.min(oe, WORK_END);
       if (cs >= ce) return;
       const next = [];
@@ -1343,31 +1515,35 @@
   // there's technically an earlier free gap (e.g. still mid-layover in another airport).
   // Tips (T()) are never placed — they only show as a checklist in the day modal.
   // Returns null when there's no free room at all (modal checklist still works).
+  // Media hora de traslado a pie / transporte entre una actividad y la siguiente
+  const ACTIVITY_GAP = 0.5;
+  // Salvo hora explícita (`after`), ninguna propuesta arranca antes de las 9am —
+  // deja espacio para desayunar y arrancar el día con calma.
+  const DEFAULT_PICK_AFTER = 9;
   function layoutPicks(day, items) {
     const schedulable = (items || []).map((it, idx) => ({ it, idx })).filter(x => x.it.layout);
     if (!schedulable.length) return null;
-    const windows = freeWindows(day).slice().sort((a, b) => a[0] - b[0]);
+    let windows = freeWindows(day).slice().sort((a, b) => a[0] - b[0]);
     if (!windows.length) return null;
 
+    // First-fit por actividad: cada una busca la primera ventana libre donde quepa
+    // completa (respetando su hora mínima `after`); al colocarla, la ventana se parte
+    // en dos dejando ACTIVITY_GAP de traslado a cada lado. Si una actividad grande no
+    // cabe en ningún hueco, se omite sin bloquear a las demás.
     const result = [];
-    let wi = 0;
-    let cursor = windows[0][0];
     for (const { it, idx } of schedulable) {
       const dur = Math.max(0.5, it.hours || 1);
-      const minStart = it.after || 0;
-      while (wi < windows.length && windows[wi][1] <= minStart) { wi++; if (wi < windows.length) cursor = windows[wi][0]; }
-      if (wi >= windows.length) break;
-      cursor = Math.max(cursor, minStart, windows[wi][0]);
-      while (wi < windows.length && cursor + dur > windows[wi][1] + 1e-9) {
-        if (wi + 1 < windows.length) { wi++; cursor = Math.max(windows[wi][0], minStart); }
-        else break;
+      const minStart = it.after || DEFAULT_PICK_AFTER;
+      for (let w = 0; w < windows.length; w++) {
+        const ws = Math.max(windows[w][0], minStart);
+        if (ws + dur > windows[w][1] + 1e-9) continue;
+        result.push({ idx, start: Math.round(ws), end: Math.max(Math.round(ws + dur), Math.round(ws) + 1) });
+        const next = [];
+        if (ws - ACTIVITY_GAP - windows[w][0] >= MIN_WINDOW) next.push([windows[w][0], ws - ACTIVITY_GAP]);
+        if (windows[w][1] - (ws + dur + ACTIVITY_GAP) >= MIN_WINDOW) next.push([ws + dur + ACTIVITY_GAP, windows[w][1]]);
+        windows.splice(w, 1, ...next);
+        break;
       }
-      if (wi >= windows.length) break;
-      const start = cursor;
-      const end = Math.min(cursor + dur, windows[wi][1]);
-      if (end - start < 0.25) break;
-      result.push({ idx, start: Math.round(start), end: Math.max(Math.round(end), Math.round(start) + 1) });
-      cursor = end;
     }
     return result.length ? result : null;
   }
@@ -1381,7 +1557,7 @@
 
   for (let h = 0; h < 24; h++) {
     const el = document.createElement('div');
-    el.className = 'gantt-hour' + (h >= 8 && h <= 22 ? ' daytime' : '');
+    el.className = 'gantt-hour' + (h >= 8 && h < 19 ? ' daytime' : '');
     el.style.gridRow = (h + 2);
     el.textContent = String(h).padStart(2, '0') + ':00';
     gantt.appendChild(el);
@@ -1397,6 +1573,11 @@
     const colBg = document.createElement('div');
     colBg.className = 'gantt-col-bg ' + data.leg + (isFirstOfLeg ? ' first-of-leg' : '');
     colBg.style.gridColumn = col;
+    const sun = SUN[d];
+    if (sun) {
+      colBg.style.setProperty('--sr', sun[0]);
+      colBg.style.setProperty('--ss', sun[1]);
+    }
     gantt.appendChild(colBg);
 
     const head = document.createElement('div');
@@ -1408,8 +1589,9 @@
 
     (GRID_DAYS[d] || []).forEach(seg => {
       const el = document.createElement('div');
-      if (seg.type === 'flight' || seg.type === 'activity') {
-        el.className = 'gseg ' + seg.type;
+      if (seg.start != null) {
+        // Bloque con franja horaria: vuelo, actividad, comida o traslado
+        el.className = 'gseg ' + seg.type + (seg.type === 'transit' ? ' blk' : '');
         el.style.gridColumn = col;
         el.style.gridRow = (seg.start + 2) + ' / ' + (seg.end + 2);
         el.tabIndex = 0;
@@ -1487,6 +1669,27 @@
       const range = g.start === g.end ? `Oct ${g.start}` : `Oct ${g.start}–${g.end}`;
       el.innerHTML = `<div class="wear-head">${LEG_FLAG[g.leg] || ''} ${LEG_LABEL[g.leg]} · ${range}</div><div class="wear-text">${WEAR_TEXT[g.leg] || ''}</div>`;
       wearStrip.appendChild(el);
+    });
+  }
+
+  // ── CLIMA DÍA A DÍA (sección Clima) ──
+  const daywGrid = document.getElementById('dayw-grid');
+  if (daywGrid) {
+    TRIP_DAYS.forEach(d => {
+      const w = DAY_WEATHER[d], data = DAYS[d];
+      if (!w || !data) return;
+      const el = document.createElement('div');
+      el.className = 'dayw-card ' + data.leg;
+      el.innerHTML = `
+        <div class="dayw-head">
+          <span class="dayw-day"><small>${WD_SHORT[(MONTH_START_WEEKDAY + d - 1) % 7]}</small> Oct ${d}</span>
+          <span class="dayw-temp">${w.icon} ${w.hi}° <small>/ ${w.lo}°</small></span>
+        </div>
+        <div class="dayw-city">${LEG_FLAG[data.leg] || ''} ${WHERE[d] || ''}</div>
+        <div class="dayw-desc">${w.desc}</div>
+        <div class="dayw-wear">🎒 ${w.wear}</div>`;
+      el.addEventListener('click', () => openDayModal(d, data));
+      daywGrid.appendChild(el);
     });
   }
 
@@ -1588,7 +1791,7 @@
 
   function openDayModal(dayNum, data) {
     dName.textContent = data.title;
-    dSub.textContent = data.sub;
+    dSub.textContent = data.sub + (SUN[dayNum] ? ' · ☀️ ' + fmtHourMin(SUN[dayNum][0]) + ' – 🌙 ' + fmtHourMin(SUN[dayNum][1]) : '');
     dBody.innerHTML = '';
 
     const fijoSec = document.createElement('div');
@@ -1603,6 +1806,16 @@
     });
     fijoSec.appendChild(fList);
     dBody.appendChild(fijoSec);
+
+    const w = DAY_WEATHER[dayNum];
+    if (w) {
+      const climaSec = document.createElement('div');
+      climaSec.className = 'day-section clima';
+      climaSec.innerHTML = `<h4>🌤️ Clima y qué llevar</h4>
+        <div class="day-clima">${w.icon} <b>${w.hi}° / ${w.lo}°C</b> — ${w.desc}</div>
+        <div class="dayw-wear">🎒 ${w.wear}</div>`;
+      dBody.appendChild(climaSec);
+    }
 
     if (data.propuesta && data.propuesta.length) {
       const propSec = document.createElement('div');
