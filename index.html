@@ -117,6 +117,8 @@
     .budget-value { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
     .budget-item.accent .budget-value { color: #7C3AED; }
     .budget-note { font-size: .74rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .budget-bar.cats { grid-template-columns: repeat(5, 1fr); }
+    .budget-bar.cats .budget-value { font-size: 1.02rem; }
 
     /* ─── VIEW TOGGLE (Calendario / Cronograma) ─── */
     .view-toggle {
@@ -157,7 +159,7 @@
       .month-where { font-size: .64rem; }
     }
     @media (max-width: 640px) {
-      .budget-bar { grid-template-columns: repeat(2, 1fr); }
+      .budget-bar, .budget-bar.cats { grid-template-columns: repeat(2, 1fr); }
       .budget-value { font-size: 1.05rem; }
     }
 
@@ -394,6 +396,14 @@
     .lodge-cell small { display: block; font-weight: 600; font-size: .66rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
     .lodge-cell.sub { text-align: right; }
     .lodge-cell.sub b { font-size: .95rem; }
+    .meal-input {
+      width: 72px; font: inherit; font-size: .85rem; font-weight: 700; text-align: right;
+      padding: .25rem .45rem; border: 1px solid var(--border); border-radius: 6px;
+      background: var(--card2); color: var(--text);
+    }
+    .meal-input:focus { outline: 2px solid var(--cr-l); background: var(--card); }
+    .est-subhead { font-size: .9rem; font-weight: 700; color: var(--muted2); text-transform: uppercase; letter-spacing: .06em; margin: 2.25rem 0 .9rem; }
+    .est-subhead:first-of-type { margin-top: 0; }
     @media (max-width: 640px) {
       .lodge-row { grid-template-columns: 1fr 1fr; row-gap: .5rem; }
       .lodge-cell.sub { text-align: left; }
@@ -919,26 +929,51 @@
 <!-- ── ESTIMACIONES HOSPEDAJE ── -->
 <section id="estimaciones">
   <p class="section-label">Presupuesto de referencia</p>
-  <h2>Estimaciones <span>de hospedaje</span></h2>
-  <p class="section-intro">Cuánto cuesta la noche <strong>por persona</strong> en cada sitio, asumiendo que los 3 comparten habitación triple o apartamento (rango medio: hotel 3★ o apartamento bien ubicado, precios de referencia de julio 2026 para octubre 2026). Verificar en Booking/Airbnb — Sevilla y Suiza suben rápido, reservar cuanto antes.</p>
+  <h2>Estimaciones <span>de gastos por persona</span></h2>
+  <p class="section-intro">Presupuesto <strong>por persona</strong> separado en Alojamiento, Comidas, Transporte y Actividades. Los valores de Comidas y Transporte se pueden <strong>editar directamente</strong> (quedan guardados en este navegador) y las Actividades se suman solas al marcarlas como "Elegida" en el Cronograma. <strong>Los vuelos quedan por fuera: ya están comprados.</strong></p>
 
-  <div class="budget-bar">
+  <div class="budget-bar cats">
     <div class="budget-item">
-      <div class="budget-label">Noches de hotel</div>
-      <div class="budget-value" id="est-nights">—</div>
+      <div class="budget-label">🏨 Alojamiento</div>
+      <div class="budget-value" id="est-lodging">—</div>
     </div>
     <div class="budget-item">
-      <div class="budget-label">Total hospedaje por persona</div>
-      <div class="budget-value" id="est-cur">—</div>
+      <div class="budget-label">🍽️ Comidas</div>
+      <div class="budget-value" id="est-meals">—</div>
+    </div>
+    <div class="budget-item">
+      <div class="budget-label">🚄 Transporte</div>
+      <div class="budget-value" id="est-transport">—</div>
+    </div>
+    <div class="budget-item">
+      <div class="budget-label">🎟️ Actividades</div>
+      <div class="budget-value" id="est-activities">—</div>
     </div>
     <div class="budget-item accent">
-      <div class="budget-label">≈ COP por persona</div>
+      <div class="budget-label">Total ≈ COP por persona</div>
       <div class="budget-value" id="est-cop">—</div>
     </div>
   </div>
-  <p class="budget-note">Mismo tipo de cambio referencial de la página: 1€ ≈ $4.000 COP · 1 CHF ≈ $4.800 COP. Las noches del 3 y 19 de octubre se duermen en el avión. No incluye vuelos, comidas ni actividades.</p>
+  <p class="budget-note">Tipo de cambio referencial: 1€ ≈ $4.000 COP · 1 CHF ≈ $4.800 COP. No incluye los vuelos (ya comprados) ni taxis en Bogotá. Precios de referencia de julio 2026 — verificar antes de reservar.</p>
 
+  <h3 class="est-subhead">🏨 Alojamiento — por persona / noche, 3 compartiendo triple o apartamento</h3>
   <div class="lodge-list" id="lodge-list"></div>
+
+  <h3 class="est-subhead">🍽️ Comidas — ajusta el valor por día según su estilo</h3>
+  <div class="lodge-list" id="meals-list"></div>
+
+  <h3 class="est-subhead">🚄 Transporte terrestre — sin vuelos, ajustable</h3>
+  <div class="lodge-list" id="transport-list"></div>
+
+  <h3 class="est-subhead">🎟️ Actividades — se eligen en el Cronograma</h3>
+  <div class="lodge-list">
+    <div class="lodge-row">
+      <div class="lodge-city">🎟️ Actividades marcadas como "Elegida"<small>Marca ☐ → ☑ en el Cronograma o en el detalle de cada día — se suman aquí automáticamente y quedan guardadas en este navegador.</small></div>
+      <div class="lodge-cell"><b id="act-count">0</b><small>elegidas</small></div>
+      <div class="lodge-cell"><b id="act-total">0€</b><small>total por persona</small></div>
+      <div class="lodge-cell sub"><a href="#itinerario" style="font-size:.78rem;font-weight:700;color:#7C3AED;text-decoration:none">Elegir actividades ↑</a></div>
+    </div>
+  </div>
 </section>
 
 <!-- ── WEATHER ── -->
@@ -1467,6 +1502,7 @@
       if (chk) chk.textContent = PICKS[key] ? '☑' : '☐';
     });
     updateBudgetSummary();
+    updateEstimates();
     updateMonthCellDot(key.split('-')[0]);
   }
 
@@ -1495,7 +1531,7 @@
   }
 
   // ── PRESUPUESTO DE ACTIVIDADES ELEGIDAS — monto por persona (genérico) ──
-  function updateBudgetSummary() {
+  function pickTotals() {
     let count = 0, eur = 0, chf = 0;
     Object.keys(PICKS).forEach(key => {
       if (!PICKS[key]) return;
@@ -1509,6 +1545,10 @@
         else chf += item.cost.amount;
       }
     });
+    return { count, eur, chf };
+  }
+  function updateBudgetSummary() {
+    const { count, eur, chf } = pickTotals();
     const perPersonCOP = eur * FX.EUR + chf * FX.CHF;
 
     const elCount = document.getElementById('bud-count');
@@ -1752,14 +1792,85 @@
     { city:'Berna',         leg:'ch', flag:'🇨🇭', dates:'Oct 17–18', nights:1, perNight:70, cur:'CHF', zone:'Old Town / cerca de la estación' },
     { city:'Ginebra',       leg:'ch', flag:'🇨🇭', dates:'Oct 18–19', nights:1, perNight:75, cur:'CHF', zone:'Pâquis o cerca de Cornavin (tren directo al aeropuerto)' }
   ];
-  const lodgeList = document.getElementById('lodge-list');
-  if (lodgeList) {
-    let nightsTotal = 0, eurTotal = 0, chfTotal = 0;
-    const curSym = c => c === 'EUR' ? '€' : ' CHF';
+  // Comidas: valor por persona/día editable. Transporte terrestre: monto total editable
+  // (los vuelos quedan por fuera del presupuesto — ya están comprados).
+  const MEALS_EST = [
+    { id:'m-es', leg:'es', flag:'🇪🇸', label:'España — Sevilla', dates:'Oct 4–5', days:2, def:35, cur:'EUR',
+      note:'Desayuno ~5€ · menú del día ~12–15€ · tapeo/cena ~15€' },
+    { id:'m-cr', leg:'cr', flag:'🇭🇷', label:'Croacia — Zagreb, Plitvice y Dubrovnik', dates:'Oct 6–13', days:8, def:30, cur:'EUR',
+      note:'Zagreb es económico; el casco antiguo de Dubrovnik es más caro — es un promedio' },
+    { id:'m-ch', leg:'ch', flag:'🇨🇭', label:'Suiza — Zúrich a Ginebra', dates:'Oct 14–18', days:5, def:55, cur:'CHF',
+      note:'Comer afuera es caro: Migros/Coop para desayunos y almuerzos ahorra mucho' },
+    { id:'m-fly', leg:'transit', flag:'✈️', label:'Días de avión', dates:'Oct 3 y 19', days:2, def:10, cur:'EUR',
+      note:'Snacks y comidas de aeropuerto que no incluye el vuelo' }
+  ];
+  const TRANSPORT_EST = [
+    { id:'t-es', leg:'es', flag:'🚌', label:'Sevilla — traslados aeropuerto', dates:'Oct 4 y 6', def:8, cur:'EUR',
+      note:'Bus EA ~4€ por trayecto; taxi ~25€ dividido entre 3 sale parecido' },
+    { id:'t-zg', leg:'cr', flag:'🚌', label:'Zagreb — traslados y tranvías', dates:'Oct 6–9', def:20, cur:'EUR',
+      note:'Bus del aeropuerto ~8€ por trayecto (llegada y salida) + tranvías del centro' },
+    { id:'t-du', leg:'cr', flag:'🚌', label:'Dubrovnik — traslados y buses', dates:'Oct 9–13', def:20, cur:'EUR',
+      note:'Shuttle del aeropuerto ~10€ por trayecto; los buses urbanos vienen incluidos en el Dubrovnik Pass' },
+    { id:'t-ch', leg:'ch', flag:'🚄', label:'Suiza — trenes punto a punto', dates:'Oct 13–19', def:165, cur:'CHF',
+      note:'ZRH→Zúrich→Lucerna→Interlaken→Lauterbrunnen→Berna→Ginebra→GVA en 2ª clase, tarifa normal. Los billetes Supersaver anticipados bajan 30–50%; el Swiss Travel Pass (~389 CHF / 6 días) solo conviene si suben a Pilatus y Jungfraujoch (50% y 25% de descuento)' }
+  ];
+
+  const EST_PRICES_KEY = 'viajeEuropaEstPrices';
+  let estPrices = {};
+  try { estPrices = JSON.parse(localStorage.getItem(EST_PRICES_KEY)) || {}; } catch (e) { estPrices = {}; }
+  [...MEALS_EST, ...TRANSPORT_EST].forEach(m => {
+    if (typeof estPrices[m.id] !== 'number' || estPrices[m.id] < 0) estPrices[m.id] = m.def;
+  });
+  function saveEstPrices() {
+    try { localStorage.setItem(EST_PRICES_KEY, JSON.stringify(estPrices)); } catch (e) { /* solo en memoria */ }
+  }
+
+  const curSym = c => c === 'EUR' ? '€' : ' CHF';
+  function fmtEurChf(eur, chf) {
+    const parts = [];
+    if (eur > 0) parts.push(eur + '€');
+    if (chf > 0) parts.push(chf + ' CHF');
+    return parts.length ? parts.join(' + ') : '0€';
+  }
+
+  function updateEstimates() {
+    const elLodging = document.getElementById('est-lodging');
+    if (!elLodging) return;
+    let lodgeEUR = 0, lodgeCHF = 0;
     LODGING.forEach(l => {
       const sub = l.perNight * l.nights;
-      nightsTotal += l.nights;
-      if (l.cur === 'EUR') eurTotal += sub; else chfTotal += sub;
+      if (l.cur === 'EUR') lodgeEUR += sub; else lodgeCHF += sub;
+    });
+    let mealEUR = 0, mealCHF = 0;
+    MEALS_EST.forEach(m => {
+      const sub = (estPrices[m.id] || 0) * m.days;
+      if (m.cur === 'EUR') mealEUR += sub; else mealCHF += sub;
+      const subEl = document.getElementById('sub-' + m.id);
+      if (subEl) subEl.textContent = sub + curSym(m.cur);
+    });
+    let transEUR = 0, transCHF = 0;
+    TRANSPORT_EST.forEach(t => {
+      const sub = estPrices[t.id] || 0;
+      if (t.cur === 'EUR') transEUR += sub; else transCHF += sub;
+      const subEl = document.getElementById('sub-' + t.id);
+      if (subEl) subEl.textContent = sub + curSym(t.cur);
+    });
+    const p = pickTotals();
+    elLodging.textContent = fmtEurChf(lodgeEUR, lodgeCHF);
+    document.getElementById('est-meals').textContent = fmtEurChf(mealEUR, mealCHF);
+    document.getElementById('est-transport').textContent = fmtEurChf(transEUR, transCHF);
+    document.getElementById('est-activities').textContent = fmtEurChf(p.eur, p.chf);
+    document.getElementById('act-count').textContent = p.count;
+    document.getElementById('act-total').textContent = fmtEurChf(p.eur, p.chf);
+    const totalCOP = (lodgeEUR + mealEUR + transEUR + p.eur) * FX.EUR
+                   + (lodgeCHF + mealCHF + transCHF + p.chf) * FX.CHF;
+    document.getElementById('est-cop').textContent = fmtCOP(totalCOP) + ' COP';
+  }
+
+  const lodgeList = document.getElementById('lodge-list');
+  if (lodgeList) {
+    LODGING.forEach(l => {
+      const sub = l.perNight * l.nights;
       const el = document.createElement('div');
       el.className = 'lodge-row ' + l.leg;
       el.innerHTML = `
@@ -1769,10 +1880,32 @@
         <div class="lodge-cell sub"><b>${sub}${curSym(l.cur)}</b><small>subtotal por persona</small></div>`;
       lodgeList.appendChild(el);
     });
-    document.getElementById('est-nights').textContent = nightsTotal;
-    document.getElementById('est-cur').textContent = eurTotal + '€ + ' + chfTotal + ' CHF';
-    document.getElementById('est-cop').textContent = fmtCOP(eurTotal * FX.EUR + chfTotal * FX.CHF) + ' COP';
   }
+
+  // Filas editables (comidas y transporte): el input actualiza el estado, lo persiste
+  // y recalcula los totales en vivo.
+  function buildEditableRows(listEl, items, perDay) {
+    if (!listEl) return;
+    items.forEach(m => {
+      const el = document.createElement('div');
+      el.className = 'lodge-row ' + m.leg;
+      el.innerHTML = `
+        <div class="lodge-city">${m.flag} ${m.label}<small>${m.note}</small></div>
+        <div class="lodge-cell">${m.dates}<small>${perDay ? m.days + ' días' : 'monto total'}</small></div>
+        <div class="lodge-cell"><input class="meal-input" type="number" min="0" step="1" value="${estPrices[m.id]}" aria-label="${m.label}">${curSym(m.cur)}<small>${perDay ? 'por persona / día' : 'por persona, editable'}</small></div>
+        <div class="lodge-cell sub"><b id="sub-${m.id}">—</b><small>subtotal por persona</small></div>`;
+      el.querySelector('input').addEventListener('input', e => {
+        const v = parseFloat(e.target.value);
+        estPrices[m.id] = isNaN(v) || v < 0 ? 0 : v;
+        saveEstPrices();
+        updateEstimates();
+      });
+      listEl.appendChild(el);
+    });
+  }
+  buildEditableRows(document.getElementById('meals-list'), MEALS_EST, true);
+  buildEditableRows(document.getElementById('transport-list'), TRANSPORT_EST, false);
+  updateEstimates();
 
   // ── GANTT HORIZONTAL SCROLL — nav buttons + edge fade ──
   const ganttWrapEl = document.getElementById('gantt-wrap');
