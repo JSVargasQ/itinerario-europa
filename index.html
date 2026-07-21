@@ -158,6 +158,13 @@
       .budget-value { font-size: 1.05rem; }
     }
 
+    .leg-strip { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+    .leg-pill { display: inline-flex; align-items: center; gap: .35rem; padding: .35rem .75rem; border-radius: 100px; font-size: .78rem; font-weight: 700; }
+    .leg-pill.es { background: var(--es-bg); color: var(--es-dark); }
+    .leg-pill.cr { background: var(--cr-bg); color: var(--cr-dark); }
+    .leg-pill.ch { background: var(--ch-bg); color: var(--ch-dark); }
+    .leg-pill.transit { background: var(--card2); color: var(--muted); }
+
     .gantt-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r); background: var(--card); box-shadow: var(--shadow); }
     .gantt {
       display: grid;
@@ -181,18 +188,26 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       padding: .3rem; text-align: center; transition: background .15s;
     }
-    .gantt-day-head:hover { background: var(--card2); }
-    .gantt-day-head.es { box-shadow: inset 0 3px 0 var(--es); }
-    .gantt-day-head.cr { box-shadow: inset 0 3px 0 var(--cr); }
-    .gantt-day-head.ch { box-shadow: inset 0 3px 0 var(--ch); }
-    .gantt-day-head.transit { box-shadow: inset 0 3px 0 var(--muted); }
+    .gantt-day-head.es { background: var(--es-bg); box-shadow: inset 0 3px 0 var(--es); }
+    .gantt-day-head.cr { background: var(--cr-bg); box-shadow: inset 0 3px 0 var(--cr); }
+    .gantt-day-head.ch { background: var(--ch-bg); box-shadow: inset 0 3px 0 var(--ch); }
+    .gantt-day-head.transit { background: var(--card2); box-shadow: inset 0 3px 0 var(--muted); }
+    .gantt-day-head:hover { filter: brightness(0.97); }
     .gantt-day-head .wd { font-size: .6rem; font-weight: 600; color: var(--muted2); text-transform: uppercase; letter-spacing: .04em; }
-    .gantt-day-head .num { font-size: 1rem; font-weight: 800; line-height: 1.2; }
-    .gantt-day-head .where { font-size: .6rem; font-weight: 600; color: var(--muted2); line-height: 1.15; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .gantt-day-head .num { font-size: 1rem; font-weight: 800; line-height: 1.2; color: var(--text); }
+    .gantt-day-head .where { font-size: .64rem; font-weight: 800; line-height: 1.15; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .gantt-day-head.es .where { color: var(--es-dark); }
+    .gantt-day-head.cr .where { color: var(--cr-dark); }
+    .gantt-day-head.ch .where { color: var(--ch-dark); }
+    .gantt-day-head.transit .where { color: var(--muted); }
     .gantt-col-bg {
       grid-row: 2 / 26; border-right: 1px solid var(--border); z-index: 0;
       background-image: repeating-linear-gradient(to bottom, var(--border) 0 1px, transparent 1px 22px);
     }
+    .gantt-col-bg.es { background-color: rgba(245,127,23,.035); }
+    .gantt-col-bg.cr { background-color: rgba(21,101,192,.035); }
+    .gantt-col-bg.ch { background-color: rgba(198,40,40,.035); }
+    .gantt-col-bg.first-of-leg, .gantt-day-head.first-of-leg { border-left: 2px solid var(--border); }
     .gseg {
       position: relative; z-index: 1; display: flex; align-items: center; gap: .25rem;
       font-size: .66rem; line-height: 1.15; overflow: hidden;
@@ -464,6 +479,7 @@
   </div>
 
   <div class="view-panel" id="view-gantt">
+    <div class="leg-strip" id="leg-strip"></div>
     <div class="gantt-wrap">
       <div class="gantt" id="gantt"></div>
     </div>
@@ -1238,19 +1254,22 @@
     gantt.appendChild(el);
   }
 
+  const LEG_FLAG = { es: '🇪🇸', cr: '🇭🇷', ch: '🇨🇭', transit: '🇨🇴' };
   TRIP_DAYS.forEach((d, i) => {
     const data = DAYS[d];
     const col = i + 2;
+    const prevLeg = i > 0 ? DAYS[TRIP_DAYS[i - 1]].leg : null;
+    const isFirstOfLeg = data.leg !== prevLeg;
 
     const colBg = document.createElement('div');
-    colBg.className = 'gantt-col-bg';
+    colBg.className = 'gantt-col-bg ' + data.leg + (isFirstOfLeg ? ' first-of-leg' : '');
     colBg.style.gridColumn = col;
     gantt.appendChild(colBg);
 
     const head = document.createElement('div');
-    head.className = 'gantt-day-head ' + data.leg;
+    head.className = 'gantt-day-head ' + data.leg + (isFirstOfLeg ? ' first-of-leg' : '');
     head.style.gridColumn = col;
-    head.innerHTML = `<span class="wd">${WD_SHORT[(MONTH_START_WEEKDAY + d - 1) % 7]}</span><span class="num">${d}</span><span class="where">${WHERE[d] || ''}</span>`;
+    head.innerHTML = `<span class="wd">${WD_SHORT[(MONTH_START_WEEKDAY + d - 1) % 7]}</span><span class="num">${d}</span><span class="where">${LEG_FLAG[data.leg] || ''} ${WHERE[d] || ''}</span>`;
     head.addEventListener('click', () => openDayModal(d, data));
     gantt.appendChild(head);
 
@@ -1291,6 +1310,26 @@
       });
     }
   });
+
+  // ── LEG SUMMARY STRIP (país + rango de fechas, un vistazo antes de entrar al detalle) ──
+  const legStrip = document.getElementById('leg-strip');
+  if (legStrip) {
+    const LEG_LABEL = { es: 'España', cr: 'Croacia', ch: 'Suiza', transit: 'Bogotá' };
+    const legGroups = [];
+    TRIP_DAYS.forEach(d => {
+      const leg = DAYS[d].leg;
+      const last = legGroups[legGroups.length - 1];
+      if (last && last.leg === leg) last.end = d;
+      else legGroups.push({ leg, start: d, end: d });
+    });
+    legGroups.forEach(g => {
+      const el = document.createElement('span');
+      el.className = 'leg-pill ' + g.leg;
+      const range = g.start === g.end ? `Oct ${g.start}` : `Oct ${g.start}–${g.end}`;
+      el.textContent = `${LEG_FLAG[g.leg] || ''} ${LEG_LABEL[g.leg]} · ${range}`;
+      legStrip.appendChild(el);
+    });
+  }
 
   updateBudgetSummary();
 
