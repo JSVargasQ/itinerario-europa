@@ -974,7 +974,9 @@
 
   // Propuesta item: A = actividad programable (aparece en el Gantt con su duración real)
   //                 T = tip logístico (sin bloque en el Gantt, solo checklist en el modal)
-  function A(text, hours, amount, cur) { return { text, hours, cost: amount ? { amount, cur } : null, layout: true }; }
+  // after: hora mínima (24h) en la que puede empezar — para actividades que solo
+  // tienen sentido una vez llegados al destino, aunque técnicamente haya "hueco" libre antes.
+  function A(text, hours, amount, cur, after) { return { text, hours, cost: amount ? { amount, cur } : null, layout: true, after: after || 0 }; }
   function T(text) { return { text, hours: 0, cost: null, layout: false }; }
 
   const DAYS = {
@@ -983,13 +985,13 @@
           propuesta:[T('Llegar con margen al aeropuerto El Dorado'), T('Dormir en el vuelo para llegar con energía a Sevilla')] },
     4:  { leg:'es', icon:'🇪🇸', short:'Sevilla', title:'Madrid → Sevilla', sub:'Domingo 4 de octubre · Llegada a Sevilla',
           fijo:['🛬 5:00am — Llegada a Madrid', '✈️ 9:00–11:00am — Vuelo Madrid → Sevilla', '🏨 Check-in hotel en Sevilla ~10:00pm'],
-          propuesta:[A('Tarde/noche libre en Sevilla: Barrio de Santa Cruz', 1.5), A('Catedral y Giralda iluminada de noche (vista exterior)', 1), A('Primera tapeada en el centro o Triana', 1.5, 15, 'EUR')] },
+          propuesta:[T('Llegada con jet lag (vuelo nocturno + conexión) — ritmo tranquilo, prioricen comer y descansar antes de salir'), A('Tarde libre en Sevilla: Barrio de Santa Cruz', 1.5), A('Primera tapeada en el centro o Triana', 1.5, 15, 'EUR'), A('Catedral y Giralda iluminada de noche (vista exterior)', 1, null, null, 20)] },
     5:  { leg:'es', icon:'🇪🇸', short:'Sevilla', title:'Sevilla', sub:'Lunes 5 de octubre · Día completo',
           fijo:['Día completo en Sevilla', '🏨 Hotel en Sevilla'],
           propuesta:[A('Real Alcázar de Sevilla (reservar entrada con antelación)', 2.5, 16, 'EUR'), A('Catedral de Sevilla + subida a la Giralda', 1.5, 13, 'EUR'), A('Plaza de España y Parque de María Luisa', 1.5), A('Barrio de Triana — cerámica y orilla del Guadalquivir', 1.5), A('Noche: show de flamenco en un tablao', 2, 40, 'EUR')] },
     6:  { leg:'cr', icon:'✈️', short:'Sevilla→Zagreb', title:'Sevilla → Palma → Zagreb', sub:'Martes 6 de octubre · Día de viaje',
           fijo:['✈️ 9:00–10:00am — Vuelo Sevilla → Palma', '🛫 12:00pm — Escala en el aeropuerto de Palma', '✈️ 2:00–3:00pm — Vuelo Palma → Zagreb (llegan 3:00pm)', '🏨 Hotel en Zagreb'],
-          propuesta:[T('Escala en Palma: aprovechar para comer algo y descansar en el aeropuerto'), A('Tarde/noche en Zagreb: Plaza Ban Jelačić y calle Tkalčićeva para cenar', 1.5, 15, 'EUR')] },
+          propuesta:[T('Escala en Palma: aprovechar para comer algo y descansar en el aeropuerto'), A('Tarde/noche en Zagreb: Plaza Ban Jelačić y calle Tkalčićeva para cenar', 1.5, 15, 'EUR', 16)] },
     7:  { leg:'cr', icon:'🌊', short:'Plitvice', title:'Lagos de Plitvice', sub:'Miércoles 7 de octubre · Excursión (Pendiente de reservar)',
           fijo:['🌊 8:00am–5:00pm — Excursión a Lagos de Plitvice (Pendiente)', '🏨 Hotel en Zagreb'],
           propuesta:[T('Reservar con Civitatis desde Zagreb'), T('Llevar calzado impermeable y cámara'), A('Cena tranquila en Zagreb al volver', 1.5, 15, 'EUR')] },
@@ -1039,8 +1041,8 @@
   // type: city/hotel/escala/transit/arrival → single-row plain-text marker at `hour`
   const TRIP_DAYS = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
   const GRID_DAYS = {
-    3:  [ { type:'flight', start:12, end:24, label:'Bogotá → Madrid', icon:'✈️' } ],
-    4:  [ { type:'flight', start:0, end:5, label:'Bogotá → Madrid (aterriza 5am)', icon:'✈️' },
+    3:  [ { type:'flight', start:12, end:24, label:'Bogotá → Madrid', icon:'✈️', buf:[2.5,0] } ],
+    4:  [ { type:'flight', start:0, end:5, label:'Bogotá → Madrid (aterriza 5am)', icon:'✈️', buf:[0,2] },
           { type:'flight', start:9, end:11, label:'Madrid → Sevilla', icon:'✈️' },
           { type:'hotel', hour:22, label:'Hotel' } ],
     5:  [ { type:'city', hour:1, label:'Sevilla' },
@@ -1080,7 +1082,7 @@
           { type:'transit', hour:19, label:'Tren a Ginebra' },
           { type:'hotel', hour:22, label:'Hotel' } ],
     19: [ { type:'flight', start:9, end:12, label:'Ginebra → Madrid', icon:'✈️' },
-          { type:'flight', start:16, end:24, label:'Madrid → Bogotá', icon:'✈️' } ],
+          { type:'flight', start:16, end:24, label:'Madrid → Bogotá', icon:'✈️', buf:[2.5,0] } ],
     20: [ { type:'arrival', hour:6, label:'🛬 Llegada Bogotá' } ]
   };
 
@@ -1155,12 +1157,21 @@
     elCurr.textContent = parts.length ? parts.join(' + ') + ' /persona' : '—';
     elPer.textContent = fmtCOP(perPersonCOP) + ' COP';
   }
+  // Buffer por defecto alrededor de cada vuelo (horas): [antes, después] — check-in/seguridad
+  // antes de embarcar, desembarco/equipaje/traslado al llegar. Los vuelos con Bogotá usan un
+  // buffer mayor (control migratorio) vía su propio campo `buf`.
+  const DEFAULT_FLIGHT_BUF = [1, 0.75];
+  // Ventanas más cortas que esto se ignoran (quedan como huecos de traslado, no de actividad)
+  const MIN_WINDOW = 1;
+
   function freeWindows(day) {
     const segs = GRID_DAYS[day] || [];
     let windows = [[WORK_START, WORK_END]];
     segs.forEach(s => {
-      const os = s.type === 'flight' || s.type === 'activity' ? s.start : s.hour;
-      const oe = s.type === 'flight' || s.type === 'activity' ? s.end : s.hour + 1;
+      const isFlight = s.type === 'flight' || s.type === 'activity';
+      const buf = s.type === 'flight' ? (s.buf || DEFAULT_FLIGHT_BUF) : [0, 0];
+      const os = (isFlight ? s.start : s.hour) - buf[0];
+      const oe = (isFlight ? s.end : s.hour + 1) + buf[1];
       const cs = Math.max(os, WORK_START), ce = Math.min(oe, WORK_END);
       if (cs >= ce) return;
       const next = [];
@@ -1171,13 +1182,16 @@
       });
       windows = next;
     });
-    return windows.filter(([s, e]) => e - s > 0);
+    return windows.filter(([s, e]) => e - s >= MIN_WINDOW);
   }
 
   // Places each schedulable propuesta item (A(), not T()) into the free windows
   // in array order, respecting its real duration — big activities (e.g. Jungfraujoch,
   // a full-day excursion) get their actual hours instead of an even split, and an
   // item that doesn't fully fit in the current window rolls into the next one.
+  // `after` (set via A(...,after)) forces an item to not start before a given hour, for
+  // things that only make sense once you've actually reached that city that day, even if
+  // there's technically an earlier free gap (e.g. still mid-layover in another airport).
   // Tips (T()) are never placed — they only show as a checklist in the day modal.
   // Returns null when there's no free room at all (modal checklist still works).
   function layoutPicks(day, items) {
@@ -1191,8 +1205,12 @@
     let cursor = windows[0][0];
     for (const { it, idx } of schedulable) {
       const dur = Math.max(0.5, it.hours || 1);
+      const minStart = it.after || 0;
+      while (wi < windows.length && windows[wi][1] <= minStart) { wi++; if (wi < windows.length) cursor = windows[wi][0]; }
+      if (wi >= windows.length) break;
+      cursor = Math.max(cursor, minStart, windows[wi][0]);
       while (wi < windows.length && cursor + dur > windows[wi][1] + 1e-9) {
-        if (wi + 1 < windows.length) { wi++; cursor = windows[wi][0]; }
+        if (wi + 1 < windows.length) { wi++; cursor = Math.max(windows[wi][0], minStart); }
         else break;
       }
       if (wi >= windows.length) break;
