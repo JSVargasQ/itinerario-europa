@@ -165,7 +165,46 @@
     .leg-pill.ch { background: var(--ch-bg); color: var(--ch-dark); }
     .leg-pill.transit { background: var(--card2); color: var(--muted); }
 
-    .gantt-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r); background: var(--card); box-shadow: var(--shadow); }
+    .wear-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .75rem; margin-top: 1.25rem; }
+    .wear-card { border-radius: var(--r-sm); padding: .8rem 1rem; border: 1px solid var(--border); }
+    .wear-card.es { background: var(--es-bg); }
+    .wear-card.cr { background: var(--cr-bg); }
+    .wear-card.ch { background: var(--ch-bg); }
+    .wear-card.transit { background: var(--card2); }
+    .wear-card .wear-head { display: flex; align-items: center; gap: .4rem; font-size: .78rem; font-weight: 800; margin-bottom: .3rem; }
+    .wear-card.es .wear-head { color: var(--es-dark); }
+    .wear-card.cr .wear-head { color: var(--cr-dark); }
+    .wear-card.ch .wear-head { color: var(--ch-dark); }
+    .wear-card.transit .wear-head { color: var(--muted); }
+    .wear-card .wear-text { font-size: .78rem; color: var(--muted2); line-height: 1.5; }
+
+    .gantt-outer { position: relative; }
+    .gantt-wrap {
+      overflow-x: auto; overflow-y: visible; border: 1px solid var(--border); border-radius: var(--r);
+      background: var(--card); box-shadow: var(--shadow); scroll-behavior: smooth;
+      scroll-snap-type: x proximity; scrollbar-width: thin;
+    }
+    .gantt-nav {
+      position: absolute; top: 50%; transform: translateY(-50%); z-index: 50;
+      width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border);
+      background: var(--card); color: var(--text); font-size: 1.1rem; font-weight: 700;
+      cursor: pointer; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center;
+      transition: background .15s, transform .15s; font-family: inherit;
+    }
+    .gantt-nav:hover { background: var(--card2); }
+    .gantt-nav:active { transform: translateY(-50%) scale(0.92); }
+    .gantt-nav.prev { left: -14px; }
+    .gantt-nav.next { right: -14px; }
+    .gantt-fade {
+      position: absolute; top: 1px; bottom: 1px; width: 32px; pointer-events: none; z-index: 20;
+      opacity: 1; transition: opacity .2s;
+    }
+    .gantt-fade.right { right: 1px; background: linear-gradient(to right, transparent, var(--card) 85%); border-radius: 0 var(--r) var(--r) 0; }
+    .gantt-fade.right.hide { opacity: 0; }
+    .gantt-scroll-hint { font-size: .72rem; color: var(--muted); margin-top: .6rem; }
+    @media (max-width: 640px) {
+      .gantt-nav { display: none; }
+    }
     .gantt {
       display: grid;
       grid-template-columns: 58px repeat(18, 112px);
@@ -203,6 +242,7 @@
     .gantt-col-bg {
       grid-row: 2 / 26; border-right: 1px solid var(--border); z-index: 0;
       background-image: repeating-linear-gradient(to bottom, var(--border) 0 1px, transparent 1px 22px);
+      scroll-snap-align: start;
     }
     .gantt-col-bg.es { background-color: rgba(245,127,23,.035); }
     .gantt-col-bg.cr { background-color: rgba(21,101,192,.035); }
@@ -213,7 +253,7 @@
       font-size: .66rem; line-height: 1.15; overflow: hidden;
     }
     .gseg.flight, .gseg.activity {
-      margin: 1px 3px; padding: .15rem .35rem; border-radius: 6px; font-weight: 700;
+      margin: 1px 3px; padding: .15rem .35rem; border-radius: 6px; font-weight: 700; cursor: pointer;
     }
     .gseg.flight { background: rgba(245,158,11,.16); border: 1px solid rgba(245,158,11,.4); color: var(--warn-dark); }
     .gseg.activity { background: rgba(16,185,129,.14); border: 1px solid rgba(16,185,129,.38); color: var(--ok-dark); }
@@ -232,18 +272,25 @@
     .gseg.pick .txt { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
     .gseg.pick.picked { background: rgba(124,58,237,.08); border: 1px solid #7C3AED; color: var(--text); }
 
-    /* Expand truncated chip text on hover/keyboard focus so it's fully readable */
-    .gseg.flight, .gseg.activity, .gseg.pick { outline: none; }
-    .gseg.flight:hover, .gseg.flight:focus, .gseg.flight:focus-within,
-    .gseg.activity:hover, .gseg.activity:focus, .gseg.activity:focus-within,
-    .gseg.pick:hover, .gseg.pick:focus, .gseg.pick:focus-within {
-      position: absolute; z-index: 40; width: max-content; min-width: 90px; max-width: 210px;
-      height: auto; box-shadow: 0 10px 24px rgba(15,23,42,.22);
+    /* Expand truncated chip text on hover/keyboard focus so it's fully readable.
+       Only the text label pops out into a small floating card — the chip itself
+       (and its real grid height, which can span many hours, e.g. Plitvice 8am-5pm)
+       never gets resized, so it can't visually "shrink" while focused. */
+    .gseg.flight, .gseg.activity, .gseg.pick { outline: none; z-index: 1; }
+    .gseg.flight:hover, .gseg.flight:focus-within,
+    .gseg.activity:hover, .gseg.activity:focus-within,
+    .gseg.pick:hover, .gseg.pick:focus-within {
+      z-index: 40;
     }
     .gseg.flight:hover .txt, .gseg.flight:focus .txt, .gseg.flight:focus-within .txt,
     .gseg.activity:hover .txt, .gseg.activity:focus .txt, .gseg.activity:focus-within .txt,
     .gseg.pick:hover .txt, .gseg.pick:focus .txt, .gseg.pick:focus-within .txt {
+      position: absolute; top: 0; left: 0; z-index: 45;
+      width: max-content; min-width: 90px; max-width: 210px;
       -webkit-line-clamp: unset; white-space: normal;
+      background: var(--card); color: var(--text); border: 1px solid var(--border);
+      border-radius: 6px; padding: .3rem .5rem;
+      box-shadow: 0 10px 24px rgba(15,23,42,.22);
     }
 
     @media (max-width: 640px) {
@@ -401,6 +448,8 @@
     .pick-row.picked { background: rgba(124,58,237,.08); border-color: #7C3AED; color: var(--text); }
     .pick-row .meta { font-size: .72rem; font-weight: 500; color: var(--muted2); }
     .pick-row.picked .meta { color: #7C3AED; }
+    .pick-row .why { display: block; font-size: .76rem; font-weight: 400; font-style: italic; color: var(--muted); line-height: 1.5; margin-top: .3rem; }
+    .pick-row.picked .why { color: #6D28D9; }
   </style>
 </head>
 <body>
@@ -470,19 +519,27 @@
   <p class="budget-note">Tipo de cambio referencial jul 2026: 1€ ≈ $4.000 COP · 1 CHF ≈ $4.800 COP. Precios de actividades son estimados por persona — verifica antes de reservar. No incluye vuelos ni hoteles.</p>
 
   <div class="view-toggle">
-    <button id="btn-view-calendar" class="active" type="button">📅 Calendario</button>
-    <button id="btn-view-gantt" type="button">🗓️ Cronograma por horas</button>
+    <button id="btn-view-gantt" class="active" type="button">🗓️ Cronograma por horas</button>
+    <button id="btn-view-calendar" type="button">📅 Calendario</button>
   </div>
 
-  <div class="view-panel active" id="view-calendar">
+  <div class="view-panel" id="view-calendar">
     <div class="month-grid" id="month-grid"></div>
   </div>
 
-  <div class="view-panel" id="view-gantt">
+  <div class="view-panel active" id="view-gantt">
     <div class="leg-strip" id="leg-strip"></div>
-    <div class="gantt-wrap">
-      <div class="gantt" id="gantt"></div>
+    <div class="gantt-outer" id="gantt-outer">
+      <div class="gantt-wrap" id="gantt-wrap">
+        <div class="gantt" id="gantt"></div>
+      </div>
+      <button class="gantt-nav prev" id="gantt-prev" type="button" aria-label="Día anterior">‹</button>
+      <button class="gantt-nav next" id="gantt-next" type="button" aria-label="Día siguiente">›</button>
+      <div class="gantt-fade right" id="gantt-fade-right"></div>
     </div>
+    <p class="gantt-scroll-hint">💡 Desliza, arrastra o usa las flechas para ver los demás días</p>
+    <p style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:1.5rem">🧳 Qué ropa llevar, por tramo</p>
+    <div class="wear-strip" id="wear-strip"></div>
   </div>
 </section>
 
@@ -513,11 +570,13 @@
           <li><span class="ico">🌳</span> Parque de María Luisa</li>
           <li><span class="ico">🏘️</span> Barrio de Santa Cruz</li>
           <li><span class="ico">🌉</span> Triana — Puente de Isabel II y cerámica</li>
-          <li><span class="ico">💃</span> Show de flamenco en un tablao</li>
           <li><span class="ico">🛍️</span> Mercado de Triana</li>
         </ul>
+        <div class="card-section-title">Restaurantes / tapeo</div>
+        <div class="resto-row"><span>🍢 La Brunilda (Triana, C. Galera)</span></div>
+        <div class="resto-row"><span>🐂 Casa Cuesta (Triana, junto al mercado, desde 1880)</span></div>
+        <div class="resto-row"><span>🍺 El Rinconcillo (centro, el bar más antiguo de Sevilla, 1670)</span></div>
         <div class="tip-box"><span class="tip-icon">🍂</span> Sevilla en octubre: clima suave (~24°C de día), ideal para caminar sin el calor extremo del verano andaluz. El Alcázar y la Catedral tienen mucha demanda — comprar entrada online con horario.</div>
-        <div class="tip-box" style="margin-top:.5rem"><span class="tip-icon">💃</span> Vale la pena reservar un tablao flamenco con cena la primera o segunda noche — se llenan rápido en temporada alta.</div>
       </div>
     </div>
 
@@ -990,66 +1049,140 @@
 
   // Propuesta item: A = actividad programable (aparece en el Gantt con su duración real)
   //                 T = tip logístico (sin bloque en el Gantt, solo checklist en el modal)
-  // after: hora mínima (24h) en la que puede empezar — para actividades que solo
-  // tienen sentido una vez llegados al destino, aunque técnicamente haya "hueco" libre antes.
-  function A(text, hours, amount, cur, after) { return { text, hours, cost: amount ? { amount, cur } : null, layout: true, after: after || 0 }; }
-  function T(text) { return { text, hours: 0, cost: null, layout: false }; }
+  // opts.hours: duración estimada, para ubicarla en el Gantt
+  // opts.amount/cur: costo estimado por persona (si aplica)
+  // opts.after: hora mínima (24h) en la que puede empezar — para actividades que solo
+  //   tienen sentido una vez llegados al destino, aunque técnicamente haya "hueco" libre antes
+  // opts.detail: por qué se sugiere / de dónde sale la recomendación — se muestra al
+  //   abrir el día (desde el Calendario o el Cronograma)
+  function A(text, opts) {
+    opts = opts || {};
+    return {
+      text, hours: opts.hours || 1,
+      cost: opts.amount ? { amount: opts.amount, cur: opts.cur } : null,
+      layout: true, after: opts.after || 0, detail: opts.detail || ''
+    };
+  }
+  function T(text, detail) { return { text, hours: 0, cost: null, layout: false, detail: detail || '' }; }
 
   const DAYS = {
     3:  { leg:'transit', icon:'✈️', short:'Bogotá→Madrid', title:'Bogotá → Madrid', sub:'Sábado 3 de octubre · Vuelo nocturno',
           fijo:['✈️ 12:00pm — Vuelo Bogotá → Madrid (nocturno, llega 5:00am del día 4)'],
-          propuesta:[T('Llegar con margen al aeropuerto El Dorado'), T('Dormir en el vuelo para llegar con energía a Sevilla')] },
+          propuesta:[
+            T('Llegar con margen al aeropuerto El Dorado', 'Vuelo internacional — se recomienda estar 2.5–3h antes por chequeo de equipaje y migración.'),
+            T('Dormir en el vuelo para llegar con energía a Sevilla', 'Es un vuelo nocturno de ~9-10h; aterrizan a las 5am y siguen de inmediato hacia Sevilla, así que dormir en el aire ayuda a llegar con menos jet lag.')
+          ] },
     4:  { leg:'es', icon:'🇪🇸', short:'Sevilla', title:'Madrid → Sevilla', sub:'Domingo 4 de octubre · Llegada a Sevilla',
           fijo:['🛬 5:00am — Llegada a Madrid', '✈️ 9:00–11:00am — Vuelo Madrid → Sevilla', '🏨 Check-in hotel en Sevilla ~10:00pm'],
-          propuesta:[T('Llegada con jet lag (vuelo nocturno + conexión) — ritmo tranquilo, prioricen comer y descansar antes de salir'), A('Tarde libre en Sevilla: Barrio de Santa Cruz', 1.5), A('Primera tapeada en el centro o Triana', 1.5, 15, 'EUR'), A('Catedral y Giralda iluminada de noche (vista exterior)', 1, null, null, 20)] },
+          propuesta:[
+            T('Llegada con jet lag (vuelo nocturno + conexión)', 'Ritmo tranquilo — el cuerpo llega desfasado después de un vuelo nocturno más una conexión, mejor un plan liviano que uno apretado de museos.'),
+            A('Tarde libre en Sevilla: Barrio de Santa Cruz', { hours:1.5, detail:'Antiguo barrio judío, calles estrechas y patios con flores — ideal para una primera caminata sin agenda fija tras el vuelo largo.' }),
+            A('Cena en La Brunilda o Casa Cuesta (Triana)', { hours:1.5, amount:15, cur:'EUR', detail:'Reemplaza la "tapeada" genérica por opciones concretas: La Brunilda (cocina andaluza moderna, C. Galera) y Casa Cuesta (tapas tradicionales junto al mercado de Triana, abierto desde 1880) aparecen entre los bares de tapas mejor valorados de Triana en guías de 2026 (freetourssevilla.com, sevillalover.com).' }),
+            A('Catedral y Giralda iluminada de noche (vista exterior)', { hours:1, after:20, detail:'La fachada se ilumina al caer la noche — gratis, solo para ver/fotografiar desde la Plaza Virgen de los Reyes.' })
+          ] },
     5:  { leg:'es', icon:'🇪🇸', short:'Sevilla', title:'Sevilla', sub:'Lunes 5 de octubre · Día completo',
           fijo:['Día completo en Sevilla', '🏨 Hotel en Sevilla'],
-          propuesta:[A('Real Alcázar de Sevilla (reservar entrada con antelación)', 2.5, 16, 'EUR'), A('Catedral de Sevilla + subida a la Giralda', 1.5, 13, 'EUR'), A('Plaza de España y Parque de María Luisa', 1.5), A('Barrio de Triana — cerámica y orilla del Guadalquivir', 1.5), A('Noche: show de flamenco en un tablao', 2, 40, 'EUR')] },
+          propuesta:[
+            A('Real Alcázar de Sevilla (reservar entrada con antelación)', { hours:2.5, amount:16, cur:'EUR', detail:'Precio verificado en la web oficial (alcazarsevilla.org): entrada general 15,50€ adultos. Reservar horario online con antelación — se agota en temporada alta.' }),
+            A('Catedral de Sevilla + subida a la Giralda', { hours:1.5, amount:13, cur:'EUR', detail:'La catedral gótica más grande del mundo; la Giralda se sube por rampas (no escaleras), herencia de cuando era el minarete de la mezquita almohade.' }),
+            A('Plaza de España y Parque de María Luisa', { hours:1.5, detail:'Entrada libre — construida para la Exposición Iberoamericana de 1929, es de los rincones más fotografiados de España.' }),
+            A('Barrio de Triana — cerámica y orilla del Guadalquivir', { hours:1.5, detail:'Cuna del flamenco y la cerámica sevillana; cruzar el Puente de Isabel II al atardecer es el mejor momento para las fotos.' })
+          ] },
     6:  { leg:'cr', icon:'✈️', short:'Sevilla→Zagreb', title:'Sevilla → Palma → Zagreb', sub:'Martes 6 de octubre · Día de viaje',
           fijo:['✈️ 9:00–10:00am — Vuelo Sevilla → Palma', '🛫 12:00pm — Escala en el aeropuerto de Palma', '✈️ 2:00–3:00pm — Vuelo Palma → Zagreb (llegan 3:00pm)', '🏨 Hotel en Zagreb'],
-          propuesta:[T('Escala en Palma: aprovechar para comer algo y descansar en el aeropuerto'), A('Tarde/noche en Zagreb: Plaza Ban Jelačić y calle Tkalčićeva para cenar', 1.5, 15, 'EUR', 16)] },
+          propuesta:[
+            T('Escala en Palma: aprovechar para comer algo y descansar en el aeropuerto', 'Conexión de ~4h dentro del aeropuerto — suficiente para almorzar en las cafeterías de la terminal y descansar antes del último vuelo del día.'),
+            A('Cena en Batak Tkalčićeva (parrilla croata)', { hours:1.5, amount:15, cur:'EUR', after:16, detail:'Tkalčićeva es la calle de restaurantes y bares más recomendada del centro histórico de Zagreb (Tripadvisor, guías de Zagreb 2026); Batak destaca por su cocina croata tradicional a la parrilla. Reservar o llegar temprano, se llena rápido.' })
+          ] },
     7:  { leg:'cr', icon:'🌊', short:'Plitvice', title:'Lagos de Plitvice', sub:'Miércoles 7 de octubre · Excursión (Pendiente de reservar)',
           fijo:['🌊 8:00am–5:00pm — Excursión a Lagos de Plitvice (Pendiente)', '🏨 Hotel en Zagreb'],
-          propuesta:[T('Reservar con Civitatis desde Zagreb'), T('Llevar calzado impermeable y cámara'), A('Cena tranquila en Zagreb al volver', 1.5, 15, 'EUR')] },
+          propuesta:[
+            T('Reservar con Civitatis desde Zagreb', 'Tour de día completo a Plitvice, ~125€/persona — reservar con anticipación, los cupos se agotan en temporada alta.'),
+            T('Llevar calzado impermeable y cámara', 'Los senderos de madera sobre el agua pueden estar resbalosos, sobre todo después de lluvia de otoño.'),
+            A('Cena en Submarine Burger Tkalčićeva', { hours:1.5, amount:15, cur:'EUR', detail:'Después de un día largo en Plitvice, opción casual y rápida en la misma calle Tkalčićeva — bien valorada entre los restaurantes cerca de esa calle (Tripadvisor).' })
+          ] },
     8:  { leg:'cr', icon:'🏰', short:'Zagreb', title:'Zagreb', sub:'Jueves 8 de octubre · Día completo',
           fijo:['Día completo en Zagreb', '🏨 Hotel en Zagreb'],
-          propuesta:[A('Upper Town: Iglesia de San Marcos, Torre Lotrščak + funicular', 2, 3, 'EUR'), A('Catedral de Zagreb y Puerta de Piedra', 1), A('Mercado Dolac y Museo de las Relaciones Rotas', 1.5, 8, 'EUR'), A('Museo Nikola Tesla, Túnel de Grič', 1.5, 2, 'EUR')] },
+          propuesta:[
+            A('Upper Town: Iglesia de San Marcos, Torre Lotrščak + funicular', { hours:2, amount:3, cur:'EUR', detail:'El funicular de Zagreb funciona desde 1890 (uno de los más cortos del mundo, 66m) y ahorra la subida a pie a la Ciudad Alta.' }),
+            A('Catedral de Zagreb y Puerta de Piedra', { hours:1, detail:'Entrada libre; la Puerta de Piedra alberga una capilla donde los locales dejan ofrendas desde el siglo XVIII, tras un incendio que solo dejó intacto un cuadro de la Virgen.' }),
+            A('Mercado Dolac y Museo de las Relaciones Rotas', { hours:1.5, amount:8, cur:'EUR', detail:'Dolac es el mercado de abastos más emblemático de Zagreb (gratis, solo para pasear); el Museo de las Relaciones Rotas exhibe objetos donados por personas de todo el mundo y ganó el premio al museo más innovador de Europa en 2011.' }),
+            A('Museo Nikola Tesla, Túnel de Grič', { hours:1.5, amount:2, cur:'EUR', detail:'Tesla nació en Smiljan, en la actual Croacia; el Túnel Grič fue refugio antiaéreo en la Segunda Guerra Mundial y hoy es un paso peatonal abierto al público.' })
+          ] },
     9:  { leg:'cr', icon:'✈️', short:'Zagreb→Dubrovnik', title:'Zagreb → Dubrovnik', sub:'Viernes 9 de octubre · Vuelo nocturno',
           fijo:['Zagreb durante el día', '✈️ 8:00–11:00pm — Vuelo Zagreb → Dubrovnik'],
-          propuesta:[A('Mañana libre: Herradura de Lenuci (Parque Zrinjevac)', 1.5), T('Tarde: preparar maletas antes del vuelo nocturno')] },
+          propuesta:[
+            A('Mañana libre: Herradura de Lenuci (Parque Zrinjevac)', { hours:1.5, detail:'Conjunto de siete parques en forma de U alrededor del centro, diseñado en el siglo XIX — caminata tranquila antes de armar maletas.' }),
+            T('Tarde: preparar maletas antes del vuelo nocturno', 'El vuelo a Dubrovnik sale a las 8pm — dejar tiempo para llegar con calma al aeropuerto de Zagreb.')
+          ] },
     10: { leg:'cr', icon:'🏛️', short:'Dubrovnik', title:'Dubrovnik', sub:'Sábado 10 de octubre · Día 1 de 4',
           fijo:['Día completo en Dubrovnik', '🏨 Hotel en Dubrovnik'],
-          propuesta:[A('Murallas de Dubrovnik al amanecer (abren 8am)', 2.5, 35, 'EUR'), A('Ciudad Vieja — Stradun', 1), A('Plaza de Luza y Escaleras Jesuitas', 1)] },
+          propuesta:[
+            A('Murallas de Dubrovnik al amanecer (abren 8am)', { hours:2.5, amount:35, cur:'EUR', detail:'2km de muralla medieval; la entrada ronda 30-35€ según temporada (wallsofdubrovnik.com). Ir a la apertura evita el calor y las aglomeraciones de los cruceros.' }),
+            A('Ciudad Vieja — Stradun', { hours:1, detail:'La calle principal, pavimentada en piedra caliza pulida desde el siglo XIII — gratis, mejor temprano antes de que llegue el grueso de turistas.' }),
+            A('Plaza de Luza y Escaleras Jesuitas', { hours:1, detail:'Las escaleras aparecieron en Juego de Tronos como la "escalinata de la vergüenza" de Desembarco del Rey — punto fotográfico clásico entre fans de la serie.' })
+          ] },
     11: { leg:'cr', icon:'🏛️', short:'Dubrovnik', title:'Dubrovnik', sub:'Domingo 11 de octubre · Día 2 de 4',
           fijo:['Día completo en Dubrovnik', '🏨 Hotel en Dubrovnik'],
-          propuesta:[A('Palacio del Rector y Catedral de Dubrovnik', 1.5, 10, 'EUR'), A('Monasterio Franciscano', 1, 5, 'EUR'), A('Fortaleza de San Lorenzo', 1.5, 10, 'EUR')] },
+          propuesta:[
+            A('Palacio del Rector y Catedral de Dubrovnik', { hours:1.5, amount:10, cur:'EUR', detail:'El Palacio del Rector, antigua sede de gobierno de la República de Ragusa, hoy funciona como museo histórico de la ciudad.' }),
+            A('Monasterio Franciscano', { hours:1, amount:5, cur:'EUR', detail:'Alberga una de las farmacias en funcionamiento continuo más antiguas de Europa, activa desde 1317.' }),
+            A('Fortaleza de San Lorenzo', { hours:1.5, amount:10, cur:'EUR', detail:'Fuera de las murallas, sobre un acantilado de 37m — de las mejores vistas de la Ciudad Vieja, precisamente porque se ve desde afuera.' })
+          ] },
     12: { leg:'cr', icon:'🏛️', short:'Dubrovnik', title:'Dubrovnik', sub:'Lunes 12 de octubre · Día 3 de 4',
           fijo:['Día completo en Dubrovnik', '🏨 Hotel en Dubrovnik'],
-          propuesta:[A('Día completo opcional a Kotor (Montenegro) o Mostar (Bosnia)', 9, 65, 'EUR'), A('Teleférico al Monte Srđ (ideal al atardecer)', 2, 27, 'EUR'), A('Tarde de playa / relax en la ciudad', 2.5)] },
+          propuesta:[
+            A('Día completo opcional a Kotor (Montenegro) o Mostar (Bosnia)', { hours:9, amount:65, cur:'EUR', detail:'Tours de día completo desde Dubrovnik, populares en plataformas como Civitatis/GetYourGuide — Kotor (bahía tipo fiordo en Montenegro) o Mostar (puente otomano del s. XVI en Bosnia). Con 4 noches en Dubrovnik sobra tiempo para uno de los dos.' }),
+            A('Teleférico al Monte Srđ (ideal al atardecer)', { hours:2, amount:27, cur:'EUR', detail:'Sube en unos 4 minutos hasta 405m sobre la ciudad; el atardecer sobre el Adriático desde ahí es de los planes más recomendados en guías de Dubrovnik.' }),
+            A('Tarde de playa / relax en la ciudad', { hours:2.5, detail:'Sin costo si es una playa pública — buen cierre a las 4 noches en Dubrovnik antes del vuelo a Zúrich.' })
+          ] },
     13: { leg:'cr', icon:'✈️', short:'Dubrovnik→Zúrich', title:'Dubrovnik → Zúrich', sub:'Martes 13 de octubre · Vuelo nocturno',
           fijo:['Dubrovnik durante el día', '✈️ 7:00–10:00pm — Vuelo Dubrovnik → Zúrich', '🏨 Hotel en Zúrich'],
-          propuesta:[A('Mañana: Isla Lokrum en ferry (10 min) si da tiempo', 3, 27, 'EUR'), T('Tarde: rumbo al aeropuerto con calma')] },
+          propuesta:[
+            A('Mañana: Isla Lokrum en ferry (10 min) si da tiempo', { hours:3, amount:27, cur:'EUR', detail:'10 minutos en ferry desde el puerto viejo; reserva natural con pavos reales y un lago salado. El combo ferry + entrada ronda 27€/persona.' }),
+            T('Tarde: rumbo al aeropuerto con calma', 'El vuelo a Zúrich sale a las 7pm — hay margen suficiente si Lokrum termina a media tarde.')
+          ] },
     14: { leg:'ch', icon:'🇨🇭', short:'Zúrich', title:'Zúrich', sub:'Miércoles 14 de octubre · Día completo',
           fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Zúrich → tren a Lucerna, ~50 min'],
-          propuesta:[A('Altstadt, Grossmünster y Fraumünster', 2.5), A('Bahnhofstrasse y Museo del Chocolate Lindt', 2, 15, 'CHF')] },
+          propuesta:[
+            A('Altstadt, Grossmünster y Fraumünster', { hours:2.5, detail:'Iglesias emblemáticas de la Reforma protestante; el Fraumünster tiene vitrales diseñados por Marc Chagall (entrada pequeña, unos pocos CHF).' }),
+            A('Bahnhofstrasse y Museo del Chocolate Lindt', { hours:2, amount:15, cur:'CHF', detail:'Lindt Home of Chocolate, junto al lago de Zúrich — precio estimado de entrada, verificar valor actualizado en el sitio oficial antes de ir.' })
+          ] },
     15: { leg:'ch', icon:'🌉', short:'Lucerna', title:'Lucerna', sub:'Jueves 15 de octubre · Día completo',
           fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Lucerna → tren panorámico a Interlaken, ~2h'],
-          propuesta:[A('Puente de la Capilla y Monumento del León', 1.5), A('Opcional: Monte Pilatus en teleférico', 4, 84, 'CHF')] },
+          propuesta:[
+            A('Puente de la Capilla y Monumento del León', { hours:1.5, detail:'El puente de madera cubierto más antiguo de Europa en uso (1333); el león tallado en roca (1821) conmemora a los guardias suizos caídos en la Revolución Francesa.' }),
+            A('Opcional: Monte Pilatus en teleférico', { hours:4, amount:84, cur:'CHF', detail:'Precio verificado en pilatus.ch: 84 CHF ida y vuelta desde Kriens en temporada de verano/otoño (mayo-octubre). 50% de descuento con Swiss Travel Pass.' })
+          ] },
     16: { leg:'ch', icon:'⛰️', short:'Interlaken', title:'Interlaken', sub:'Viernes 16 de octubre · Día completo',
           fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Interlaken → tren a Lauterbrunnen, ~20 min'],
-          propuesta:[A('Harder Kulm (mirador con vista al Jungfrau)', 2, 32, 'CHF'), A('Hohenmatte Park', 1)] },
+          propuesta:[
+            A('Harder Kulm (mirador con vista al Jungfrau)', { hours:2, amount:32, cur:'CHF', detail:'Funicular en operación desde 1908; mirador a 1.322m con vista directa al Eiger, Mönch y Jungfrau — de los miradores mejor valorados de Interlaken.' }),
+            A('Hohenmatte Park', { hours:1, detail:'Pradera central de Interlaken con vista a la Jungfrau, entrada gratis — punto clásico para descansar entre actividades.' })
+          ] },
     17: { leg:'ch', icon:'💧', short:'Lauterbrunnen', title:'Lauterbrunnen', sub:'Sábado 17 de octubre · Día completo',
           fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Lauterbrunnen → tren a Berna, ~1h 30min (trasbordo en Interlaken Ost)'],
-          propuesta:[A('Opcional: Jungfraujoch "Top of Europe" — sale muy temprano (~6:30am), reserva obligatoria', 7, 271, 'CHF'), A('Cascada Staubbachfall y valle de las 72 cascadas', 1), A('Pueblos de Mürren o Wengen', 2)] },
+          propuesta:[
+            A('Opcional: Jungfraujoch "Top of Europe" — sale muy temprano (~6:30am), reserva obligatoria', { hours:7, amount:271, cur:'CHF', detail:'Precio verificado en jungfrau.ch: 261,20 CHF ida y vuelta desde Interlaken Ost en temporada mayo-octubre, más 10 CHF de reserva obligatoria de asiento. El primer tren desde Lauterbrunnen sale ~6:30am; subida + tiempo arriba + bajada toma 6-8h en total (myswissalps.com).' }),
+            A('Cascada Staubbachfall y valle de las 72 cascadas', { hours:1, detail:'300m de caída de agua visible desde el pueblo, entrada libre — Lauterbrunnen tiene 72 cascadas en total a lo largo del valle.' }),
+            A('Pueblos de Mürren o Wengen', { hours:2, detail:'Ambos son pueblos sin autos, accesibles solo por teleférico o tren de cremallera — Mürren tiene vista frontal al Eiger.' })
+          ] },
     18: { leg:'ch', icon:'🐻', short:'Berna→Ginebra', title:'Berna → Ginebra', sub:'Domingo 18 de octubre · Día completo',
           fijo:['Estancia en Suiza (Zúrich / Ginebra)', '🏨 Hotel en Berna → tren directo a Ginebra por la noche, ~1h 50min'],
-          propuesta:[A('Ciudad Vieja UNESCO y Zytglogge', 2), A('Bundeshaus (Parlamento federal)', 1), A('Rosengarten al atardecer', 1)] },
+          propuesta:[
+            A('Ciudad Vieja UNESCO y Zytglogge', { hours:2, detail:'6km de arcadas medievales, Patrimonio UNESCO desde 1983; el Zytglogge (torre-reloj astronómico del s. XIII) anima sus figuras cada hora en punto.' }),
+            A('Bundeshaus (Parlamento federal)', { hours:1, detail:'Sede del gobierno federal suizo — tours gratuitos cuando no hay sesión parlamentaria, conviene verificar horario disponible antes de ir.' }),
+            A('Rosengarten al atardecer', { hours:1, detail:'Mirador con la vista panorámica más recomendada de Berna y el río Aare en curva — entrada libre todo el día.' })
+          ] },
     19: { leg:'ch', icon:'✈️', short:'Ginebra→Bogotá', title:'Ginebra → Madrid → Bogotá', sub:'Lunes 19 de octubre · Regreso',
           fijo:['✈️ 9:00am–12:00pm — Vuelo Ginebra → Madrid', '✈️ 4:00pm — Vuelo Madrid → Bogotá (nocturno, llega 6:00am del día 20)'],
-          propuesta:[A('Si el horario lo permite: paseo corto al lago Léman / Jet d\'Eau antes de ir al aeropuerto', 1), T('Traslado con margen a Ginebra-Aeropuerto')] },
+          propuesta:[
+            A('Si el horario lo permite: paseo corto al lago Léman / Jet d\'Eau antes de ir al aeropuerto', { hours:1, detail:'Depende de qué tan cerca quede el hotel del lago — el surtidor Jet d\'Eau (140m) se ve desde la orilla sin costo.' }),
+            T('Traslado con margen a Ginebra-Aeropuerto', 'El vuelo a Madrid sale a las 9am — conviene salir del hotel con al menos 1h de margen.')
+          ] },
     20: { leg:'transit', icon:'🛬', short:'Bogotá', title:'Llegada a Bogotá', sub:'Martes 20 de octubre · Fin del viaje',
           fijo:['🛬 6:00am — Llegada a Bogotá'],
-          propuesta:[T('Descanso — fin del viaje 🎉')] }
+          propuesta:[T('Descanso — fin del viaje 🎉', 'Llegan a Bogotá tras un viaje largo desde Ginebra vía Madrid — día pensado para descansar, sin planes.')] }
   };
 
   // ── HOUR-BY-HOUR SEGMENTS (mirrors the cronograma spreadsheet) ──
@@ -1280,8 +1413,10 @@
         el.style.gridColumn = col;
         el.style.gridRow = (seg.start + 2) + ' / ' + (seg.end + 2);
         el.tabIndex = 0;
-        el.title = seg.label;
+        el.title = seg.label + ' — toca para ver el detalle del día';
         el.innerHTML = `<span>${seg.icon}</span><span class="txt">${seg.label}</span>`;
+        el.addEventListener('click', () => openDayModal(d, data));
+        el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDayModal(d, data); } });
       } else {
         el.className = 'gseg ' + seg.type;
         el.style.gridColumn = col;
@@ -1303,25 +1438,31 @@
         el.style.gridRow = (p.start + 2) + ' / ' + (p.end + 2);
         el.dataset.pickkey = key;
         el.tabIndex = 0;
-        el.title = item.text + (costTxt ? ' — ' + costTxt + '/pers' : '');
-        el.innerHTML = `<span class="chk">${PICKS[key] ? '☑' : '☐'}</span><span class="txt">${item.text}${costTxt ? ' · <b>' + costTxt + '</b>' : ''}</span>`;
-        el.addEventListener('click', () => togglePick(key));
+        el.title = item.text + (costTxt ? ' — ' + costTxt + '/pers' : '') + ' — toca la casilla para elegir, o el texto para ver el detalle';
+        el.innerHTML = `<span class="chk" tabindex="0" role="checkbox" aria-checked="${!!PICKS[key]}">${PICKS[key] ? '☑' : '☐'}</span><span class="txt">${item.text}${costTxt ? ' · <b>' + costTxt + '</b>' : ''}</span>`;
+        const chkEl = el.querySelector('.chk');
+        chkEl.addEventListener('click', e => { e.stopPropagation(); togglePick(key); });
+        chkEl.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); togglePick(key); } });
+        el.addEventListener('click', () => openDayModal(d, data));
+        el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDayModal(d, data); } });
         gantt.appendChild(el);
       });
     }
   });
 
+  // ── LEG GROUPS (tramos consecutivos del mismo país) — reusado por leg-strip y wear-strip ──
+  const LEG_LABEL = { es: 'España', cr: 'Croacia', ch: 'Suiza', transit: 'Bogotá' };
+  const legGroups = [];
+  TRIP_DAYS.forEach(d => {
+    const leg = DAYS[d].leg;
+    const last = legGroups[legGroups.length - 1];
+    if (last && last.leg === leg) last.end = d;
+    else legGroups.push({ leg, start: d, end: d });
+  });
+
   // ── LEG SUMMARY STRIP (país + rango de fechas, un vistazo antes de entrar al detalle) ──
   const legStrip = document.getElementById('leg-strip');
   if (legStrip) {
-    const LEG_LABEL = { es: 'España', cr: 'Croacia', ch: 'Suiza', transit: 'Bogotá' };
-    const legGroups = [];
-    TRIP_DAYS.forEach(d => {
-      const leg = DAYS[d].leg;
-      const last = legGroups[legGroups.length - 1];
-      if (last && last.leg === leg) last.end = d;
-      else legGroups.push({ leg, start: d, end: d });
-    });
     legGroups.forEach(g => {
       const el = document.createElement('span');
       el.className = 'leg-pill ' + g.leg;
@@ -1329,6 +1470,44 @@
       el.textContent = `${LEG_FLAG[g.leg] || ''} ${LEG_LABEL[g.leg]} · ${range}`;
       legStrip.appendChild(el);
     });
+  }
+
+  // ── WEAR STRIP (qué ropa llevar, agrupado por tramo/país) ──
+  const wearStrip = document.getElementById('wear-strip');
+  if (wearStrip) {
+    const WEAR_TEXT = {
+      transit: 'Ropa cómoda de avión y capas ligeras — los aeropuertos y aviones suelen tener aire acondicionado fuerte incluso si afuera hace calor.',
+      es: '~20–25°C de día, 14–16°C de noche. Camiseta + chaqueta ligera para la noche, calzado cómodo para caminar (Alcázar, Triana, Santa Cruz).',
+      cr: '17–22°C de día, 10–12°C de noche. Capas: camiseta + chaqueta ligera, calzado impermeable para Plitvice y las murallas de Dubrovnik.',
+      ch: '8–14°C en ciudad, bajo cero en Jungfraujoch. Abrigo o chaqueta de plumas, bufanda, y capas térmicas extra si suben a Jungfraujoch.'
+    };
+    legGroups.forEach(g => {
+      const el = document.createElement('div');
+      el.className = 'wear-card ' + g.leg;
+      const range = g.start === g.end ? `Oct ${g.start}` : `Oct ${g.start}–${g.end}`;
+      el.innerHTML = `<div class="wear-head">${LEG_FLAG[g.leg] || ''} ${LEG_LABEL[g.leg]} · ${range}</div><div class="wear-text">${WEAR_TEXT[g.leg] || ''}</div>`;
+      wearStrip.appendChild(el);
+    });
+  }
+
+  // ── GANTT HORIZONTAL SCROLL — nav buttons + edge fade ──
+  const ganttWrapEl = document.getElementById('gantt-wrap');
+  const ganttPrevBtn = document.getElementById('gantt-prev');
+  const ganttNextBtn = document.getElementById('gantt-next');
+  const ganttFadeRight = document.getElementById('gantt-fade-right');
+  if (ganttWrapEl) {
+    const dayStep = () => (document.querySelector('.gantt-day-head')?.offsetWidth || 112) + 1;
+    ganttPrevBtn.addEventListener('click', () => ganttWrapEl.scrollBy({ left: -dayStep(), behavior: 'smooth' }));
+    ganttNextBtn.addEventListener('click', () => ganttWrapEl.scrollBy({ left: dayStep(), behavior: 'smooth' }));
+    const updateFade = () => {
+      const atEnd = ganttWrapEl.scrollLeft + ganttWrapEl.clientWidth >= ganttWrapEl.scrollWidth - 4;
+      ganttFadeRight.classList.toggle('hide', atEnd);
+      ganttPrevBtn.style.visibility = ganttWrapEl.scrollLeft <= 4 ? 'hidden' : 'visible';
+      ganttNextBtn.style.visibility = atEnd ? 'hidden' : 'visible';
+    };
+    ganttWrapEl.addEventListener('scroll', updateFade, { passive: true });
+    window.addEventListener('resize', updateFade);
+    setTimeout(updateFade, 100);
   }
 
   updateBudgetSummary();
@@ -1396,8 +1575,8 @@
   }
   btnViewCalendar.addEventListener('click', () => setView('calendar'));
   btnViewGantt.addEventListener('click', () => setView('gantt'));
-  let savedView = 'calendar';
-  try { savedView = localStorage.getItem(VIEW_KEY) || 'calendar'; } catch (e) { /* ignore */ }
+  let savedView = 'gantt';
+  try { savedView = localStorage.getItem(VIEW_KEY) || 'gantt'; } catch (e) { /* ignore */ }
   setView(savedView);
 
   // ── DAY MODAL ──
@@ -1441,7 +1620,7 @@
         const li = document.createElement('li');
         li.className = 'pick-row' + (PICKS[key] ? ' picked' : '');
         li.dataset.pickkey = key;
-        li.innerHTML = `<span class="chk">${PICKS[key] ? '☑' : '☐'}</span><span class="txt">${item.text}${meta ? `<br><span class="meta">${meta}</span>` : ''}</span>`;
+        li.innerHTML = `<span class="chk">${PICKS[key] ? '☑' : '☐'}</span><span class="txt">${item.text}${meta ? `<br><span class="meta">${meta}</span>` : ''}${item.detail ? `<br><span class="why">${item.detail}</span>` : ''}</span>`;
         li.addEventListener('click', () => togglePick(key));
         pList.appendChild(li);
       });
