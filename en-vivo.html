@@ -304,11 +304,11 @@
 
   /* ── 3 oct ── */
   add({ kind:'transit', st:'prop', ic:'🚕', title:'Salida hacia el aeropuerto El Dorado', sub:'Internacional: llegar ~3 h antes. Equipaje: mochila + maleta de 10 kg.', s:Y+'03T09:00', sz:Z.BOG, e:Y+'03T09:45', ez:Z.BOG, city:'Bogotá' });
-  F('03','12:35','Bogotá',Z.BOG,'05:15','Madrid',Z.MAD,'Vuelo Bogotá → Madrid','Iberia IB0156 · Terminal 1 · vuelo nocturno', { eDay:Y+'04', city:'Bogotá' });
+  F('03','12:35','Bogotá',Z.BOG,'05:15','Madrid',Z.MAD,'Vuelo Bogotá → Madrid','Iberia · Terminal 1 · vuelo nocturno', { eDay:Y+'04', city:'Bogotá' });
 
   /* ── 4 oct ── */
   add({ kind:'transit', st:'prop', ic:'🛂', title:'Migración Schengen y conexión', sub:'Madrid-Barajas: pasar migración y moverse a la Terminal 2.', s:Y+'04T05:30', sz:Z.MAD, e:Y+'04T07:30', ez:Z.MAD, city:'Madrid' });
-  F('04','09:20','Madrid',Z.MAD,'10:30','Sevilla',Z.MAD,'Vuelo Madrid → Sevilla','Air Europa (Express) UX5051 · Terminal 2', { city:'Madrid' });
+  F('04','09:20','Madrid',Z.MAD,'10:30','Sevilla',Z.MAD,'Vuelo Madrid → Sevilla','Air Europa (Express) · Terminal 2', { city:'Madrid' });
   add({ kind:'transit', st:'prop', ic:'🚕', title:'Aeropuerto → centro de Sevilla', sub:'Taxi ~25 min o bus EA ~35 min.', s:Y+'04T11:00', sz:Z.MAD, e:Y+'04T11:45', ez:Z.MAD, city:'Sevilla' });
   add({ kind:'hin', st:'fijo', ic:'🔑', title:'Check-in · Apartamentos RG Plaza de España', sub:'Av. de la Borbolla 77, Sevilla · desde 15:00 · 1 apartamento, 2 noches. Pueden dejar maletas antes.', s:Y+'04T15:00', sz:Z.MAD, city:'Sevilla', doc:'2026-10-04_Mad-Sev' });
   add({ kind:'act', st:'prop', ic:'🚶', title:'Barrio de Santa Cruz', sub:'Primer paseo sin agenda tras el vuelo largo.', s:Y+'04T16:30', sz:Z.MAD, e:Y+'04T18:00', ez:Z.MAD, city:'Sevilla' });
@@ -325,9 +325,9 @@
   /* ── 6 oct ── */
   add({ kind:'hout', st:'fijo', ic:'🧳', title:'Check-out · Apartamentos RG Plaza de España', sub:'Límite oficial 11:00. Se sale antes por el vuelo.', s:Y+'06T07:45', sz:Z.MAD, city:'Sevilla', doc:'2026-10-04_Mad-Sev' });
   add({ kind:'transit', st:'prop', ic:'🚕', title:'Al aeropuerto de Sevilla', sub:'Llegar ~2 h antes del vuelo.', s:Y+'06T08:15', sz:Z.MAD, e:Y+'06T08:45', ez:Z.MAD, city:'Sevilla' });
-  F('06','10:50','Sevilla',Z.MAD,'12:25','Palma',Z.MAD,'Vuelo Sevilla → Palma','Ryanair FR351 (operado por Lauda Europe)', { city:'Sevilla', doc:'2026-10-06_Sev-Pal-Zag' });
+  F('06','10:50','Sevilla',Z.MAD,'12:25','Palma',Z.MAD,'Vuelo Sevilla → Palma','Ryanair (operado por Lauda Europe)', { city:'Sevilla', doc:'2026-10-06_Sev-Pal-Zag' });
   add({ kind:'meal', st:'prop', ic:'🍽️', title:'Escala en Palma — almuerzo en el aeropuerto', sub:'Es solo una conexión, no una visita a Mallorca.', s:Y+'06T12:40', sz:Z.MAD, e:Y+'06T13:30', ez:Z.MAD, city:'Palma' });
-  F('06','14:00','Palma',Z.MAD,'16:25','Zagreb',Z.ZAG,'Vuelo Palma → Zagreb','Ryanair FR2283', { city:'Palma', doc:'2026-10-06_Sev-Pal-Zag' });
+  F('06','14:00','Palma',Z.MAD,'16:25','Zagreb',Z.ZAG,'Vuelo Palma → Zagreb','Ryanair', { city:'Palma', doc:'2026-10-06_Sev-Pal-Zag' });
   add({ kind:'transit', st:'prop', ic:'🚌', title:'Aeropuerto → centro de Zagreb', sub:'Bus/taxi ~40 min.', s:Y+'06T17:00', sz:Z.ZAG, e:Y+'06T17:40', ez:Z.ZAG, city:'Zagreb' });
   add({ kind:'hin', st:'fijo', ic:'🔑', title:'Check-in · Modern Flat in Zagreb Centre', sub:'Gundulićeva 54, Lower Town · desde 15:00 · apartamento de 3 habitaciones, 3 noches.', s:Y+'06T17:45', sz:Z.ZAG, city:'Zagreb', doc:'2026-10-06_Sev-Pal-Zag' });
   add({ kind:'act', st:'prop', ic:'🚶', title:'Plaza Ban Jelačić y calle Tkalčićeva', s:Y+'06T18:30', sz:Z.ZAG, e:Y+'06T20:00', ez:Z.ZAG, city:'Zagreb' });
@@ -348,7 +348,7 @@
   add({ kind:'hout', st:'fijo', ic:'🧳', title:'Check-out · Modern Flat in Zagreb Centre', sub:'Límite 11:00. Dejar maletas en recepción si preguntan.', s:Y+'09T11:00', sz:Z.ZAG, city:'Zagreb', doc:'2026-10-06_Sev-Pal-Zag' });
   add({ kind:'meal', st:'prop', ic:'🍽️', title:'Almuerzo', s:Y+'09T13:00', sz:Z.ZAG, e:Y+'09T14:30', ez:Z.ZAG, city:'Zagreb' });
   add({ kind:'transit', st:'prop', ic:'🚕', title:'Al aeropuerto de Zagreb', sub:'~40 min. Llegar ~2 h antes del vuelo.', s:Y+'09T19:45', sz:Z.ZAG, e:Y+'09T20:30', ez:Z.ZAG, city:'Zagreb' });
-  F('09','22:45','Zagreb',Z.ZAG,'23:40','Dubrovnik',Z.ZAG,'Vuelo Zagreb → Dubrovnik','Croatia Airlines OU664', { city:'Zagreb', doc:'2026-10-09_Zag-Dub' });
+  F('09','22:45','Zagreb',Z.ZAG,'23:40','Dubrovnik',Z.ZAG,'Vuelo Zagreb → Dubrovnik','Croatia Airlines', { city:'Zagreb', doc:'2026-10-09_Zag-Dub' });
 
   /* ── 10 oct ── */
   add({ kind:'transit', st:'prop', ic:'🚕', title:'Aeropuerto de Dubrovnik → hotel', sub:'~25 min (el aeropuerto queda en Čilipi).', s:Y+'10T00:00', sz:Z.ZAG, e:Y+'10T00:40', ez:Z.ZAG, city:'Dubrovnik' });
@@ -370,7 +370,7 @@
   add({ kind:'act', st:'prop', ic:'🚶', title:'Mañana libre en la Ciudad Vieja', s:Y+'13T09:00', sz:Z.ZAG, e:Y+'13T10:30', ez:Z.ZAG, city:'Dubrovnik' });
   add({ kind:'hout', st:'pend', ic:'🧳', title:'Check-out Dubrovnik (hotel por reservar)', sub:'Límite habitual 11:00. Dejar maletas hasta la tarde.', s:Y+'13T11:00', sz:Z.ZAG, city:'Dubrovnik' });
   add({ kind:'transit', st:'prop', ic:'🚕', title:'Al aeropuerto de Dubrovnik', sub:'Llegar ~2 h antes del vuelo.', s:Y+'13T16:30', sz:Z.ZAG, e:Y+'13T17:15', ez:Z.ZAG, city:'Dubrovnik' });
-  F('13','19:40','Dubrovnik',Z.ZAG,'21:40','Zúrich',Z.ZRH,'Vuelo Dubrovnik → Zúrich','Swiss LX2267 · Economy Light', { city:'Dubrovnik', doc:'2026-10-13_Dub-Zur' });
+  F('13','19:40','Dubrovnik',Z.ZAG,'21:40','Zúrich',Z.ZRH,'Vuelo Dubrovnik → Zúrich','Swiss · Economy Light', { city:'Dubrovnik', doc:'2026-10-13_Dub-Zur' });
   add({ kind:'transit', st:'prop', ic:'🚕', title:'Aeropuerto de Zúrich → hotel (Glattbrugg)', sub:'Muy cerca del aeropuerto.', s:Y+'13T22:15', sz:Z.ZRH, e:Y+'13T22:45', ez:Z.ZRH, city:'Zúrich' });
   add({ kind:'hin', st:'fijo', ic:'🔑', title:'Check-in · The Gate Boutique Hotel Zürich', sub:'Riethofstrasse 15, Glattbrugg · ventana de check-in 15:00–23:30 · habitaciones con desayuno incluido.', s:Y+'13T22:50', sz:Z.ZRH, city:'Zúrich', doc:'2026-10-13_Dub-Zur' });
 
@@ -409,9 +409,9 @@
   /* ── 19 oct ── */
   add({ kind:'hout', st:'pend', ic:'🧳', title:'Check-out Ginebra', s:Y+'19T06:30', sz:Z.ZRH, city:'Ginebra' });
   add({ kind:'transit', st:'prop', ic:'🚆', title:'Tren a la estación del aeropuerto de Ginebra', sub:'~8 min. Llegar ~2 h antes del vuelo.', s:Y+'19T07:15', sz:Z.ZRH, e:Y+'19T07:30', ez:Z.ZRH, city:'Ginebra' });
-  F('19','09:50','Ginebra',Z.ZRH,'11:55','Madrid',Z.MAD,'Vuelo Ginebra → Madrid','Iberia IB1276 (operado por Air Nostrum) · Terminal 1 → T4 · billete aparte del de Bogotá', { city:'Ginebra', doc:'2026-10-19_Gin-Mad-Bog' });
+  F('19','09:50','Ginebra',Z.ZRH,'11:55','Madrid',Z.MAD,'Vuelo Ginebra → Madrid','Iberia (operado por Air Nostrum) · Terminal 1 → T4 · billete aparte del de Bogotá', { city:'Ginebra', doc:'2026-10-19_Gin-Mad-Bog' });
   add({ kind:'meal', st:'prop', ic:'🍽️', title:'Escala en Madrid — almuerzo', sub:'~4 h entre vuelos, con billetes separados (sin protección si el primero se retrasa): recoger y volver a facturar equipaje con margen.', s:Y+'19T12:30', sz:Z.MAD, e:Y+'19T14:00', ez:Z.MAD, city:'Madrid' });
-  F('19','16:25','Madrid',Z.MAD,'19:30','Bogotá',Z.BOG,'Vuelo Madrid → Bogotá','Iberia IB0153 · llegada Terminal 1', { city:'Madrid', doc:'2026-10-19_Gin-Mad-Bog' });
+  F('19','16:25','Madrid',Z.MAD,'19:30','Bogotá',Z.BOG,'Vuelo Madrid → Bogotá','Iberia · llegada Terminal 1', { city:'Madrid', doc:'2026-10-19_Gin-Mad-Bog' });
 
   /* ═════════ PRECIOS DE ACTIVIDADES (por persona, estimados; vienen del itinerario completo) ═════════
      a = monto, c = moneda; free = gratis; tbd = por confirmar; n = nota. Se asignan por el inicio del título. */
