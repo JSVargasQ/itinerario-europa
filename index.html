@@ -466,6 +466,28 @@
     .urgency.high { background: #FEE2E2; color: #B91C1C; }
     .urgency.med { background: #FEF3C7; color: #B45309; }
 
+    /* ─── CHECKLIST PRE-VIAJE ─── */
+    .check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: .6rem; }
+    .check-item {
+      display: flex; align-items: flex-start; gap: .55rem;
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--r-sm);
+      box-shadow: var(--shadow); padding: .7rem .85rem; cursor: pointer;
+      font-size: .85rem; line-height: 1.45; transition: border-color .15s, background .15s;
+    }
+    .check-item:hover { border-color: var(--muted2); }
+    .check-item .chk { flex-shrink: 0; font-size: 1rem; margin-top: .05rem; }
+    .check-item.done { background: rgba(16,185,129,.07); border-color: var(--ok); }
+    .check-item.done .txt { text-decoration: line-through; color: var(--muted2); }
+    .check-item .who {
+      display: inline-block; font-size: .62rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: .05em; padding: .08rem .45rem; border-radius: 100px; margin-left: .4rem;
+      background: var(--card2); color: var(--muted); border: 1px solid var(--border); white-space: nowrap;
+    }
+    .check-item .who.juanse { background: #EDE9FE; color: #6D28D9; border-color: #DDD6FE; }
+    .check-item .who.nubia { background: #FCE7F3; color: #BE185D; border-color: #FBCFE8; }
+    .check-item .who.hernando { background: #DBEAFE; color: #1D4ED8; border-color: #BFDBFE; }
+    .check-item .note { display: block; font-size: .74rem; color: var(--muted2); margin-top: .15rem; }
+
     /* ─── FOOTER ─── */
     footer {
       border-top: 1px solid var(--border); background: var(--card);
@@ -550,6 +572,7 @@
     <li><a href="#estimaciones">Estimaciones</a></li>
     <li><a href="#clima">Clima</a></li>
     <li><a href="#recomendaciones">Recomendaciones</a></li>
+    <li><a href="#checklist">Checklist</a></li>
   </ul>
 </nav>
 
@@ -568,7 +591,7 @@
   <div class="hero-stats">
     <div class="stat"><div class="stat-num">18</div><div class="stat-label">Días</div></div>
     <div class="stat"><div class="stat-num">3</div><div class="stat-label">Países</div></div>
-    <div class="stat"><div class="stat-num">10</div><div class="stat-label">Destinos</div></div>
+    <div class="stat"><div class="stat-num">9</div><div class="stat-label">Destinos</div></div>
     <div class="stat"><div class="stat-num">Oct 3</div><div class="stat-label">→ Oct 20</div></div>
   </div>
 </section>
@@ -636,7 +659,7 @@
 
 <!-- ── CITY CARDS ── -->
 <section id="destinos">
-  <p class="section-label">10 destinos</p>
+  <p class="section-label">9 destinos</p>
   <h2>Destinos <span>del viaje</span></h2>
 
   <div class="cards-grid">
@@ -824,54 +847,31 @@
       </div>
     </div>
 
-    <!-- ─ INTERLAKEN ─ -->
+    <!-- ─ WILDERSWIL (BASE) ─ -->
     <div class="city-card ch">
       <div class="card-header">
         <div class="card-meta">
           <span class="card-flag">⛰️</span>
-          <span class="card-dates">Oct 15 – 16 · 1 noche</span>
+          <span class="card-dates">Oct 15 – 17 · 2 noches · BASE</span>
         </div>
-        <div class="card-title">Interlaken</div>
-        <div class="card-country ch">🇨🇭 Suiza · Entre dos lagos</div>
+        <div class="card-title">Wilderswil</div>
+        <div class="card-country ch">🇨🇭 Suiza · Base del Oberland bernés</div>
       </div>
       <div class="card-body">
-        <div class="transport-badge">🚞 Lucerna → Interlaken · tren panorámico 2h</div>
-        <div class="card-section-title">El trayecto ES el destino</div>
-        <div class="tip-box" style="margin-bottom:.75rem"><span class="tip-icon">🚞</span> <strong>Luzern–Interlaken Express:</strong> tren panorámico de 2 horas con ventanales gigantes. Atraviesa el Paso de Brünig y bordea 5 lagos. Sentarse del lado derecho para mejores vistas.</div>
-        <div class="card-section-title">Atracciones</div>
+        <div class="transport-badge">🚞 Lucerna → Wilderswil · tren panorámico ~2h15 (vía Interlaken Ost)</div>
+        <div class="card-section-title">La estrategia (acordada en reunión)</div>
+        <div class="tip-box" style="margin-bottom:.75rem"><span class="tip-icon">🧳</span> <strong>2 noches con las maletas quietas.</strong> Wilderswil está a 1 parada de Interlaken Ost, sobre la misma línea que sube al valle de Lauterbrunnen y al Jungfraujoch, y es más barato que Interlaken. Desde aquí, todo se hace en trenes de día sin cargar equipaje.</div>
+        <div class="tip-box" style="margin-bottom:.75rem"><span class="tip-icon">🚞</span> <strong>Luzern–Interlaken Express:</strong> tren panorámico de 2 horas con ventanales gigantes — atraviesa el Paso de Brünig y bordea 5 lagos. Sentarse del lado derecho.</div>
+        <div class="card-section-title">Excursiones desde la base</div>
         <ul class="activity-list">
-          <li><span class="ico">🌿</span> Hohenmatte Park (pradera central)</li>
-          <li><span class="ico">🏔️</span> Harder Kulm (mirador 1.322m) <span class="note">teleférico</span></li>
-          <li><span class="ico">🚶</span> Hoheweg (avenida principal)</li>
-          <li><span class="ico">🌊</span> Lago Brienz <span class="note">opcional — aguas turquesa</span></li>
-          <li><span class="ico">🌊</span> Lago Thun <span class="note">opcional</span></li>
-        </ul>
-        <div class="tip-box"><span class="tip-icon">🍁</span> Harder Kulm en octubre ofrece vistas del Jungfrau, Mönch y Eiger con colores otoñales. Amanecer o atardecer son los mejores momentos.</div>
-      </div>
-    </div>
-
-    <!-- ─ LAUTERBRUNNEN ─ -->
-    <div class="city-card ch">
-      <div class="card-header">
-        <div class="card-meta">
-          <span class="card-flag">💧</span>
-          <span class="card-dates">Oct 16 – 17 · 1 noche</span>
-        </div>
-        <div class="card-title">Lauterbrunnen</div>
-        <div class="card-country ch">🇨🇭 Suiza · Valle de las 72 cascadas</div>
-      </div>
-      <div class="card-body">
-        <div class="transport-badge">🚞 Interlaken → Lauterbrunnen · tren 20 min</div>
-        <div class="card-section-title">Atracciones</div>
-        <ul class="activity-list">
-          <li><span class="ico">💧</span> Cataratas Staubbachfall (300m de caída)</li>
-          <li><span class="ico">🏘️</span> Mürren (pueblo sin carros, acceso por teleférico)</li>
-          <li><span class="ico">🏘️</span> Wengen (otro pueblo alpino encantador)</li>
+          <li><span class="ico">💧</span> Cataratas Staubbachfall (300m) y valle de las 72 cascadas</li>
+          <li><span class="ico">🏘️</span> Mürren y Wengen (pueblos sin carros)</li>
+          <li><span class="ico">🏔️</span> Harder Kulm (mirador 1.322m) <span class="note">atardecer</span></li>
           <li><span class="ico">🏔️</span> Jungfraujoch "Top of Europe" <span class="note">opcional · reserva obligatoria</span></li>
+          <li><span class="ico">💦</span> Trümmelbachfälle <span class="note">alternativa si no suben</span></li>
         </ul>
         <div class="card-section-title">¿Vale Jungfraujoch?</div>
-        <div class="tip-box"><span class="tip-icon">❄️</span> <strong>Jungfraujoch en octubre:</strong> -2°C a -7°C en la cumbre (3.454m). Menos turistas que en verano. Snow Fun Park abierto hasta mediados de octubre. <strong>Requiere reserva anticipada</strong> en jungfrau.ch. Subida en tren: ~2h. Si el cielo está despejado, las vistas son únicas.</div>
-        <div class="tip-box" style="margin-top:.5rem"><span class="tip-icon">🌈</span> El Valle de Lauterbrunnen tiene 72 cascadas visibles desde el sendero principal. En octubre el valle se cubre de colores dorados.</div>
+        <div class="tip-box"><span class="tip-icon">❄️</span> <strong>Jungfraujoch en octubre:</strong> -2°C a -7°C en la cumbre (3.454m). Menos turistas que en verano. <strong>Requiere reserva anticipada</strong> en jungfrau.ch y se decide 1-2 días antes según el pronóstico — la línea pasa por la propia estación de Wilderswil.</div>
       </div>
     </div>
 
@@ -886,7 +886,7 @@
         <div class="card-country ch">🇨🇭 Suiza · Capital federal</div>
       </div>
       <div class="card-body">
-        <div class="transport-badge">🚞 Lauterbrunnen → Berna · tren ~1h 30min (con trasbordo en Interlaken Ost)</div>
+        <div class="transport-badge">🚞 Wilderswil → Berna · tren ~1h 10min (vía Interlaken Ost)</div>
         <div class="card-section-title">Atracciones</div>
         <ul class="activity-list">
           <li><span class="ico">🏘️</span> Ciudad Vieja (Patrimonio UNESCO)</li>
@@ -1075,6 +1075,21 @@
       <div class="rec-title">Berna a 1 día — bien aprovechado</div>
       <div class="rec-text">Berna queda con 1 noche/1 día completo, suficiente para Old Town, Zytglogge, Bundeshaus y el Rosengarten al atardecer antes del tren nocturno a Ginebra.</div>
     </div>
+    <div class="rec-card warning">
+      <span class="rec-icon">📅</span>
+      <div class="rec-title">Reservar YA lo que es cancelable</div>
+      <div class="rec-text">El grupo acordó reservar a finales de agosto, pero <strong>lo cancelable no cuesta nada asegurarlo desde ya</strong>: el tour de Plitvice tiene cancelación gratuita hasta 24h antes y cupos de máximo 8 personas, y la mayoría de hoteles en Booking tienen tarifa cancelable que congela el precio de octubre. Agosto debería ser la fecha para <strong>confirmar</strong>, no para empezar a buscar. Lo único que sí conviene dejar para el final: Jungfraujoch (se decide por clima, 1-2 días antes).</div>
+    </div>
+    <div class="rec-card info">
+      <span class="rec-icon">🧳</span>
+      <div class="rec-title">Equipaje en los vuelos internos (low-cost)</div>
+      <div class="rec-text">Los tramos Sevilla→Palma→Zagreb, Zagreb→Dubrovnik y Dubrovnik→Zúrich son de aerolíneas low-cost: <strong>verificar tamaño y peso del equipaje de cada tiquete y pagar la maleta online antes del vuelo</strong> — en el mostrador cuesta 2-3 veces más. Trucos de la reunión: bolsas al vacío para comprimir y llevar puesta la ropa más voluminosa al volar.</div>
+    </div>
+    <div class="rec-card info">
+      <span class="rec-icon">💊</span>
+      <div class="rec-title">Botiquín y salud</div>
+      <div class="rec-text">Llevar medicamentos básicos para <strong>dolor de cabeza y de estómago</strong> (el cambio de comida y ritmo pasa factura), curitas para los pies y los artículos de aseo en presentaciones de máximo 100ml para el equipaje de cabina. Antes de viajar: confirmar con la EPS y el banco la asistencia médica internacional y la activación de tarjetas.</div>
+    </div>
   </div>
 
   <h3 style="font-size:1rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">Qué reservar con anticipación</h3>
@@ -1083,7 +1098,7 @@
       <div class="book-num">1</div>
       <div class="book-info">
         <div class="book-title">Excursión Lagos de Plitvice <span class="urgency high">Alta prioridad</span></div>
-        <div class="book-desc">Via Civitatis desde Zagreb, para el 7 de octubre. Reservar en línea con tiempo — los cupos se llenan en temporada alta.</div>
+        <div class="book-desc">Via Civitatis desde Zagreb, para el 7 de octubre. Grupos de máximo 8 personas y <strong>cancelación gratuita hasta 24h antes</strong> — se puede reservar desde ya sin riesgo, no hace falta esperar a agosto.</div>
       </div>
     </div>
     <div class="book-item">
@@ -1110,8 +1125,8 @@
     <div class="book-item">
       <div class="book-num">5</div>
       <div class="book-info">
-        <div class="book-title">Hoteles Sevilla y Suiza <span class="urgency high">Alta prioridad</span></div>
-        <div class="book-desc">Faltan por confirmar los hoteles de Sevilla, Zúrich, Lucerna, Interlaken, Lauterbrunnen, Berna y Ginebra. Octubre es temporada media-alta — reservar cuanto antes.</div>
+        <div class="book-title">Hoteles — 15 noches, 8 hospedajes <span class="urgency high">Alta prioridad</span></div>
+        <div class="book-desc">Faltan por confirmar: Sevilla, Zagreb, Dubrovnik, Zúrich, Lucerna, Wilderswil (2 noches, la base del Oberland), Berna y Ginebra. Con tarifa cancelable se pueden asegurar desde ya y confirmar a finales de agosto como acordó el grupo.</div>
       </div>
     </div>
     <div class="book-item">
@@ -1136,6 +1151,14 @@
   </div>
 </section>
 
+<!-- ── CHECKLIST PRE-VIAJE ── -->
+<section id="checklist">
+  <p class="section-label">Acordado en la reunión del 20 de julio</p>
+  <h2>Checklist <span>pre-viaje</span></h2>
+  <p class="section-intro">Los pendientes de la reunión, cada uno con su responsable. Toca para marcar como listo — el avance queda guardado en este navegador. <strong id="check-progress" style="color:var(--ok-dark)"></strong></p>
+  <div class="check-grid" id="check-grid"></div>
+</section>
+
 <!-- ── DAY MODAL ── -->
 <div id="day-modal" role="dialog" aria-modal="true" aria-labelledby="day-modal-name">
   <div class="modal-box" id="day-modal-box">
@@ -1153,7 +1176,7 @@
 <!-- ── FOOTER ── -->
 <footer>
   <p style="font-size:1rem;font-weight:700;margin-bottom:.5rem">Viaje Europa · Octubre 3–20, 2026</p>
-  <p>🇪🇸 Sevilla &nbsp;|&nbsp; 🇭🇷 Zagreb · Plitvice · Dubrovnik &nbsp;|&nbsp; 🇨🇭 Zúrich · Lucerna · Interlaken · Lauterbrunnen · Berna · Ginebra</p>
+  <p>🇪🇸 Sevilla &nbsp;|&nbsp; 🇭🇷 Zagreb · Plitvice · Dubrovnik &nbsp;|&nbsp; 🇨🇭 Zúrich · Lucerna · Wilderswil (base) · Berna · Ginebra</p>
   <div class="footer-links">
     <a href="https://www.civitatis.com/es/zagreb/excursion-lagos-plitvice/" target="_blank" rel="noopener">Civitatis Plitvice →</a>
     <a href="https://www.dubrovnikpass.com/" target="_blank" rel="noopener">Dubrovnik Pass →</a>
@@ -1187,7 +1210,7 @@
   const WHERE = {
     3: 'Bogotá', 4: 'Madrid', 5: 'Sevilla', 6: 'Zagreb', 7: 'Zagreb', 8: 'Zagreb',
     9: 'Dubrovnik', 10: 'Dubrovnik', 11: 'Dubrovnik', 12: 'Dubrovnik', 13: 'Zúrich',
-    14: 'Zúrich', 15: 'Lucerna', 16: 'Interlaken', 17: 'Lauterbrunnen', 18: 'Ginebra',
+    14: 'Zúrich', 15: 'Lucerna', 16: 'Wilderswil', 17: 'Wilderswil', 18: 'Ginebra',
     19: 'Madrid', 20: 'Bogotá'
   };
 
@@ -1209,8 +1232,8 @@
     13: [6.87, 18.03],
     14: [7.70, 18.75],  // Zúrich
     15: [7.72, 18.72],  // Lucerna
-    16: [7.77, 18.73],  // Interlaken
-    17: [7.80, 18.70],  // Lauterbrunnen
+    16: [7.77, 18.73],  // Wilderswil / valle de Lauterbrunnen
+    17: [7.80, 18.70],  // Wilderswil / Jungfrau
     18: [7.83, 18.72],  // Berna
     19: [7.88, 18.77],  // Ginebra
     20: [5.68, 17.77]   // Bogotá
@@ -1249,9 +1272,9 @@
           wear:'Abrigo, bufanda ligera y paraguas; zapatos que aguanten lluvia.' },
     15: { icon:'⛅', hi:14, lo:6,  desc:'Lucerna: fresco; en la cumbre del Pilatus ~0–5°C',
           wear:'Abrigo y una capa térmica si suben al Pilatus; guantes ligeros no sobran en la cumbre.' },
-    16: { icon:'⛅', hi:13, lo:5,  desc:'Interlaken: clima de montaña, mañanas frías',
+    16: { icon:'⛅', hi:13, lo:5,  desc:'Valle de Lauterbrunnen (base Wilderswil): clima de montaña, mañanas frías',
           wear:'Capas térmicas para Harder Kulm y abrigo todo el día; el funicular arriba es ~5°C más frío.' },
-    17: { icon:'❄️', hi:12, lo:3,  desc:'Lauterbrunnen: valle frío; Jungfraujoch −2 a −7°C con nieve',
+    17: { icon:'❄️', hi:12, lo:3,  desc:'Base Wilderswil: valle frío; Jungfraujoch −2 a −7°C con nieve',
           wear:'Si van a Jungfraujoch: térmica completa — guantes, gorro, bufanda y botas. En el valle, abrigo y capas.' },
     18: { icon:'🌤️', hi:13, lo:6,  desc:'Berna: fresco y seco; el atardecer en el Rosengarten enfría rápido',
           wear:'Abrigo y bufanda; para el mirador al atardecer, llevar la chaqueta puesta.' },
@@ -1364,24 +1387,24 @@
             A('Bahnhofstrasse y Museo del Chocolate Lindt', { hours:2, amount:15, cur:'CHF', detail:'Lindt Home of Chocolate, junto al lago de Zúrich — precio estimado de entrada, verificar valor actualizado en el sitio oficial antes de ir.' })
           ] },
     15: { leg:'ch', icon:'🌉', short:'Lucerna', title:'Lucerna', sub:'Jueves 15 de octubre · Día completo',
-          fijo:['Día completo en Lucerna', '🚞 5:00pm — Tren panorámico Lucerna → Interlaken (~2h) — salir con luz: el sol se pone ~6:45pm', '🏨 Noche en Interlaken'],
+          fijo:['Día completo en Lucerna', '🚞 5:00pm — Tren panorámico Lucerna → Wilderswil (~2h15, vía Interlaken Ost) — salir con luz: el sol se pone ~6:45pm', '🏨 Noche en Wilderswil — base por 2 noches: aquí se quedan las maletas'],
           propuesta:[
             A('Opcional: Monte Pilatus en teleférico (mejor por la mañana)', { hours:3.5, after:9, amount:84, cur:'CHF', detail:'Precio verificado en pilatus.ch: 84 CHF ida y vuelta desde Kriens en temporada de verano/otoño (mayo-octubre). 50% de descuento con Swiss Travel Pass. Por la mañana hay más probabilidad de cielo despejado en la cumbre; subida + cumbre + bajada toman ~3.5h desde el centro.' }),
             A('Puente de la Capilla y Monumento del León', { hours:1.5, detail:'El puente de madera cubierto más antiguo de Europa en uso (1333); el león tallado en roca (1821) conmemora a los guardias suizos caídos en la Revolución Francesa. Ambos quedan a 10 min a pie entre sí — buena tarde antes del tren.' })
           ] },
-    16: { leg:'ch', icon:'⛰️', short:'Interlaken', title:'Interlaken', sub:'Viernes 16 de octubre · Día completo',
-          fijo:['Día completo en Interlaken', '🚞 6:00pm — Tren Interlaken → Lauterbrunnen (~20 min)', '🏨 Noche en Lauterbrunnen'],
+    16: { leg:'ch', icon:'💧', short:'Valle Lauterbrunnen', title:'Valle de Lauterbrunnen (desde Wilderswil)', sub:'Viernes 16 de octubre · Excursión de día, sin maletas',
+          fijo:['Base en Wilderswil — se explora el valle sin cargar equipaje', '🚞 Trenes locales Wilderswil ⇄ Lauterbrunnen cada ~30 min (trayecto ~15 min)', '🏨 Noche en Wilderswil'],
           propuesta:[
-            A('Harder Kulm (mirador con vista al Jungfrau)', { hours:2, amount:32, cur:'CHF', detail:'Funicular en operación desde 1908; mirador a 1.322m con vista directa al Eiger, Mönch y Jungfrau — de los miradores mejor valorados de Interlaken.' }),
-            A('Hohenmatte Park', { hours:1, detail:'Pradera central de Interlaken con vista a la Jungfrau, entrada gratis — punto clásico para descansar entre actividades.' })
+            A('Cascada Staubbachfall y valle de las 72 cascadas', { hours:1.5, after:9, detail:'300m de caída visible desde el pueblo de Lauterbrunnen, entrada libre — el valle tiene 72 cascadas y en octubre se cubre de dorados.' }),
+            A('Mürren o Wengen (pueblos sin autos)', { hours:2.5, detail:'Accesibles solo por teleférico o tren de cremallera — Mürren tiene vista frontal al Eiger, Mönch y Jungfrau. Por esto mismo NO conviene carro en esta zona.' }),
+            A('Harder Kulm al atardecer (funicular desde Interlaken)', { hours:2, after:16, amount:32, cur:'CHF', detail:'Funicular en operación desde 1908; mirador a 1.322m con vista directa al Eiger, Mönch y Jungfrau. El atardecer (~6:45pm) desde la plataforma es el cierre perfecto del día — Interlaken Ost queda a 1 parada de Wilderswil.' })
           ] },
-    17: { leg:'ch', icon:'💧', short:'Lauterbrunnen', title:'Lauterbrunnen', sub:'Sábado 17 de octubre · Día completo',
-          fijo:['Día completo en Lauterbrunnen', '🚞 6:00pm — Tren Lauterbrunnen → Berna (~1h 30min, trasbordo en Interlaken Ost)', '🏨 Noche en Berna'],
+    17: { leg:'ch', icon:'🏔️', short:'Jungfrau→Berna', title:'Jungfraujoch / Wilderswil → Berna', sub:'Sábado 17 de octubre · Último día en el Oberland',
+          fijo:['Mañana y tarde en la zona, con base en Wilderswil', '🚞 6:00pm — Tren Wilderswil → Berna (~1h 10min, vía Interlaken Ost)', '🏨 Noche en Berna'],
           propuesta:[
             T('Si van a Jungfraujoch: madrugar — primer tren ~6:30am', 'Desayuno muy temprano o para llevar; el almuerzo de ese día queda arriba en la estación (hay restaurantes en Jungfraujoch) o de vuelta en el valle.'),
-            A('Opcional: Jungfraujoch "Top of Europe" — sale muy temprano (~6:30am), reserva obligatoria', { hours:7, after:7, amount:271, cur:'CHF', detail:'Precio verificado en jungfrau.ch: 261,20 CHF ida y vuelta desde Interlaken Ost en temporada mayo-octubre, más 10 CHF de reserva obligatoria de asiento. El primer tren desde Lauterbrunnen sale ~6:30am; subida + tiempo arriba + bajada toma 6-8h en total (myswissalps.com).' }),
-            A('Cascada Staubbachfall y valle de las 72 cascadas', { hours:1, detail:'300m de caída de agua visible desde el pueblo, entrada libre — Lauterbrunnen tiene 72 cascadas en total a lo largo del valle.' }),
-            A('Pueblos de Mürren o Wengen', { hours:2, detail:'Ambos son pueblos sin autos, accesibles solo por teleférico o tren de cremallera — Mürren tiene vista frontal al Eiger.' })
+            A('Opcional: Jungfraujoch "Top of Europe" — sale muy temprano (~6:30am), reserva obligatoria', { hours:7, after:7, amount:271, cur:'CHF', detail:'Precio verificado en jungfrau.ch: 261,20 CHF ida y vuelta desde Interlaken Ost en temporada mayo-octubre, más 10 CHF de reserva obligatoria de asiento. La línea del tren pasa por la propia estación de Wilderswil; subida + tiempo arriba + bajada toma 6-8h en total (myswissalps.com). Se decide 1-2 días antes según el pronóstico — con niebla cerrada no vale la pena.' }),
+            A('Alternativa si no suben: Trümmelbachfälle y Grindelwald', { hours:3, after:9, amount:14, cur:'CHF', detail:'Trümmelbachfälle: 10 cascadas glaciares DENTRO de la montaña (~14 CHF, a 10 min de Lauterbrunnen); Grindelwald, el otro gran valle del Oberland, queda a ~30 min en tren desde Wilderswil.' })
           ] },
     18: { leg:'ch', icon:'🐻', short:'Berna→Ginebra', title:'Berna → Ginebra', sub:'Domingo 18 de octubre · Día completo',
           fijo:['Día completo en Berna', '🚄 7:00pm — Tren directo Berna → Ginebra (~1h 50min)', '🏨 Noche en Ginebra'],
@@ -1463,15 +1486,14 @@
           { type:'hotel', hour:22, label:'Hotel en Lucerna' } ],
     15: [ { type:'meal', start:8, end:9, label:'Desayuno', icon:'☕' },
           { type:'meal', start:13, end:14, label:'Almuerzo', icon:'🍽️' },
-          { type:'transit', start:17, end:19, label:'Tren panorámico Lucerna → Interlaken (~2h, con luz de día)', icon:'🚞' },
-          { type:'meal', start:20, end:21, label:'Cena en Interlaken', icon:'🍷' },
-          { type:'hotel', hour:22, label:'Hotel en Interlaken' } ],
+          { type:'transit', start:17, end:19, label:'Tren panorámico Lucerna → Wilderswil (~2h15, con luz de día)', icon:'🚞' },
+          { type:'meal', start:20, end:21, label:'Cena en Wilderswil', icon:'🍷' },
+          { type:'hotel', hour:22, label:'Hotel en Wilderswil (base)' } ],
     16: [ { type:'meal', start:8, end:9, label:'Desayuno', icon:'☕' },
           { type:'meal', start:13, end:14, label:'Almuerzo', icon:'🍽️' },
-          { type:'transit', start:18, end:19, label:'Tren Interlaken → Lauterbrunnen (~20 min)', icon:'🚞' },
-          { type:'meal', start:19, end:20, label:'Cena en Lauterbrunnen', icon:'🍷' },
-          { type:'hotel', hour:22, label:'Hotel en Lauterbrunnen' } ],
-    17: [ { type:'transit', start:18, end:20, label:'Tren Lauterbrunnen → Berna (~1h30, trasbordo en Interlaken Ost)', icon:'🚞' },
+          { type:'meal', start:19, end:20, label:'Cena en Wilderswil / Interlaken', icon:'🍷' },
+          { type:'hotel', hour:22, label:'Hotel en Wilderswil (base)' } ],
+    17: [ { type:'transit', start:18, end:19, label:'Tren Wilderswil → Berna (~1h10, vía Interlaken Ost)', icon:'🚞' },
           { type:'meal', start:20, end:21, label:'Cena en Berna', icon:'🍷' },
           { type:'hotel', hour:22, label:'Hotel en Berna' } ],
     18: [ { type:'meal', start:8, end:9, label:'Desayuno', icon:'☕' },
@@ -1787,8 +1809,7 @@
     { city:'Dubrovnik',     leg:'cr', flag:'🇭🇷', dates:'Oct 9–13',  nights:4, perNight:45, cur:'EUR', zone:'Lapad o Ploče (Old Town es más caro)' },
     { city:'Zúrich',        leg:'ch', flag:'🇨🇭', dates:'Oct 13–14', nights:1, perNight:80, cur:'CHF', zone:'Cerca de la estación central (HB)' },
     { city:'Lucerna',       leg:'ch', flag:'🇨🇭', dates:'Oct 14–15', nights:1, perNight:70, cur:'CHF', zone:'Casco antiguo / estación' },
-    { city:'Interlaken',    leg:'ch', flag:'🇨🇭', dates:'Oct 15–16', nights:1, perNight:65, cur:'CHF', zone:'Centro, entre las dos estaciones' },
-    { city:'Lauterbrunnen', leg:'ch', flag:'🇨🇭', dates:'Oct 16–17', nights:1, perNight:65, cur:'CHF', zone:'El pueblo — pocas opciones, reservar YA' },
+    { city:'Wilderswil',    leg:'ch', flag:'🇨🇭', dates:'Oct 15–17', nights:2, perNight:60, cur:'CHF', zone:'Base del Oberland (acordado en reunión) — a 1 parada de Interlaken Ost y más barato que Interlaken' },
     { city:'Berna',         leg:'ch', flag:'🇨🇭', dates:'Oct 17–18', nights:1, perNight:70, cur:'CHF', zone:'Old Town / cerca de la estación' },
     { city:'Ginebra',       leg:'ch', flag:'🇨🇭', dates:'Oct 18–19', nights:1, perNight:75, cur:'CHF', zone:'Pâquis o cerca de Cornavin (tren directo al aeropuerto)' }
   ];
@@ -1812,7 +1833,7 @@
     { id:'t-du', leg:'cr', flag:'🚌', label:'Dubrovnik — traslados y buses', dates:'Oct 9–13', def:20, cur:'EUR',
       note:'Shuttle del aeropuerto ~10€ por trayecto; los buses urbanos vienen incluidos en el Dubrovnik Pass' },
     { id:'t-ch', leg:'ch', flag:'🚄', label:'Suiza — trenes punto a punto', dates:'Oct 13–19', def:165, cur:'CHF',
-      note:'ZRH→Zúrich→Lucerna→Interlaken→Lauterbrunnen→Berna→Ginebra→GVA en 2ª clase, tarifa normal. Los billetes Supersaver anticipados bajan 30–50%; el Swiss Travel Pass (~389 CHF / 6 días) solo conviene si suben a Pilatus y Jungfraujoch (50% y 25% de descuento)' }
+      note:'ZRH→Zúrich→Lucerna→Wilderswil (+ trenes del valle)→Berna→Ginebra→GVA en 2ª clase, tarifa normal. Los billetes Supersaver anticipados bajan 30–50%; el Swiss Travel Pass (~389 CHF / 6 días) solo conviene si suben a Pilatus y Jungfraujoch (50% y 25% de descuento)' }
   ];
 
   const EST_PRICES_KEY = 'viajeEuropaEstPrices';
@@ -1906,6 +1927,52 @@
   buildEditableRows(document.getElementById('meals-list'), MEALS_EST, true);
   buildEditableRows(document.getElementById('transport-list'), TRANSPORT_EST, false);
   updateEstimates();
+
+  // ── CHECKLIST PRE-VIAJE (reunión 20 jul 2026) — marcado persistido por navegador ──
+  const CHECKLIST = [
+    { t:'Enviar el enlace del itinerario a todos', who:'Juanse' },
+    { t:'Mantener el itinerario actualizado para consulta del grupo', who:'Juanse' },
+    { t:'Equipo de invierno en Decathlon', who:'Nubia', note:'Calzado impermeable, chaquetas y ropa térmica — este fin de semana' },
+    { t:'Comprar zapatos de caminata y probarlos con tiempo', who:'Grupo', note:'Botas impermeables; estrenarlas antes del viaje para evitar ampollas' },
+    { t:'Probar las botas Salomon con Sandra (o venderlas)', who:'Nubia' },
+    { t:'Seguro médico: EPS + tarjetas con cobertura internacional', who:'Nubia', note:'Confirmar procedimientos de asistencia en el exterior' },
+    { t:'Investigar bus o ferry Dubrovnik → Kotor', who:'Grupo', note:'Alternativa al tour de 65€ para el día libre (Oct 12)' },
+    { t:'Reservar hoteles — 15 noches, 8 hospedajes', who:'Grupo', note:'Tarifa cancelable desde ya; confirmar a finales de agosto. Incluye la base de 2 noches en Wilderswil' },
+    { t:'Reservar excursión a Plitvice (Civitatis)', who:'Grupo', note:'Cancelación gratis hasta 24h antes y cupos de 8 — se puede reservar ya' },
+    { t:'Adaptadores universales de energía', who:'Grupo', note:'Buscar en casa primero; Suiza usa clavija propia (tipo J)' },
+    { t:'eSIM para datos (p. ej. Holafly) en vez de roaming', who:'Grupo' },
+    { t:'Efectivo: euros de emergencia + francos al llegar a Suiza', who:'Grupo' },
+    { t:'Botiquín básico', who:'Grupo', note:'Dolor de cabeza/estómago, curitas; aseo en <100ml para cabina' },
+    { t:'Gafas de sol para todos', who:'Grupo' },
+    { t:'Pedir el Rolex desde Colombia para reclamarlo en destino', who:'Hernando' },
+    { t:'Imprimir el itinerario final antes de salir', who:'Grupo' }
+  ];
+  const CHECK_KEY = 'viajeEuropaChecklist';
+  let checkState = {};
+  try { checkState = JSON.parse(localStorage.getItem(CHECK_KEY)) || {}; } catch (e) { checkState = {}; }
+  const checkGrid = document.getElementById('check-grid');
+  const checkProgress = document.getElementById('check-progress');
+  function updateCheckProgress() {
+    if (!checkProgress) return;
+    const done = CHECKLIST.filter((_, i) => checkState[i]).length;
+    checkProgress.textContent = done + ' de ' + CHECKLIST.length + ' listas ✓';
+  }
+  if (checkGrid) {
+    CHECKLIST.forEach((item, i) => {
+      const el = document.createElement('div');
+      el.className = 'check-item' + (checkState[i] ? ' done' : '');
+      el.innerHTML = `<span class="chk">${checkState[i] ? '☑' : '☐'}</span><span class="txt">${item.t}<span class="who ${item.who.toLowerCase()}">${item.who}</span>${item.note ? `<span class="note">${item.note}</span>` : ''}</span>`;
+      el.addEventListener('click', () => {
+        checkState[i] = !checkState[i];
+        try { localStorage.setItem(CHECK_KEY, JSON.stringify(checkState)); } catch (e) { /* solo en memoria */ }
+        el.classList.toggle('done', !!checkState[i]);
+        el.querySelector('.chk').textContent = checkState[i] ? '☑' : '☐';
+        updateCheckProgress();
+      });
+      checkGrid.appendChild(el);
+    });
+    updateCheckProgress();
+  }
 
   // ── GANTT HORIZONTAL SCROLL — nav buttons + edge fade ──
   const ganttWrapEl = document.getElementById('gantt-wrap');
