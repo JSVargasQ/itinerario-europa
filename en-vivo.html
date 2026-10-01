@@ -125,6 +125,10 @@
     .tag.fijo { background: #DCFCE7; color: #166534; }
     .tag.pend { background: #FEF3C7; color: var(--warn-dark); }
     .tag.prop { background: var(--card2); color: var(--muted2); }
+    .tag.px { background: #FEF3C7; color: #92400E; }
+    .tag.free { background: var(--card2); color: var(--muted2); }
+    .day-cost { font-size: .76rem; color: var(--muted); margin: 6px 0 0; }
+    .day-cost b { color: var(--text); }
     .tag.opc { background: #EDE9FE; color: #5B21B6; }
     .tag.hin { background: #DCFCE7; color: #166534; }
     .tag.hout { background: #FEE2E2; color: #991B1B; }
@@ -290,7 +294,7 @@
   const DAY_NOTE = {
     8: 'Plitvice quedó para el 8 de octubre. Pendiente de reservar la excursión (Civitatis o similar).',
     9: 'Vuelo nocturno: el check-out es a las 11:00 pero el vuelo sale a las 22:45. Pueden dejar maletas en recepción.',
-    15: 'Wilderswil es la base: maletas quietas hasta el 17. Opcional Jungfraujoch: sale ~6:30 y exige reserva.',
+    15: 'Wilderswil es la base: maletas quietas hasta el 17. Opcional Jungfraujoch (~CHF 271 p/p con reserva de asiento): sale ~6:30 y exige reservar.',
     19: 'Día de regreso: Ginebra → Madrid → Bogotá. Llegan a Bogotá a las 19:30 del mismo día.'
   };
 
@@ -409,6 +413,29 @@
   add({ kind:'meal', st:'prop', ic:'🍽️', title:'Escala en Madrid — almuerzo', sub:'~4 h entre vuelos, con billetes separados (sin protección si el primero se retrasa): recoger y volver a facturar equipaje con margen.', s:Y+'19T12:30', sz:Z.MAD, e:Y+'19T14:00', ez:Z.MAD, city:'Madrid' });
   F('19','16:25','Madrid',Z.MAD,'19:30','Bogotá',Z.BOG,'Vuelo Madrid → Bogotá','Iberia IB0153 · llegada Terminal 1', { city:'Madrid', doc:'2026-10-19_Gin-Mad-Bog' });
 
+  /* ═════════ PRECIOS DE ACTIVIDADES (por persona, estimados; vienen del itinerario completo) ═════════
+     a = monto, c = moneda; free = gratis; tbd = por confirmar; n = nota. Se asignan por el inicio del título. */
+  const FREE = { free:true };
+  const PRICE = {
+    'Cena en Triana': { a:15, c:'EUR' }, 'Real Alcázar': { a:16, c:'EUR', n:'Entrada general 15,50 €' }, 'Catedral + subida a la Giralda': { a:13, c:'EUR' },
+    'Barrio de Santa Cruz': FREE, 'Catedral y Giralda iluminadas': FREE, 'Plaza de España': FREE, 'Triana y orilla': FREE,
+    'Plaza Ban Jelačić': FREE, 'Cena en Batak': { a:15, c:'EUR' }, 'Ciudad Alta': { a:3, c:'EUR', n:'Funicular + torre' }, 'Catedral de Zagreb': FREE,
+    'Mercado Dolac': { a:8, c:'EUR', n:'Entrada al museo (el mercado es gratis)' }, 'Museo Nikola Tesla': { a:2, c:'EUR' },
+    'Excursión a los Lagos de Plitvice': { tbd:true, n:'Entrada al parque + transporte; confirmar al reservar' }, 'Cena en Submarine': { a:15, c:'EUR' },
+    'Herradura de Lenuci': FREE, 'Murallas de Dubrovnik': { a:35, c:'EUR', n:'30–35 € según temporada' }, 'Stradun': FREE, 'Palacio del Rector': { a:10, c:'EUR' },
+    'Isla Lokrum': { a:27, c:'EUR', n:'Ferry + entrada' }, 'Monasterio Franciscano': { a:5, c:'EUR' }, 'Fortaleza de San Lorenzo': { a:10, c:'EUR' },
+    'Teleférico al Monte Srđ': { a:27, c:'EUR' }, 'Opcional: día completo a Kotor': { a:65, c:'EUR', n:'Tour de día completo' }, 'Mañana libre en la Ciudad Vieja': FREE,
+    'Altstadt': { free:true, n:'Fraumünster: entrada de pocos CHF' }, 'Bahnhofstrasse': { a:15, c:'CHF', n:'Lindt Home of Chocolate (estimado)' },
+    'Puente de la Capilla': FREE, 'Harder Kulm': { a:32, c:'CHF', n:'Funicular ida y vuelta' }, 'Cascada Staubbach': FREE,
+    'Mürren o Wengen': { tbd:true, n:'Depende del teleférico/tren elegido' }, 'Ciudad Vieja (UNESCO)': FREE, 'Bundeshaus': { free:true, n:'Tours gratuitos si no hay sesión' },
+    'Rosengarten': FREE, 'Jet d': FREE
+  };
+  const SYM = { EUR:'€', CHF:'CHF ' };
+  E.forEach(e => { for (const k in PRICE) if (e.title.startsWith(k)) { e.px = PRICE[k]; break; } });
+  const pxTxt = (px) => px.free ? 'Gratis' : px.tbd ? 'Por confirmar' : SYM[px.c] + px.a + ' p/p';
+  const pxTag = (e) => e.px ? `<span class="tag ${e.px.a ? 'px' : 'free'}" title="${e.px.n || ''}">${e.px.a ? '💶 ' : ''}${pxTxt(e.px)}</span>` : '';
+  const dayCost = (d) => { const t = {}; E.forEach(e => { if (e.day === d && e.px && e.px.a && e.st !== 'opc') t[e.px.c] = (t[e.px.c] || 0) + e.px.a; }); return Object.keys(t).map(c => SYM[c] + t[c]).join(' + '); };
+
   /* ═════════ UTILIDADES DE ZONA HORARIA ═════════ */
   const dtfCache = {};
   const dtf = (tz) => dtfCache[tz] || (dtfCache[tz] = new Intl.DateTimeFormat('en-CA', { timeZone: tz, hourCycle:'h23', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' }));
@@ -522,7 +549,7 @@
     vis.forEach(e => {
       if (e.day !== lastDay) {
         lastDay = e.day; const lg = LEGS[DAY_LEG[e.day]]; const wd = WDF[wdOf(2026, 10, e.day)];
-        h += `<div class="day-head" id="day-${e.day}" style="--c:${lg.c}"><div class="day-pill">${lg.f} ${wd} ${e.day} de octubre <small>· duerme en ${SLEEP[e.day] === 'Vuelo' ? 'el vuelo' : SLEEP[e.day]}</small></div>${DAY_NOTE[e.day] ? `<div class="day-note">${DAY_NOTE[e.day]}</div>` : ''}</div>`;
+        h += `<div class="day-head" id="day-${e.day}" style="--c:${lg.c}"><div class="day-pill">${lg.f} ${wd} ${e.day} de octubre <small>· duerme en ${SLEEP[e.day] === 'Vuelo' ? 'el vuelo' : SLEEP[e.day]}</small></div>${DAY_NOTE[e.day] ? `<div class="day-note">${DAY_NOTE[e.day]}</div>` : ''}${dayCost(e.day) ? `<div class="day-cost">💶 Actividades y cenas del día, por persona (si hacen todo lo propuesto): <b>${dayCost(e.day)}</b></div>` : ''}</div>`;
       }
       const lg = LEGS[e.leg] || LEGS.co; const ref = e.s.slice(0, 10);
       const a = shown(e.t0, e.sz, ref);
@@ -539,11 +566,12 @@
         times = e.sz !== Z.BOG ? (mode === 'col' ? 'Hora local: ' + hm(e.t0, e.sz) : '🇨🇴 Colombia: ' + hm(e.t0, Z.BOG)) : '';
       }
       const tag = e.kind === 'hin' ? '<span class="tag hin">Check-in</span>' : e.kind === 'hout' ? '<span class="tag hout">Check-out</span>' : '';
+      const pxt = pxTag(e);
       const st = e.st === 'fijo' ? '<span class="tag fijo">Fijo</span>' : e.st === 'pend' ? '<span class="tag pend">Por reservar</span>' : e.st === 'opc' ? '<span class="tag opc">Opcional</span>' : '<span class="tag prop">Propuesta</span>';
       h += `<div class="ev ${e.st === 'pend' ? 'pending' : ''}" data-id="${e.id}" style="--c:${lg.c}">
               <div class="tm">${a.txt}${a.off ? `<small>${a.off > 0 ? '+' : ''}${a.off} día</small>` : ''}</div>
-              <div class="ev-top"><span class="ev-ic">${e.ic}</span><span class="ev-title">${e.title}</span>${tag}${st}</div>
-              ${e.sub ? `<div class="ev-sub">${e.sub}</div>` : ''}
+              <div class="ev-top"><span class="ev-ic">${e.ic}</span><span class="ev-title">${e.title}</span>${tag}${st}${pxt}</div>
+              ${e.sub ? `<div class="ev-sub">${e.sub}</div>` : ''}${e.px && e.px.n ? `<div class="ev-sub">💶 ${e.px.n}</div>` : ''}
               <div class="ev-times">${times}${e.doc ? `<br>📎 Documento en <b>${e.doc}</b>` : ''}</div>
               <div class="prog" style="display:none"><i></i></div>
             </div>`;
@@ -656,7 +684,7 @@
         const times = e.t1 ? `${hm(e.t0, tzS)} – ${hm(e.t1, tzE)}` : hm(e.t0, tzS);
         const label = e.kind === 'flight' ? `${e.from} → ${e.to}` : e.title;
         const w = `calc((100% - 6px) / ${sg.n})`;
-        h += `<div class="gseg ${gClass(e)}${e.st === 'pend' ? ' pend' : ''}" tabindex="0" data-id="${e.id}" title="${e.title} · ${times}" style="grid-column:${col};grid-row:${sg.r0 + 2} / ${sg.r1 + 2};width:${w};margin-left:calc(3px + ${sg.lane} * ${w})"><span>${e.ic}</span><span class="txt">${label}<span class="tm2">${times}${e.kind === 'flight' ? ' · ' + e.sub : ''}</span></span></div>`;
+        h += `<div class="gseg ${gClass(e)}${e.st === 'pend' ? ' pend' : ''}" tabindex="0" data-id="${e.id}" title="${e.title} · ${times}" style="grid-column:${col};grid-row:${sg.r0 + 2} / ${sg.r1 + 2};width:${w};margin-left:calc(3px + ${sg.lane} * ${w})"><span>${e.ic}</span><span class="txt">${label}<span class="tm2">${times}${e.kind === 'flight' ? ' · ' + e.sub : ''}${e.px ? ' · ' + (e.px.a ? '💶 ' : '') + pxTxt(e.px) : ''}</span></span></div>`;
       });
     });
     g.innerHTML = h;
