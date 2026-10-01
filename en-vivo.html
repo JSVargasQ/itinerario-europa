@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Viaje Europa — En vivo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --co: #1565C0; --co-bg: #E3F2FD;
+      --es: #F57F17; --es-bg: #FFF8E1;
+      --cr: #C62828; --cr-bg: #FFEBEE;
+      --ch: #AD1457; --ch-bg: #FCE4EC;
+      --bg: #F7F8FA; --card: #FFFFFF; --card2: #F1F4F8; --border: #E2E8F0;
+      --text: #0F172A; --muted: #475569; --muted2: #64748B;
+      --ok: #10B981; --ok-dark: #047857; --warn: #F59E0B; --warn-dark: #B45309;
+      --now: #E11D48;
+      --r: 14px; --r-sm: 8px;
+      --shadow: 0 1px 2px rgba(15,23,42,.04), 0 4px 14px rgba(15,23,42,.06);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; overflow-x: hidden; }
+    button { font: inherit; cursor: pointer; }
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+
+    /* ─── BARRA SUPERIOR ─── */
+    header.top {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(255,255,255,.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .top-row { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; justify-content: space-between; padding: 10px 0; }
+    .brand { font-weight: 800; letter-spacing: -.02em; font-size: 1rem; }
+    .brand a { color: var(--muted2); font-weight: 500; font-size: .78rem; text-decoration: none; margin-left: 8px; }
+    .brand a:hover { color: var(--text); }
+    .seg { display: inline-flex; background: var(--card2); border: 1px solid var(--border); border-radius: 100px; padding: 3px; }
+    .seg button { border: 0; background: transparent; padding: 6px 14px; border-radius: 100px; font-size: .8rem; font-weight: 600; color: var(--muted); }
+    .seg button.on { background: var(--card); color: var(--text); box-shadow: 0 1px 3px rgba(15,23,42,.12); }
+    .clocks { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 0 0 10px; font-size: .78rem; color: var(--muted); }
+    .clk { display: inline-flex; align-items: baseline; gap: 6px; }
+    .clk b { font-variant-numeric: tabular-nums; font-size: .95rem; color: var(--text); }
+    .clk.here b { color: var(--now); }
+    .clk small { color: var(--muted2); }
+
+    /* ─── ESTADO AHORA ─── */
+    .status { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 18px 0 8px; }
+    @media (max-width: 640px) { .status { grid-template-columns: 1fr; } }
+    .st-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; box-shadow: var(--shadow); }
+    .st-card.now { border-left: 5px solid var(--now); }
+    .st-card.next { border-left: 5px solid var(--co); }
+    .st-label { font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted2); }
+    .st-title { font-weight: 700; font-size: 1.02rem; margin: 2px 0; }
+    .st-sub { font-size: .82rem; color: var(--muted); }
+    .bar { height: 6px; border-radius: 4px; background: var(--card2); margin-top: 8px; overflow: hidden; }
+    .bar i { display: block; height: 100%; background: var(--now); border-radius: 4px; }
+    .sim { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: .78rem; color: var(--muted); margin-bottom: 4px; }
+    .sim input { font: inherit; padding: 4px 8px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--card); color: var(--text); }
+    .sim button { border: 1px solid var(--border); background: var(--card); border-radius: var(--r-sm); padding: 4px 10px; font-size: .78rem; font-weight: 600; color: var(--muted); }
+    .sim button:hover { color: var(--text); }
+    .sim .badge-sim { background: #FEF3C7; color: var(--warn-dark); border-radius: 100px; padding: 2px 10px; font-weight: 700; font-size: .72rem; }
+
+    h2.sec { font-size: 1.25rem; font-weight: 800; letter-spacing: -.02em; margin: 30px 0 4px; }
+    p.intro { color: var(--muted); font-size: .88rem; margin-bottom: 14px; }
+
+    /* ─── CALENDARIO ─── */
+    .cal-head, .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .cal-head div { text-align: center; font-size: .7rem; font-weight: 700; color: var(--muted2); text-transform: uppercase; letter-spacing: .06em; padding-bottom: 4px; }
+    .cell { min-height: 108px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 6px; font-size: .68rem; display: flex; flex-direction: column; gap: 3px; text-align: left; color: inherit; }
+    .cell.empty { background: transparent; border-color: transparent; }
+    .cell.out { opacity: .45; }
+    .cell.trip { cursor: pointer; border-top: 4px solid var(--c, var(--border)); }
+    .cell.trip:hover { box-shadow: var(--shadow); }
+    .cell.today { outline: 2px solid var(--now); outline-offset: 1px; }
+    .cell.sel { background: var(--card2); }
+    .cell .dn { font-weight: 800; font-size: .85rem; display: flex; justify-content: space-between; align-items: center; }
+    .cell .dn small { font-weight: 600; color: var(--muted2); font-size: .62rem; }
+    .cell .city { font-weight: 700; color: var(--c, var(--muted)); font-size: .7rem; line-height: 1.15; }
+    .chip { border-radius: 5px; padding: 1px 5px; line-height: 1.35; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chip.flight { background: var(--co-bg); color: #0D47A1; }
+    .chip.hin { background: #DCFCE7; color: #166534; }
+    .chip.hout { background: #FEE2E2; color: #991B1B; }
+    .chip.act { background: var(--card2); color: var(--muted); }
+    @media (max-width: 720px) {
+      .cell { min-height: 74px; padding: 4px; }
+      .cell .city { display: none; }
+      .chip { font-size: 0; padding: 0; width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+      .chip.flight { background: var(--co); } .chip.hin { background: var(--ok); } .chip.hout { background: #EF4444; } .chip.act { background: #94A3B8; }
+      .cell .chips { display: flex; flex-wrap: wrap; gap: 3px; }
+    }
+    .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .75rem; color: var(--muted); margin-top: 10px; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+    /* ─── LÍNEA DE TIEMPO ─── */
+    .tl-tools { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 8px; }
+    .tl-lab { font-size: .8rem; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+    .btn { border: 1px solid var(--border); background: var(--card); border-radius: 100px; padding: 6px 14px; font-weight: 600; font-size: .8rem; color: var(--text); }
+    .btn:hover { box-shadow: var(--shadow); }
+    .btn.primary { background: var(--now); color: #fff; border-color: var(--now); }
+    .tl { position: relative; padding-left: 74px; margin-top: 8px; }
+    .rail { position: absolute; left: 66px; top: 0; bottom: 0; width: 4px; background: var(--border); border-radius: 2px; }
+    .rail-fill { position: absolute; left: 66px; top: 0; width: 4px; background: var(--now); border-radius: 2px; height: 0; transition: height .6s ease; }
+    .day-head { position: relative; margin: 26px 0 10px -74px; padding-left: 74px; }
+    .day-head:first-child { margin-top: 0; }
+    .day-pill { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; background: var(--c, var(--text)); color: #fff; border-radius: 100px; padding: 5px 16px; font-weight: 700; font-size: .86rem; }
+    .day-pill small { font-weight: 500; opacity: .9; }
+    .day-note { font-size: .78rem; color: var(--muted); margin: 6px 0 0; }
+    .ev { position: relative; background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 14px; margin-bottom: 10px; box-shadow: var(--shadow); }
+    .ev::before { content: ''; position: absolute; left: -17px; top: 16px; width: 14px; height: 14px; border-radius: 50%; background: var(--card); border: 3px solid var(--c, #94A3B8); z-index: 2; margin-left: -.5px; }
+    .ev .tm { position: absolute; left: -76px; top: 10px; width: 52px; text-align: right; font-weight: 800; font-size: .86rem; font-variant-numeric: tabular-nums; line-height: 1.2; }
+    .ev .tm small { display: block; font-weight: 500; font-size: .66rem; color: var(--muted2); }
+    .ev.past { opacity: .55; }
+    .ev.past::before { background: var(--c, #94A3B8); }
+    .ev.live { border: 2px solid var(--now); background: #FFF1F2; }
+    .ev.live::before { background: var(--now); border-color: var(--now); box-shadow: 0 0 0 5px rgba(225,29,72,.2); }
+    .ev.is-next { border-color: var(--co); }
+    .ev.sel-day { }
+    .ev-top { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+    .ev-ic { font-size: 1.05rem; }
+    .ev-title { font-weight: 700; font-size: .93rem; }
+    .tag { font-size: .62rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; border-radius: 100px; padding: 1px 8px; }
+    .tag.fijo { background: #DCFCE7; color: #166534; }
+    .tag.pend { background: #FEF3C7; color: var(--warn-dark); }
+    .tag.prop { background: var(--card2); color: var(--muted2); }
+    .tag.opc { background: #EDE9FE; color: #5B21B6; }
+    .tag.hin { background: #DCFCE7; color: #166534; }
+    .tag.hout { background: #FEE2E2; color: #991B1B; }
+    .ev-sub { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+    .ev-times { font-size: .78rem; color: var(--muted2); margin-top: 4px; font-variant-numeric: tabular-nums; }
+    .ev-times b { color: var(--text); }
+    .ev.pending { border-style: dashed; }
+    .ev .prog { height: 5px; background: rgba(225,29,72,.15); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+    .ev .prog i { display: block; height: 100%; background: var(--now); }
+    .now-line { position: absolute; left: 0; right: 0; height: 0; z-index: 5; pointer-events: none; transition: top .6s ease; }
+    .now-line::before { content: ''; position: absolute; left: 62px; right: 0; top: 0; border-top: 2px solid var(--now); opacity: .55; }
+    .now-line span { position: absolute; left: 0; top: -12px; background: var(--now); color: #fff; font-weight: 800; font-size: .7rem; border-radius: 100px; padding: 3px 9px; box-shadow: 0 2px 8px rgba(225,29,72,.4); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .now-line.hidden { display: none; }
+    @media (max-width: 640px) {
+      .tl { padding-left: 58px; } .rail, .rail-fill { left: 50px; }
+      .day-head { margin-left: -58px; padding-left: 58px; }
+      .ev .tm { left: -60px; width: 42px; font-size: .78rem; }
+      .now-line::before { left: 46px; }
+      .now-line span { font-size: .62rem; padding: 2px 6px; }
+    }
+
+    /* ─── CRONOGRAMA POR HORAS (mismo formato que index.html) ─── */
+    .view-bar { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 10px; }
+    .gantt-outer { position: relative; }
+    .gantt-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--border); border-radius: var(--r); background: var(--card); box-shadow: var(--shadow); scrollbar-width: thin; scroll-snap-type: x proximity; }
+    .gantt-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 50; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 1.1rem; font-weight: 700; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; }
+    .gantt-nav:hover { background: var(--card2); }
+    .gantt-nav.prev { left: -14px; } .gantt-nav.next { right: -14px; }
+    .gantt-hint { font-size: .72rem; color: var(--muted); margin-top: 8px; }
+    @media (max-width: 640px) { .gantt-nav { display: none; } }
+    .gantt { --rh: 14px; display: grid; grid-template-columns: 58px repeat(17, 118px); grid-template-rows: 66px repeat(48, var(--rh)); min-width: max-content; position: relative; }
+    .gantt-corner { grid-column: 1; grid-row: 1; position: sticky; top: 0; left: 0; z-index: 8; background: var(--card); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: .58rem; font-weight: 700; color: var(--muted2); text-align: center; line-height: 1.2; padding: 2px; }
+    .gantt-hour { grid-column: 1; position: sticky; left: 0; z-index: 7; background: var(--card); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); font-size: .62rem; color: var(--muted2); display: flex; align-items: center; justify-content: flex-end; padding-right: .4rem; }
+    .gantt-hour.daytime { background: var(--card2); }
+    .gantt-day-head { grid-row: 1; position: sticky; top: 0; z-index: 6; cursor: pointer; background: var(--bgh, var(--card)); box-shadow: inset 0 3px 0 var(--c); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: .3rem; text-align: center; }
+    .gantt-day-head:hover { filter: brightness(.97); }
+    .gantt-day-head.today { outline: 2px solid var(--now); outline-offset: -2px; }
+    .gantt-day-head .wd { font-size: .6rem; font-weight: 600; color: var(--muted2); text-transform: uppercase; letter-spacing: .04em; }
+    .gantt-day-head .num { font-size: 1rem; font-weight: 800; line-height: 1.2; }
+    .gantt-day-head .where { font-size: .64rem; font-weight: 800; line-height: 1.15; color: var(--c); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .gantt-col-bg { grid-row: 2 / 50; border-right: 1px solid var(--border); z-index: 0; scroll-snap-align: start;
+      --sr: 7.5; --ss: 19; --night: rgba(30,58,138,.16);
+      --hourlines: repeating-linear-gradient(to bottom, var(--border) 0 1px, transparent 1px calc(var(--rh) * 2));
+      background-image: linear-gradient(to bottom, var(--night) 0, var(--night) calc(var(--sr) * 100% / 24), transparent calc(var(--sr) * 100% / 24), transparent calc(var(--ss) * 100% / 24), var(--night) calc(var(--ss) * 100% / 24), var(--night) 100%), var(--hourlines); }
+    .gantt-col-bg.first-of-leg, .gantt-day-head.first-of-leg { border-left: 2px solid var(--border); }
+    .gseg { position: relative; z-index: 1; display: flex; align-items: flex-start; gap: .25rem; font-size: .64rem; line-height: 1.15; overflow: hidden; justify-self: start; margin-top: 1px; margin-bottom: 1px; padding: .1rem .3rem; border-radius: 6px; font-weight: 700; cursor: pointer; outline: none; }
+    .gseg .txt { display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+    .gseg .tm2 { display: none; font-weight: 500; opacity: .85; margin-top: 2px; font-variant-numeric: tabular-nums; }
+    .gseg.gflight { background: #FDEFD8; border: 1px solid rgba(245,158,11,.45); color: var(--warn-dark); }
+    .gseg.gact { background: #DEF5ED; border: 1px solid rgba(16,185,129,.4); color: var(--ok-dark); }
+    .gseg.gprop { background: var(--card2); border: 1px dashed var(--border); color: var(--muted2); font-weight: 600; }
+    .gseg.gopc { background: #F4EFFE; border: 1px dashed #7C3AED; color: #5B21B6; font-weight: 600; }
+    .gseg.gmeal { background: #FEF2E8; border: 1px dashed rgba(234,88,12,.35); color: #9A3412; font-weight: 600; }
+    .gseg.gtrans { background: #EEF0F2; border: 1px solid rgba(71,85,105,.25); color: var(--muted); font-weight: 600; }
+    .gseg.ghin { background: #DCFCE7; border: 1px solid #86EFAC; color: #166534; }
+    .gseg.ghout { background: #FEE2E2; border: 1px solid #FCA5A5; color: #991B1B; }
+    .gseg.pend { border-style: dashed; }
+    .gseg:hover, .gseg:focus-visible { z-index: 40; overflow: visible; }
+    .gseg:hover .txt, .gseg:focus-visible .txt { position: absolute; top: 0; left: 0; z-index: 45; width: max-content; min-width: 120px; max-width: 230px; -webkit-line-clamp: unset; white-space: normal; background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: .35rem .5rem; box-shadow: 0 10px 24px rgba(15,23,42,.22); display: block; }
+    .gseg:hover .tm2, .gseg:focus-visible .tm2 { display: block; }
+    .gnow { grid-row: 2 / 50; position: relative; z-index: 30; pointer-events: none; }
+    .gnow i { position: absolute; left: 0; right: 0; border-top: 2px solid var(--now); }
+    .gnow i::before { content: ''; position: absolute; left: -4px; top: -6px; width: 10px; height: 10px; border-radius: 50%; background: var(--now); }
+    .gnow b { position: absolute; right: 2px; transform: translateY(-115%); background: var(--now); color: #fff; font-size: .58rem; border-radius: 100px; padding: 0 6px; font-variant-numeric: tabular-nums; }
+    @media (max-width: 640px) {
+      .gantt { --rh: 12px; grid-template-columns: 46px repeat(17, 96px); grid-template-rows: 58px repeat(48, var(--rh)); }
+      .gantt-hour { font-size: .56rem; } .gseg { font-size: .58rem; }
+    }
+    footer { margin: 40px 0 30px; font-size: .75rem; color: var(--muted2); text-align: center; }
+  </style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      <div class="brand">✈️ Viaje Europa · En vivo <a href="index.html">← Itinerario completo</a></div>
+      <div class="seg" id="tz-seg" role="group" aria-label="Zona horaria">
+        <button type="button" data-mode="col" class="on">🇨🇴 Hora Colombia (UTC-5)</button>
+        <button type="button" data-mode="local">📍 Hora local del lugar</button>
+      </div>
+    </div>
+    <div class="clocks" id="clocks"></div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="status" id="status"></div>
+  <div class="sim">
+    <span id="sim-badge"></span>
+    <label>Simular fecha y hora (hora Colombia): <input type="datetime-local" id="sim-input"></label>
+    <button type="button" id="sim-reset">Usar hora real</button>
+  </div>
+
+  <h2 class="sec">📅 Calendario</h2>
+  <p class="intro">Octubre 2026. Cada día muestra dónde dormimos, los vuelos, y los check-in / check-out. Toca un día para ir a su parte en la línea de tiempo. Las horas siguen la zona horaria elegida arriba.</p>
+  <div class="cal-head" id="cal-head"></div>
+  <div class="cal-grid" id="cal-grid"></div>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--co)"></i> Colombia</span>
+    <span><i class="dot" style="background:var(--es)"></i> España</span>
+    <span><i class="dot" style="background:var(--cr)"></i> Croacia</span>
+    <span><i class="dot" style="background:var(--ch)"></i> Suiza</span>
+    <span>✈️ Vuelo</span><span>🔑 Check-in</span><span>🧳 Check-out</span>
+  </div>
+
+  <h2 class="sec">🕒 Cronograma</h2>
+  <p class="intro">Dos formas de ver el mismo plan. <b>Línea de tiempo</b>: lista vertical en orden cronológico con la línea roja "AHORA". <b>Cronograma por horas</b>: una columna por día y las horas en vertical, igual que en el itinerario completo. <b>Fijo</b> = reservado con documento; <b>Por reservar</b> = falta confirmar; <b>Propuesta</b> = idea para afinar.</p>
+  <div class="view-bar">
+    <div class="seg" id="view-seg" role="group" aria-label="Vista del cronograma">
+      <button type="button" data-view="tl" class="on">🕒 Línea de tiempo</button>
+      <button type="button" data-view="gantt">🗓️ Cronograma por horas</button>
+    </div>
+    <button class="btn primary" type="button" id="go-now">Ir a ahora</button>
+    <label class="tl-lab"><input type="checkbox" id="f-prop" checked> Mostrar propuestas de actividades</label>
+    <label class="tl-lab"><input type="checkbox" id="f-trans" checked> Mostrar traslados</label>
+  </div>
+
+  <div id="view-tl">
+    <div class="tl" id="tl">
+      <div class="rail"></div><div class="rail-fill" id="rail-fill"></div>
+      <div class="now-line hidden" id="now-line"><span id="now-label"></span></div>
+      <div id="tl-body"></div>
+    </div>
+  </div>
+
+  <div id="view-gantt" hidden>
+    <div class="gantt-outer">
+      <div class="gantt-wrap" id="gantt-wrap"><div class="gantt" id="gantt"></div></div>
+      <button class="gantt-nav prev" id="gantt-prev" type="button" aria-label="Día anterior">‹</button>
+      <button class="gantt-nav next" id="gantt-next" type="button" aria-label="Día siguiente">›</button>
+    </div>
+    <p class="gantt-hint">💡 Desliza o usa las flechas para ver los demás días. Pasa el cursor (o toca) sobre un bloque para leer el detalle, y haz clic para ir a ese punto en la línea de tiempo. El velo azul marca la noche de la ciudad (en hora Colombia se desplaza 7 h). Las horas siguen la zona elegida arriba.</p>
+  </div>
+
+  <footer>Las horas de vuelo salen de los tiquetes. En octubre toda Europa del viaje está en horario de verano (UTC+2) hasta el 25 de octubre, así que la diferencia con Colombia es de +7 h.</footer>
+</main>
+
+<script>
+(() => {
+  /* ═════════ DATOS (editar aquí) ═════════
+     start/end: hora LOCAL del lugar ('AAAA-MM-DDTHH:MM') + zona IANA.
+     st: 'fijo' (reservado) | 'pend' (por reservar) | 'prop' (propuesta) | 'opc' (opcional)
+     kind: flight | hin | hout | act | transit | meal                                */
+  const Z = { BOG:'America/Bogota', MAD:'Europe/Madrid', ZAG:'Europe/Zagreb', ZRH:'Europe/Zurich' };
+  const Y = '2026-10-';
+  const LEGS = { co:{ name:'Colombia', c:'var(--co)', f:'🇨🇴' }, es:{ name:'España', c:'var(--es)', f:'🇪🇸' },
+                 cr:{ name:'Croacia', c:'var(--cr)', f:'🇭🇷' }, ch:{ name:'Suiza', c:'var(--ch)', f:'🇨🇭' } };
+  // ciudad → { país, zona }
+  const CITY = {
+    'Bogotá':{ leg:'co', tz:Z.BOG }, 'Madrid':{ leg:'es', tz:Z.MAD }, 'Sevilla':{ leg:'es', tz:Z.MAD }, 'Palma':{ leg:'es', tz:Z.MAD },
+    'Zagreb':{ leg:'cr', tz:Z.ZAG }, 'Dubrovnik':{ leg:'cr', tz:Z.ZAG },
+    'Zúrich':{ leg:'ch', tz:Z.ZRH }, 'Lucerna':{ leg:'ch', tz:Z.ZRH }, 'Wilderswil':{ leg:'ch', tz:Z.ZRH },
+    'Berna':{ leg:'ch', tz:Z.ZRH }, 'Ginebra':{ leg:'ch', tz:Z.ZRH }
+  };
+  const ZONE_CITY = { [Z.BOG]:'Bogotá', [Z.MAD]:'Madrid', [Z.ZAG]:'Zagreb', [Z.ZRH]:'Zúrich' };
+
+  // Dónde duerme cada día (para el calendario)
+  const SLEEP = { 3:'Vuelo', 4:'Sevilla', 5:'Sevilla', 6:'Zagreb', 7:'Zagreb', 8:'Zagreb', 9:'Dubrovnik', 10:'Dubrovnik', 11:'Dubrovnik', 12:'Dubrovnik',
+                  13:'Zúrich', 14:'Lucerna', 15:'Wilderswil', 16:'Wilderswil', 17:'Berna', 18:'Ginebra', 19:'Vuelo' };
+  const DAY_LEG = { 3:'co', 4:'es', 5:'es', 6:'cr', 7:'cr', 8:'cr', 9:'cr', 10:'cr', 11:'cr', 12:'cr', 13:'ch', 14:'ch', 15:'ch', 16:'ch', 17:'ch', 18:'ch', 19:'es' };
+  const DAY_NOTE = {
+    8: 'Plitvice quedó para el 8 de octubre. Pendiente de reservar la excursión (Civitatis o similar).',
+    9: 'Vuelo nocturno: el check-out es a las 11:00 pero el vuelo sale a las 22:45. Pueden dejar maletas en recepción.',
+    15: 'Wilderswil es la base: maletas quietas hasta el 17. Opcional Jungfraujoch: sale ~6:30 y exige reserva.',
+    19: 'Día de regreso: Ginebra → Madrid → Bogotá. Llegan a Bogotá a las 19:30 del mismo día.'
+  };
+
+  const E = [];
+  const add = (o) => E.push(o);
+  const F = (day, t1, from, fz, t2, to, tz2, title, sub, extra={}) => add({ kind:'flight', st:'fijo', ic:'✈️', title, sub, s:Y+day+'T'+t1, sz:fz, e:(extra.eDay||Y+day)+'T'+t2, ez:tz2, from, to, ...extra });
+
+  /* ── 3 oct ── */
+  add({ kind:'transit', st:'prop', ic:'🚕', title:'Salida hacia el aeropuerto El Dorado', sub:'Internacional: llegar ~3 h antes. Equipaje: mochila + maleta de 10 kg.', s:Y+'03T09:00', sz:Z.BOG, e:Y+'03T09:45', ez:Z.BOG, city:'Bogotá' });
+  F('03','12:35','Bogotá',Z.BOG,'05:15','Madrid',Z.MAD,'Vuelo Bogotá → Madrid','Iberia IB0156 · Terminal 1 · vuelo nocturno', { eDay:Y+'04', city:'Bogotá' });
+
+  /* ── 4 oct ── */
+  add({ kind:'transit', st:'prop', ic:'🛂', title:'Migración Schengen y conexión', sub:'Madrid-Barajas: pasar migración y moverse a la Terminal 2.', s:Y+'04T05:30', sz:Z.MAD, e:Y+'04T07:30', ez:Z.MAD, city:'Madrid' });
+  F('04','09:20','Madrid',Z.MAD,'10:30','Sevilla',Z.MAD,'Vuelo Madrid → Sevilla','Air Europa (Express) UX5051 · Terminal 2', { city:'Madrid' });
+  add({ kind:'transit', st:'prop', ic:'🚕', title:'Aeropuerto → centro de Sevilla', sub:'Taxi ~25 min o bus EA ~35 min.', s:Y+'04T11:00', sz:Z.MAD, e:Y+'04T11:45', ez:Z.MAD, city:'Sevilla' });
+  add({ kind:'hin', st:'fijo', ic:'🔑', title:'Check-in · Apartamentos RG Plaza de España', sub:'Av. de la Borbolla 77, Sevilla · desde 15:00 · 1 apartamento, 2 noches. Pueden dejar maletas antes.', s:Y+'04T15:00', sz:Z.MAD, city:'Sevilla', doc:'2026-10-04_Mad-Sev' });
+  add({ kind:'act', st:'prop', ic:'🚶', title:'Barrio de Santa Cruz', sub:'Primer paseo sin agenda tras el vuelo largo.', s:Y+'04T16:30', sz:Z.MAD, e:Y+'04T18:00', ez:Z.MAD, city:'Sevilla' });
+  add({ kind:'act', st:'prop', ic:'🌙', title:'Catedral y Giralda iluminadas (por fuera)', sub:'Plaza Virgen de los Reyes, desde que cae la noche.', s:Y+'04T20:00', sz:Z.MAD, e:Y+'04T21:00', ez:Z.MAD, city:'Sevilla' });
+  add({ kind:'meal', st:'prop', ic:'🍷', title:'Cena en Triana (La Brunilda o Casa Cuesta)', sub:'Horario español, ~€15 p/p.', s:Y+'04T21:30', sz:Z.MAD, e:Y+'04T23:00', ez:Z.MAD, city:'Sevilla' });
+
+  /* ── 5 oct ── */
+  add({ kind:'act', st:'prop', ic:'🏰', title:'Real Alcázar de Sevilla', sub:'Reservar entrada con horario (~€16).', s:Y+'05T09:30', sz:Z.MAD, e:Y+'05T12:00', ez:Z.MAD, city:'Sevilla' });
+  add({ kind:'act', st:'prop', ic:'⛪', title:'Catedral + subida a la Giralda', sub:'~€13. La subida es por rampas.', s:Y+'05T12:15', sz:Z.MAD, e:Y+'05T13:45', ez:Z.MAD, city:'Sevilla' });
+  add({ kind:'meal', st:'prop', ic:'🍽️', title:'Almuerzo', s:Y+'05T14:00', sz:Z.MAD, e:Y+'05T15:30', ez:Z.MAD, city:'Sevilla' });
+  add({ kind:'act', st:'prop', ic:'🌳', title:'Plaza de España y Parque de María Luisa', s:Y+'05T16:00', sz:Z.MAD, e:Y+'05T17:30', ez:Z.MAD, city:'Sevilla' });
+  add({ kind:'act', st:'prop', ic:'🌇', title:'Triana y orilla del Guadalquivir al atardecer', s:Y+'05T18:00', sz:Z.MAD, e:Y+'05T19:30', ez:Z.MAD, city:'Sevilla' });
+
+  /* ── 6 oct ── */
+  add({ kind:'hout', st:'fijo', ic:'🧳', title:'Check-out · Apartamentos RG Plaza de España', sub:'Límite oficial 11:00. Se sale antes por el vuelo.', s:Y+'06T07:45', sz:Z.MAD, city:'Sevilla', doc:'2026-10-04_Mad-Sev' });
+  add({ kind:'transit', st:'prop', ic:'🚕', title:'Al aeropuerto de Sevilla', sub:'Llegar ~2 h antes del vuelo.', s:Y+'06T08:15', sz:Z.MAD, e:Y+'06T08:45', ez:Z.MAD, city:'Sevilla' });
+  F('06','10:50','Sevilla',Z.MAD,'12:25','Palma',Z.MAD,'Vuelo Sevilla → Palma','Ryanair FR351 (operado por Lauda Europe)', { city:'Sevilla', doc:'2026-10-06_Sev-Pal-Zag' });
+  add({ kind:'meal', st:'prop', ic:'🍽️', title:'Escala en Palma — almuerzo en el aeropuerto', sub:'Es solo una conexión, no una visita a Mallorca.', s:Y+'06T12:40', sz:Z.MAD, e:Y+'06T13:30', ez:Z.MAD, city:'Palma' });
+  F('06','14:00','Palma',Z.MAD,'16:25','Zagreb',Z.ZAG,'Vuelo Palma → Zagreb','Ryanair FR2283', { city:'Palma', doc:'2026-10-06_Sev-Pal-Zag' });
+  add({ kind:'transit', st:'prop', ic:'🚌', title:'Aeropuerto → centro de Zagreb', sub:'Bus/taxi ~40 min.', s:Y+'06T17:00', sz:Z.ZAG, e:Y+'06T17:40', ez:Z.ZAG, city:'Zagreb' });
+  add({ kind:'hin', st:'fijo', ic:'🔑', title:'Check-in · Modern Flat in Zagreb Centre', sub:'Gundulićeva 54, Lower Town · desde 15:00 · apartamento de 3 habitaciones, 3 noches.', s:Y+'06T17:45', sz:Z.ZAG, city:'Zagreb', doc:'2026-10-06_Sev-Pal-Zag' });
+  add({ kind:'act', st:'prop', ic:'🚶', title:'Plaza Ban Jelačić y calle Tkalčićeva', s:Y+'06T18:30', sz:Z.ZAG, e:Y+'06T20:00', ez:Z.ZAG, city:'Zagreb' });
+  add({ kind:'meal', st:'prop', ic:'🍖', title:'Cena en Batak Tkalčićeva (parrilla croata)', s:Y+'06T20:15', sz:Z.ZAG, e:Y+'06T21:45', ez:Z.ZAG, city:'Zagreb' });
+
+  /* ── 7 oct (Zagreb) ── */
+  add({ kind:'act', st:'prop', ic:'🏙️', title:'Ciudad Alta: San Marcos, Torre Lotrščak y funicular', s:Y+'07T09:30', sz:Z.ZAG, e:Y+'07T11:30', ez:Z.ZAG, city:'Zagreb' });
+  add({ kind:'act', st:'prop', ic:'⛪', title:'Catedral de Zagreb y Puerta de Piedra', s:Y+'07T11:45', sz:Z.ZAG, e:Y+'07T12:45', ez:Z.ZAG, city:'Zagreb' });
+  add({ kind:'act', st:'prop', ic:'🛒', title:'Mercado Dolac y Museo de las Relaciones Rotas', s:Y+'07T13:00', sz:Z.ZAG, e:Y+'07T14:30', ez:Z.ZAG, city:'Zagreb' });
+  add({ kind:'act', st:'prop', ic:'⚡', title:'Museo Nikola Tesla o Túnel de Grič', s:Y+'07T15:30', sz:Z.ZAG, e:Y+'07T17:00', ez:Z.ZAG, city:'Zagreb' });
+
+  /* ── 8 oct (Plitvice) ── */
+  add({ kind:'act', st:'pend', ic:'🌊', title:'Excursión a los Lagos de Plitvice', sub:'Día completo con almuerzo en ruta. Reservar (Civitatis o similar). Llevar calzado impermeable.', s:Y+'08T08:00', sz:Z.ZAG, e:Y+'08T17:30', ez:Z.ZAG, city:'Zagreb' });
+  add({ kind:'meal', st:'prop', ic:'🍔', title:'Cena en Submarine Burger Tkalčićeva', s:Y+'08T19:30', sz:Z.ZAG, e:Y+'08T21:00', ez:Z.ZAG, city:'Zagreb' });
+
+  /* ── 9 oct ── */
+  add({ kind:'act', st:'prop', ic:'🌳', title:'Herradura de Lenuci (Parque Zrinjevac)', s:Y+'09T09:00', sz:Z.ZAG, e:Y+'09T10:30', ez:Z.ZAG, city:'Zagreb' });
+  add({ kind:'hout', st:'fijo', ic:'🧳', title:'Check-out · Modern Flat in Zagreb Centre', sub:'Límite 11:00. Dejar maletas en recepción si preguntan.', s:Y+'09T11:00', sz:Z.ZAG, city:'Zagreb', doc:'2026-10-06_Sev-Pal-Zag' });
+  add({ kind:'meal', st:'prop', ic:'🍽️', title:'Almuerzo', s:Y+'09T13:00', sz:Z.ZAG, e:Y+'09T14:30', ez:Z.ZAG, city:'Zagreb' });
+  add({ kind:'transit', st:'prop', ic:'🚕', title:'Al aeropuerto de Zagreb', sub:'~40 min. Llegar ~2 h antes del vuelo.', s:Y+'09T19:45', sz:Z.ZAG, e:Y+'09T20:30', ez:Z.ZAG, city:'Zagreb' });
+  F('09','22:45','Zagreb',Z.ZAG,'23:40','Dubrovnik',Z.ZAG,'Vuelo Zagreb → Dubrovnik','Croatia Airlines OU664', { city:'Zagreb', doc:'2026-10-09_Zag-Dub' });
+
+  /* ── 10 oct ── */
+  add({ kind:'transit', st:'prop', ic:'🚕', title:'Aeropuerto de Dubrovnik → hotel', sub:'~25 min (el aeropuerto queda en Čilipi).', s:Y+'10T00:00', sz:Z.ZAG, e:Y+'10T00:40', ez:Z.ZAG, city:'Dubrovnik' });
+  add({ kind:'hin', st:'pend', ic:'🔑', title:'Check-in Dubrovnik (hotel por reservar)', sub:'Llegada de madrugada: avisar al alojamiento para el check-in tardío. 4 noches.', s:Y+'10T00:45', sz:Z.ZAG, city:'Dubrovnik' });
+  add({ kind:'act', st:'prop', ic:'🧱', title:'Murallas de Dubrovnik', sub:'Abren a las 8:00. Entrada con Dubrovnik Pass.', s:Y+'10T09:30', sz:Z.ZAG, e:Y+'10T12:00', ez:Z.ZAG, city:'Dubrovnik' });
+  add({ kind:'act', st:'prop', ic:'🏛️', title:'Stradun, Plaza de Luza y Escaleras Jesuitas', s:Y+'10T12:15', sz:Z.ZAG, e:Y+'10T13:45', ez:Z.ZAG, city:'Dubrovnik' });
+  add({ kind:'act', st:'prop', ic:'⛪', title:'Palacio del Rector y Catedral', s:Y+'10T15:00', sz:Z.ZAG, e:Y+'10T16:30', ez:Z.ZAG, city:'Dubrovnik' });
+
+  /* ── 11 oct ── */
+  add({ kind:'act', st:'prop', ic:'⛴️', title:'Isla Lokrum en ferry (10 min)', s:Y+'11T09:30', sz:Z.ZAG, e:Y+'11T12:30', ez:Z.ZAG, city:'Dubrovnik' });
+  add({ kind:'act', st:'prop', ic:'⛪', title:'Monasterio Franciscano', s:Y+'11T14:00', sz:Z.ZAG, e:Y+'11T15:00', ez:Z.ZAG, city:'Dubrovnik' });
+  add({ kind:'act', st:'prop', ic:'🏯', title:'Fortaleza de San Lorenzo', s:Y+'11T15:15', sz:Z.ZAG, e:Y+'11T16:45', ez:Z.ZAG, city:'Dubrovnik' });
+  add({ kind:'act', st:'prop', ic:'🚡', title:'Teleférico al Monte Srđ (atardecer)', s:Y+'11T17:15', sz:Z.ZAG, e:Y+'11T19:15', ez:Z.ZAG, city:'Dubrovnik' });
+
+  /* ── 12 oct ── */
+  add({ kind:'act', st:'opc', ic:'🗺️', title:'Opcional: día completo a Kotor (Montenegro) o Mostar (Bosnia)', sub:'Si no, día de playa y relax. Llevar pasaporte.', s:Y+'12T08:00', sz:Z.ZAG, e:Y+'12T17:00', ez:Z.ZAG, city:'Dubrovnik' });
+
+  /* ── 13 oct ── */
+  add({ kind:'act', st:'prop', ic:'🚶', title:'Mañana libre en la Ciudad Vieja', s:Y+'13T09:00', sz:Z.ZAG, e:Y+'13T10:30', ez:Z.ZAG, city:'Dubrovnik' });
+  add({ kind:'hout', st:'pend', ic:'🧳', title:'Check-out Dubrovnik (hotel por reservar)', sub:'Límite habitual 11:00. Dejar maletas hasta la tarde.', s:Y+'13T11:00', sz:Z.ZAG, city:'Dubrovnik' });
+  add({ kind:'transit', st:'prop', ic:'🚕', title:'Al aeropuerto de Dubrovnik', sub:'Llegar ~2 h antes del vuelo.', s:Y+'13T16:30', sz:Z.ZAG, e:Y+'13T17:15', ez:Z.ZAG, city:'Dubrovnik' });
+  F('13','19:40','Dubrovnik',Z.ZAG,'21:40','Zúrich',Z.ZRH,'Vuelo Dubrovnik → Zúrich','Swiss LX2267 · Economy Light', { city:'Dubrovnik', doc:'2026-10-13_Dub-Zur' });
+  add({ kind:'transit', st:'prop', ic:'🚕', title:'Aeropuerto de Zúrich → hotel (Glattbrugg)', sub:'Muy cerca del aeropuerto.', s:Y+'13T22:15', sz:Z.ZRH, e:Y+'13T22:45', ez:Z.ZRH, city:'Zúrich' });
+  add({ kind:'hin', st:'fijo', ic:'🔑', title:'Check-in · The Gate Boutique Hotel Zürich', sub:'Riethofstrasse 15, Glattbrugg · ventana de check-in 15:00–23:30 · habitaciones con desayuno incluido.', s:Y+'13T22:50', sz:Z.ZRH, city:'Zúrich', doc:'2026-10-13_Dub-Zur' });
+
+  /* ── 14 oct ── */
+  add({ kind:'hout', st:'fijo', ic:'🧳', title:'Check-out · The Gate Boutique Hotel Zürich', sub:'Ventana de check-out 07:00–11:00. Cancelación gratis hasta el 10 de oct.', s:Y+'14T08:30', sz:Z.ZRH, city:'Zúrich', doc:'2026-10-13_Dub-Zur' });
+  add({ kind:'act', st:'prop', ic:'⛪', title:'Altstadt, Grossmünster y Fraumünster', s:Y+'14T09:30', sz:Z.ZRH, e:Y+'14T12:00', ez:Z.ZRH, city:'Zúrich' });
+  add({ kind:'act', st:'prop', ic:'🍫', title:'Bahnhofstrasse y Museo del Chocolate Lindt', s:Y+'14T12:15', sz:Z.ZRH, e:Y+'14T14:15', ez:Z.ZRH, city:'Zúrich' });
+  add({ kind:'transit', st:'prop', ic:'🚆', title:'Tren Zúrich → Lucerna', sub:'~45 min.', s:Y+'14T15:00', sz:Z.ZRH, e:Y+'14T15:45', ez:Z.ZRH, city:'Lucerna' });
+  add({ kind:'hin', st:'pend', ic:'🔑', title:'Check-in Lucerna (hotel por reservar)', sub:'1 noche.', s:Y+'14T16:00', sz:Z.ZRH, city:'Lucerna' });
+  add({ kind:'act', st:'prop', ic:'🌉', title:'Puente de la Capilla y Monumento del León', s:Y+'14T17:00', sz:Z.ZRH, e:Y+'14T18:30', ez:Z.ZRH, city:'Lucerna' });
+
+  /* ── 15 oct ── */
+  add({ kind:'hout', st:'pend', ic:'🧳', title:'Check-out Lucerna', s:Y+'15T09:30', sz:Z.ZRH, city:'Lucerna' });
+  add({ kind:'transit', st:'prop', ic:'🚆', title:'Tren Lucerna → Wilderswil', sub:'~2 h con cambio en Interlaken.', s:Y+'15T10:00', sz:Z.ZRH, e:Y+'15T12:00', ez:Z.ZRH, city:'Wilderswil' });
+  add({ kind:'hin', st:'pend', ic:'🔑', title:'Check-in Wilderswil — base de 2 noches (por reservar)', sub:'Acordado en la reunión: maletas quietas hasta el 17.', s:Y+'15T14:30', sz:Z.ZRH, city:'Wilderswil' });
+  add({ kind:'act', st:'prop', ic:'🚠', title:'Harder Kulm al atardecer (funicular desde Interlaken)', s:Y+'15T16:00', sz:Z.ZRH, e:Y+'15T18:00', ez:Z.ZRH, city:'Wilderswil' });
+
+  /* ── 16 oct ── */
+  add({ kind:'act', st:'prop', ic:'💦', title:'Cascada Staubbach y valle de las 72 cascadas', sub:'Lauterbrunnen.', s:Y+'16T09:00', sz:Z.ZRH, e:Y+'16T10:30', ez:Z.ZRH, city:'Wilderswil' });
+  add({ kind:'act', st:'prop', ic:'🏔️', title:'Mürren o Wengen (pueblos sin autos)', s:Y+'16T11:00', sz:Z.ZRH, e:Y+'16T13:30', ez:Z.ZRH, city:'Wilderswil' });
+
+  /* ── 17 oct ── */
+  add({ kind:'hout', st:'pend', ic:'🧳', title:'Check-out Wilderswil', s:Y+'17T09:30', sz:Z.ZRH, city:'Wilderswil' });
+  add({ kind:'transit', st:'prop', ic:'🚆', title:'Tren Wilderswil → Berna', sub:'~1 h.', s:Y+'17T10:00', sz:Z.ZRH, e:Y+'17T11:00', ez:Z.ZRH, city:'Berna' });
+  add({ kind:'act', st:'prop', ic:'🕰️', title:'Ciudad Vieja (UNESCO) y Zytglogge', s:Y+'17T11:15', sz:Z.ZRH, e:Y+'17T13:15', ez:Z.ZRH, city:'Berna' });
+  add({ kind:'act', st:'prop', ic:'🏛️', title:'Bundeshaus (Parlamento federal)', s:Y+'17T13:30', sz:Z.ZRH, e:Y+'17T14:30', ez:Z.ZRH, city:'Berna' });
+  add({ kind:'hin', st:'pend', ic:'🔑', title:'Check-in Berna (hotel por reservar)', sub:'1 noche.', s:Y+'17T15:00', sz:Z.ZRH, city:'Berna' });
+  add({ kind:'act', st:'prop', ic:'🌹', title:'Rosengarten al atardecer', s:Y+'17T17:00', sz:Z.ZRH, e:Y+'17T18:00', ez:Z.ZRH, city:'Berna' });
+
+  /* ── 18 oct ── */
+  add({ kind:'hout', st:'pend', ic:'🧳', title:'Check-out Berna', s:Y+'18T10:00', sz:Z.ZRH, city:'Berna' });
+  add({ kind:'transit', st:'prop', ic:'🚆', title:'Tren Berna → Ginebra', sub:'~1 h 45.', s:Y+'18T10:30', sz:Z.ZRH, e:Y+'18T12:15', ez:Z.ZRH, city:'Ginebra' });
+  add({ kind:'hin', st:'pend', ic:'🔑', title:'Check-in Ginebra (hotel por reservar)', sub:'1 noche. Idealmente cerca de Cornavin (tren directo al aeropuerto).', s:Y+'18T15:00', sz:Z.ZRH, city:'Ginebra' });
+  add({ kind:'act', st:'prop', ic:'⛲', title:'Jet d’Eau y paseo por el lago', s:Y+'18T16:00', sz:Z.ZRH, e:Y+'18T17:30', ez:Z.ZRH, city:'Ginebra' });
+
+  /* ── 19 oct ── */
+  add({ kind:'hout', st:'pend', ic:'🧳', title:'Check-out Ginebra', s:Y+'19T06:30', sz:Z.ZRH, city:'Ginebra' });
+  add({ kind:'transit', st:'prop', ic:'🚆', title:'Tren a la estación del aeropuerto de Ginebra', sub:'~8 min. Llegar ~2 h antes del vuelo.', s:Y+'19T07:15', sz:Z.ZRH, e:Y+'19T07:30', ez:Z.ZRH, city:'Ginebra' });
+  F('19','09:50','Ginebra',Z.ZRH,'11:55','Madrid',Z.MAD,'Vuelo Ginebra → Madrid','Iberia IB1276 (operado por Swiss) · Terminal 1 → T4', { city:'Ginebra', doc:'2026-10-19_Gin-Mad-Bog' });
+  add({ kind:'meal', st:'prop', ic:'🍽️', title:'Escala en Madrid — almuerzo', sub:'~4 h entre vuelos: pasar de T4 a T1 con margen.', s:Y+'19T12:30', sz:Z.MAD, e:Y+'19T14:00', ez:Z.MAD, city:'Madrid' });
+  F('19','16:25','Madrid',Z.MAD,'19:30','Bogotá',Z.BOG,'Vuelo Madrid → Bogotá','Iberia IB0153 · llegada Terminal 1', { city:'Madrid', doc:'2026-10-19_Gin-Mad-Bog' });
+
+  /* ═════════ UTILIDADES DE ZONA HORARIA ═════════ */
+  const dtfCache = {};
+  const dtf = (tz) => dtfCache[tz] || (dtfCache[tz] = new Intl.DateTimeFormat('en-CA', { timeZone: tz, hourCycle:'h23', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' }));
+  const parts = (ms, tz) => { const o = {}; dtf(tz).formatToParts(new Date(ms)).forEach(p => { if (p.type !== 'literal') o[p.type] = +p.value; }); return o; };
+  const offsetMin = (tz, ms) => { const p = parts(ms, tz); return Math.round((Date.UTC(p.year, p.month-1, p.day, p.hour, p.minute, p.second) - Math.floor(ms/1000)*1000) / 60000); };
+  const toUtc = (local, tz) => {
+    const [d, t] = local.split('T'); const [y, m, dd] = d.split('-').map(Number); const [h, mi] = t.split(':').map(Number);
+    const guess = Date.UTC(y, m-1, dd, h, mi);
+    let utc = guess - offsetMin(tz, guess) * 60000;
+    const o2 = offsetMin(tz, utc); utc = guess - o2 * 60000;
+    return utc;
+  };
+  const pad = (n) => String(n).padStart(2, '0');
+  const hm = (ms, tz) => { const p = parts(ms, tz); return pad(p.hour) + ':' + pad(p.minute); };
+  const ymd = (ms, tz) => { const p = parts(ms, tz); return p.year + '-' + pad(p.month) + '-' + pad(p.day); };
+  const dayNum = (ms, tz) => parts(ms, tz).day;
+  const WD = ['dom','lun','mar','mié','jue','vie','sáb'];
+  const WDF = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const wdOf = (y, m, d) => new Date(Date.UTC(y, m-1, d)).getUTCDay();
+  const dur = (ms) => { const m = Math.round(ms / 60000); const h = Math.floor(m / 60), r = m % 60; return h ? (r ? h + ' h ' + r + ' min' : h + ' h') : r + ' min'; };
+  const rel = (ms) => { const a = Math.abs(ms), m = Math.round(a / 60000); if (m < 60) return m + ' min'; const h = Math.floor(m / 60); if (h < 48) return h + ' h' + (m % 60 ? ' ' + (m % 60) + ' min' : ''); return Math.floor(h / 24) + ' días ' + (h % 24) + ' h'; };
+
+  // Preparar eventos: instantes UTC, día local, orden
+  E.forEach((e, i) => {
+    e.id = i;
+    e.t0 = toUtc(e.s, e.sz);
+    e.t1 = e.e ? toUtc(e.e, e.ez) : null;
+    e.day = +e.s.slice(8, 10);
+    e.leg = (CITY[e.city] || {}).leg || DAY_LEG[e.day];
+    // tiempo "efectivo" para el orden y el progreso: los hitos puntuales duran 0
+    e.tEnd = e.t1 == null ? e.t0 : e.t1;
+  });
+  E.sort((a, b) => a.t0 - b.t0 || a.tEnd - b.tEnd);
+
+  /* ═════════ ESTADO ═════════ */
+  let mode = 'col';           // 'col' | 'local'
+  let simMs = null;           // null = hora real
+  let selDay = null;
+  const store = { get(k, d) { try { return localStorage.getItem(k) ?? d; } catch (_) { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (_) {} } };
+  mode = store.get('enVivoMode', 'col') === 'local' ? 'local' : 'col';
+  const nowMs = () => simMs ?? Date.now();
+
+  // hora de un evento en la zona elegida; devuelve {txt, off} con desfase de día respecto a su día local
+  const shown = (ms, ownTz, refYmd) => {
+    const tz = mode === 'col' ? Z.BOG : ownTz;
+    const txt = hm(ms, tz); const y = ymd(ms, tz);
+    let off = 0; if (y !== refYmd) off = Math.round((Date.parse(y) - Date.parse(refYmd)) / 86400000);
+    return { txt, off, tz };
+  };
+  const offTxt = (o) => o ? '<small>' + (o > 0 ? '+' + o + ' día' : o + ' día') + '</small>' : '';
+  const tzLabel = (tz) => tz === Z.BOG ? '🇨🇴 Colombia' : '📍 ' + ZONE_CITY[tz];
+
+  /* ═════════ RELOJES ═════════ */
+  function whereNow() {
+    const n = nowMs(); let cur = null;
+    for (const e of E) { if (e.t0 <= n) cur = e; else break; }
+    if (!cur) return { city: 'Bogotá', tz: Z.BOG, pre: true };
+    if (cur.kind === 'flight' && cur.t1 > n) return { city: cur.from + ' → ' + cur.to, tz: cur.sz, flying: true };
+    if (cur.kind === 'flight') return { city: cur.to, tz: cur.ez };
+    return { city: cur.city, tz: (CITY[cur.city] || {}).tz || cur.sz };
+  }
+  function renderClocks() {
+    const n = nowMs(); const w = whereNow();
+    const zs = [Z.BOG, Z.MAD, Z.ZAG, Z.ZRH];
+    const nm = { [Z.BOG]:'Bogotá', [Z.MAD]:'España', [Z.ZAG]:'Croacia', [Z.ZRH]:'Suiza' };
+    document.getElementById('clocks').innerHTML = zs.map(z => {
+      const o = offsetMin(z, n) / 60; const diff = o - (-5);
+      const here = !w.pre && !w.flying && z === w.tz ? ' here' : '';
+      return `<span class="clk${here}">${nm[z]} <b>${hm(n, z)}</b><small>${z === Z.BOG ? 'UTC-5' : 'UTC+' + o + ' · +' + diff + ' h'}</small></span>`;
+    }).join('');
+  }
+
+  /* ═════════ CALENDARIO ═════════ */
+  function renderCalendar() {
+    const head = document.getElementById('cal-head');
+    head.innerHTML = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'].map(d => `<div>${d}</div>`).join('');
+    const first = wdOf(2026, 10, 1); const grid = document.getElementById('cal-grid'); let h = '';
+    for (let i = 0; i < first; i++) h += '<div class="cell empty"></div>';
+    const todayCol = +ymd(nowMs(), Z.BOG).slice(8);
+    const todayIsOct = ymd(nowMs(), Z.BOG).startsWith('2026-10');
+    for (let d = 1; d <= 31; d++) {
+      const trip = d >= 3 && d <= 19;
+      const cls = ['cell']; if (!trip) cls.push('out'); else cls.push('trip');
+      if (todayIsOct && d === todayCol) cls.push('today'); if (selDay === d) cls.push('sel');
+      if (!trip) { h += `<div class="${cls.join(' ')}"><div class="dn">${d}</div></div>`; continue; }
+      const evs = E.filter(e => e.day === d && (e.kind === 'flight' || e.kind === 'hin' || e.kind === 'hout' || (e.kind === 'act' && e.st === 'pend')));
+      const chips = evs.map(e => {
+        const s = shown(e.t0, e.sz, e.s.slice(0, 10)); const lab = s.txt;
+        if (e.kind === 'flight') return `<div class="chip flight" title="${e.title}">✈️ ${lab} ${e.to.slice(0,3).toUpperCase()}</div>`;
+        if (e.kind === 'hin') return `<div class="chip hin" title="${e.title}">🔑 ${lab} ${e.city}</div>`;
+        if (e.kind === 'hout') return `<div class="chip hout" title="${e.title}">🧳 ${lab} ${e.city}</div>`;
+        return `<div class="chip act" title="${e.title}">🌊 ${lab} Plitvice</div>`;
+      }).join('');
+      const lg = LEGS[DAY_LEG[d]];
+      const wd = WD[wdOf(2026, 10, d)];
+      h += `<button type="button" class="${cls.join(' ')}" style="--c:${lg.c}" data-day="${d}">
+              <div class="dn">${d}<small>${lg.f} ${wd}</small></div>
+              <div class="city">🛏 ${SLEEP[d]}</div>
+              <div class="chips">${chips}</div>
+            </button>`;
+    }
+    grid.innerHTML = h;
+    grid.querySelectorAll('button.cell.trip').forEach(b => b.addEventListener('click', () => goToTl(+b.dataset.day)));
+  }
+
+  /* ═════════ LÍNEA DE TIEMPO ═════════ */
+  function renderTimeline() {
+    const showProp = document.getElementById('f-prop').checked, showTrans = document.getElementById('f-trans').checked;
+    const vis = E.filter(e => (showProp || e.st !== 'prop') && (showTrans || e.kind !== 'transit'));
+    const body = document.getElementById('tl-body'); let h = ''; let lastDay = null;
+    vis.forEach(e => {
+      if (e.day !== lastDay) {
+        lastDay = e.day; const lg = LEGS[DAY_LEG[e.day]]; const wd = WDF[wdOf(2026, 10, e.day)];
+        h += `<div class="day-head" id="day-${e.day}" style="--c:${lg.c}"><div class="day-pill">${lg.f} ${wd} ${e.day} de octubre <small>· duerme en ${SLEEP[e.day] === 'Vuelo' ? 'el vuelo' : SLEEP[e.day]}</small></div>${DAY_NOTE[e.day] ? `<div class="day-note">${DAY_NOTE[e.day]}</div>` : ''}</div>`;
+      }
+      const lg = LEGS[e.leg] || LEGS.co; const ref = e.s.slice(0, 10);
+      const a = shown(e.t0, e.sz, ref);
+      let times = '';
+      if (e.kind === 'flight') {
+        const b = shown(e.t1, e.ez, mode === 'col' ? ymd(e.t0, Z.BOG) : e.e.slice(0, 10));
+        const loc0 = hm(e.t0, e.sz), loc1 = hm(e.t1, e.ez);
+        times = `<b>${e.from}</b> ${a.txt}${a.off ? ' ('+(a.off>0?'+':'')+a.off+'d)' : ''} → <b>${e.to}</b> ${b.txt}${b.off ? ' ('+(b.off>0?'+':'')+b.off+'d)' : ''} · ${dur(e.t1 - e.t0)} de vuelo`
+              + `<br>${mode === 'col' ? `Hora local: ${e.from} ${loc0} → ${e.to} ${loc1}` : `🇨🇴 Colombia: ${hm(e.t0, Z.BOG)} → ${hm(e.t1, Z.BOG)}`}`;
+      } else if (e.t1) {
+        const b = shown(e.t1, e.ez, ref);
+        times = `${a.txt} – ${b.txt} · ${dur(e.t1 - e.t0)}` + (e.sz !== Z.BOG ? `<br>${mode === 'col' ? 'Hora local: ' + hm(e.t0, e.sz) + ' – ' + hm(e.t1, e.ez) : '🇨🇴 Colombia: ' + hm(e.t0, Z.BOG) + ' – ' + hm(e.t1, Z.BOG)}` : '');
+      } else {
+        times = e.sz !== Z.BOG ? (mode === 'col' ? 'Hora local: ' + hm(e.t0, e.sz) : '🇨🇴 Colombia: ' + hm(e.t0, Z.BOG)) : '';
+      }
+      const tag = e.kind === 'hin' ? '<span class="tag hin">Check-in</span>' : e.kind === 'hout' ? '<span class="tag hout">Check-out</span>' : '';
+      const st = e.st === 'fijo' ? '<span class="tag fijo">Fijo</span>' : e.st === 'pend' ? '<span class="tag pend">Por reservar</span>' : e.st === 'opc' ? '<span class="tag opc">Opcional</span>' : '<span class="tag prop">Propuesta</span>';
+      h += `<div class="ev ${e.st === 'pend' ? 'pending' : ''}" data-id="${e.id}" style="--c:${lg.c}">
+              <div class="tm">${a.txt}${a.off ? `<small>${a.off > 0 ? '+' : ''}${a.off} día</small>` : ''}</div>
+              <div class="ev-top"><span class="ev-ic">${e.ic}</span><span class="ev-title">${e.title}</span>${tag}${st}</div>
+              ${e.sub ? `<div class="ev-sub">${e.sub}</div>` : ''}
+              <div class="ev-times">${times}${e.doc ? `<br>📎 Documento en <b>${e.doc}</b>` : ''}</div>
+              <div class="prog" style="display:none"><i></i></div>
+            </div>`;
+    });
+    body.innerHTML = h;
+    updateLive();
+  }
+
+  /* ═════════ "AHORA" ═════════ */
+  function updateLive() {
+    const n = nowMs();
+    const live = E.find(e => e.t1 && n >= e.t0 && n < e.t1) || null;
+    const next = E.find(e => e.t0 > n) || null;
+    const nodes = [...document.querySelectorAll('#tl-body .ev')].map(el => ({ el, e: E[+el.dataset.id] }));
+    nodes.forEach(({ el, e }) => {
+      el.classList.remove('past', 'live', 'is-next');
+      const p = el.querySelector('.prog'); p.style.display = 'none';
+      if ((e.t1 ?? e.t0) <= n) el.classList.add('past');
+      if (e === live) { el.classList.add('live'); p.style.display = 'block'; p.firstElementChild.style.width = Math.min(100, (n - e.t0) / (e.t1 - e.t0) * 100) + '%'; }
+      if (e === next) el.classList.add('is-next');
+    });
+    if (document.getElementById('tl').offsetParent !== null) positionLine(nodes, n, live);
+    renderGanttNow(n);
+    renderStatus(live ? { e: live } : null, next ? { e: next } : null);
+  }
+
+  function positionLine(nodes, n, live) {
+    const line = document.getElementById('now-line'), fill = document.getElementById('rail-fill'), label = document.getElementById('now-label');
+    if (!nodes.length) { line.classList.add('hidden'); fill.style.height = '0'; return; }
+    const tlTop = document.getElementById('tl').getBoundingClientRect().top + scrollY;
+    const topOf = (el) => el.getBoundingClientRect().top + scrollY - tlTop;
+    const first = nodes[0].e, last = nodes[nodes.length - 1];
+    const liveNode = nodes.find(x => x.e === live);
+    const nextNode = nodes.find(x => x.e.t0 > n);
+    let prev = null; for (const x of nodes) { if ((x.e.t1 ?? x.e.t0) <= n) prev = x; }
+    let y = null;
+    if (n < first.t0) y = null;
+    else if (n >= (last.e.t1 ?? last.e.t0)) y = topOf(last.el) + last.el.offsetHeight;
+    else if (liveNode) { const r = (n - liveNode.e.t0) / (liveNode.e.t1 - liveNode.e.t0); y = topOf(liveNode.el) + 8 + r * (liveNode.el.offsetHeight - 16); }
+    else if (prev && nextNode) {
+      const a = prev.e.t1 ?? prev.e.t0, r = Math.max(0, Math.min(1, (n - a) / (nextNode.e.t0 - a)));
+      const y0 = topOf(prev.el) + prev.el.offsetHeight, y1 = topOf(nextNode.el);
+      y = y0 + r * (y1 - y0);
+    }
+    if (y == null) { line.classList.add('hidden'); fill.style.height = '0'; return; }
+    line.classList.remove('hidden'); line.style.top = y + 'px'; fill.style.height = y + 'px';
+    label.textContent = 'AHORA ' + hm(n, mode === 'col' ? Z.BOG : whereNow().tz) + (mode === 'col' ? ' 🇨🇴' : ' local');
+  }
+
+  /* ═════════ CRONOGRAMA POR HORAS ═════════ */
+  const SUN = { 3:[5.70,17.80], 4:[8.07,19.73], 5:[8.08,19.70], 6:[6.98,18.40], 7:[7.00,18.37], 8:[7.03,18.33], 9:[7.05,18.30], 10:[6.80,18.12], 11:[6.82,18.10], 12:[6.83,18.07], 13:[6.87,18.03], 14:[7.70,18.75], 15:[7.72,18.72], 16:[7.77,18.73], 17:[7.80,18.70], 18:[7.83,18.72], 19:[7.88,18.77] };
+  const G_DAYS = [3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];
+  const LEG_BG = { co:'var(--co-bg)', es:'var(--es-bg)', cr:'var(--cr-bg)', ch:'var(--ch-bg)' };
+  const GWHERE = { 3:'Bogotá', 19:'Ginebra → Bogotá' };
+
+  // Cortes del evento por día en la zona elegida (los vuelos que cruzan medianoche se parten en dos)
+  function ganttSegs(e) {
+    const tzS = mode === 'col' ? Z.BOG : e.sz, tzE = mode === 'col' ? Z.BOG : e.ez;
+    const ps = parts(e.t0, tzS), hS = ps.hour + ps.minute / 60;
+    if (e.t1 == null) return [{ d: ps.day, a: hS, b: hS + 1 }];
+    const pe = parts(e.t1, tzE), hE = pe.hour + pe.minute / 60;
+    if (pe.day === ps.day) return [{ d: ps.day, a: hS, b: Math.max(hE, hS + 0.5) }];
+    return [{ d: ps.day, a: hS, b: 24 }, { d: pe.day, a: 0, b: hE }];
+  }
+  function gClass(e) {
+    if (e.kind === 'flight') return 'gflight';
+    if (e.kind === 'hin') return 'ghin';
+    if (e.kind === 'hout') return 'ghout';
+    if (e.kind === 'meal') return 'gmeal';
+    if (e.kind === 'transit') return 'gtrans';
+    if (e.st === 'opc') return 'gopc';
+    return e.st === 'prop' ? 'gprop' : 'gact';
+  }
+  function buildGantt() {
+    const g = document.getElementById('gantt'); if (!g) return;
+    const showProp = document.getElementById('f-prop').checked, showTrans = document.getElementById('f-trans').checked;
+    let h = `<div class="gantt-corner">${mode === 'col' ? '🇨🇴<br>Hora<br>Colombia' : '📍<br>Hora<br>local'}</div>`;
+    for (let i = 0; i < 24; i++) h += `<div class="gantt-hour${i >= 8 && i < 19 ? ' daytime' : ''}" style="grid-row:${i*2+2} / ${i*2+4}">${pad(i)}:00</div>`;
+    const todayInfo = todayCell();
+    let prevLeg = null;
+    G_DAYS.forEach((d, i) => {
+      const col = i + 2, leg = DAY_LEG[d], lg = LEGS[leg], first = leg !== prevLeg; prevLeg = leg;
+      const sun = SUN[d]; const shift = (mode === 'col' && d !== 3) ? 7 : 0;
+      const sr = sun ? Math.max(0, sun[0] - shift) : 7.5, ss = sun ? Math.min(24, sun[1] - shift) : 19;
+      h += `<div class="gantt-col-bg${first ? ' first-of-leg' : ''}" style="grid-column:${col};--sr:${sr};--ss:${ss};background-color:color-mix(in srgb, ${lg.c} 4%, transparent)"></div>`;
+      const wd = WD[wdOf(2026, 10, d)];
+      h += `<div class="gantt-day-head${first ? ' first-of-leg' : ''}${todayInfo && todayInfo.d === d ? ' today' : ''}" data-day="${d}" style="grid-column:${col};--c:${lg.c};--bgh:${LEG_BG[leg]}"><span class="wd">${wd}</span><span class="num">${d}</span><span class="where">${lg.f} ${GWHERE[d] || SLEEP[d]}</span></div>`;
+    });
+    // segmentos por columna, con carriles para los que se solapan
+    const byDay = {};
+    E.filter(e => (showProp || e.st !== 'prop') && (showTrans || e.kind !== 'transit')).forEach(e => {
+      ganttSegs(e).forEach(sg => {
+        if (sg.d < 3 || sg.d > 19) return;
+        const r0 = Math.floor(sg.a * 2), r1 = Math.min(48, Math.max(r0 + 1, Math.ceil(sg.b * 2)));
+        (byDay[sg.d] = byDay[sg.d] || []).push({ e, r0, r1 });
+      });
+    });
+    Object.keys(byDay).forEach(dk => {
+      const d = +dk, col = d - 3 + 2, arr = byDay[d].sort((x, y) => x.r0 - y.r0 || y.r1 - x.r1);
+      let cluster = [], lanesEnd = [], maxEnd = -1;
+      const flush = () => { cluster.forEach(c => c.n = lanesEnd.length); cluster = []; lanesEnd = []; maxEnd = -1; };
+      arr.forEach(sg => {
+        if (cluster.length && sg.r0 >= maxEnd) flush();
+        let lane = lanesEnd.findIndex(en => en <= sg.r0); if (lane < 0) { lane = lanesEnd.length; lanesEnd.push(0); }
+        lanesEnd[lane] = sg.r1; sg.lane = lane; maxEnd = Math.max(maxEnd, sg.r1); cluster.push(sg);
+      });
+      flush();
+      arr.forEach(sg => {
+        const e = sg.e, tzS = mode === 'col' ? Z.BOG : e.sz, tzE = mode === 'col' ? Z.BOG : e.ez;
+        const times = e.t1 ? `${hm(e.t0, tzS)} – ${hm(e.t1, tzE)}` : hm(e.t0, tzS);
+        const label = e.kind === 'flight' ? `${e.from} → ${e.to}` : e.title;
+        const w = `calc((100% - 6px) / ${sg.n})`;
+        h += `<div class="gseg ${gClass(e)}${e.st === 'pend' ? ' pend' : ''}" tabindex="0" data-id="${e.id}" title="${e.title} · ${times}" style="grid-column:${col};grid-row:${sg.r0 + 2} / ${sg.r1 + 2};width:${w};margin-left:calc(3px + ${sg.lane} * ${w})"><span>${e.ic}</span><span class="txt">${label}<span class="tm2">${times}${e.kind === 'flight' ? ' · ' + e.sub : ''}</span></span></div>`;
+      });
+    });
+    g.innerHTML = h;
+    g.querySelectorAll('.gantt-day-head').forEach(el => el.addEventListener('click', () => goToTl(+el.dataset.day)));
+    g.querySelectorAll('.gseg').forEach(el => {
+      const go = () => goToTl(null, +el.dataset.id);
+      el.addEventListener('click', go);
+      el.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); go(); } });
+    });
+    updateGanttNav();
+  }
+  function todayCell() {
+    const n = nowMs(); const tz = mode === 'col' ? Z.BOG : whereNow().tz; const p = parts(n, tz);
+    if (p.year !== 2026 || p.month !== 10 || p.day < 3 || p.day > 19) return null;
+    return { d: p.day, h: p.hour + p.minute / 60, tz };
+  }
+  function renderGanttNow(n) {
+    const g = document.getElementById('gantt'); if (!g) return;
+    g.querySelectorAll('.gnow').forEach(x => x.remove());
+    g.querySelectorAll('.gantt-day-head').forEach(x => x.classList.remove('today'));
+    const t = todayCell(); if (!t) return;
+    const head = g.querySelector(`.gantt-day-head[data-day="${t.d}"]`); if (head) head.classList.add('today');
+    const el = document.createElement('div'); el.className = 'gnow'; el.style.gridColumn = t.d - 3 + 2;
+    el.innerHTML = `<i style="top:${t.h / 24 * 100}%"></i><b style="top:${t.h / 24 * 100}%">${pad(Math.floor(t.h))}:${pad(Math.round((t.h % 1) * 60) % 60)}</b>`;
+    g.appendChild(el);
+  }
+  function scrollGanttToToday(smooth) {
+    const w = document.getElementById('gantt-wrap'); const t = todayCell(); if (!w) return;
+    const head = document.querySelector(`#gantt .gantt-day-head[data-day="${t ? t.d : 3}"]`); if (!head) return;
+    w.scrollTo({ left: Math.max(0, head.offsetLeft - 70), behavior: smooth ? 'smooth' : 'auto' });
+  }
+  function updateGanttNav() {
+    const w = document.getElementById('gantt-wrap'), p = document.getElementById('gantt-prev'), nx = document.getElementById('gantt-next'); if (!w) return;
+    const atEnd = w.scrollLeft + w.clientWidth >= w.scrollWidth - 4;
+    p.style.visibility = w.scrollLeft <= 4 ? 'hidden' : 'visible'; nx.style.visibility = atEnd ? 'hidden' : 'visible';
+  }
+
+  /* ═════════ CAMBIO DE VISTA ═════════ */
+  let view = store.get('enVivoView', 'tl') === 'gantt' ? 'gantt' : 'tl';
+  function setView(v, opts = {}) {
+    view = v; store.set('enVivoView', v);
+    document.getElementById('view-tl').hidden = v !== 'tl';
+    document.getElementById('view-gantt').hidden = v !== 'gantt';
+    document.querySelectorAll('#view-seg button').forEach(b => b.classList.toggle('on', b.dataset.view === v));
+    updateLive(); if (v === 'gantt') { updateGanttNav(); if (!opts.keepScroll) scrollGanttToToday(false); }
+  }
+  function goToTl(day, id) {
+    setView('tl', {});
+    requestAnimationFrame(() => {
+      let t = null;
+      if (id != null) { t = document.querySelector(`#tl-body .ev[data-id="${id}"]`); }
+      else { t = document.getElementById('day-' + day); selDay = day; renderCalendar(); }
+      if (!t) return;
+      scrollTo({ top: t.getBoundingClientRect().top + scrollY - 160, behavior: 'smooth' });
+      if (id != null) { t.animate([{ boxShadow: '0 0 0 4px rgba(21,101,192,.5)' }, { boxShadow: '0 0 0 0 rgba(21,101,192,0)' }], { duration: 1600 }); }
+    });
+  }
+
+  function renderStatus(live, next) {
+    const n = nowMs(); const box = document.getElementById('status'); const w = whereNow();
+    const firstE = E[0], lastE = E[E.length - 1];
+    let nowH = '', nextH = '';
+    const fmt = (it) => { const e = it.e; const s = shown(e.t0, e.sz, e.s.slice(0, 10)); return `${e.ic} ${e.title}`; };
+    if (n < firstE.t0) {
+      nowH = `<div class="st-label">Estado</div><div class="st-title">Aún no empieza el viaje</div><div class="st-sub">Faltan <b>${rel(firstE.t0 - n)}</b> para el primer traslado.</div>`;
+    } else if (n >= (lastE.t1 ?? lastE.t0)) {
+      nowH = `<div class="st-label">Estado</div><div class="st-title">🎉 Viaje terminado</div><div class="st-sub">Ya aterrizaron en Bogotá.</div>`;
+    } else if (live) {
+      const e = live.e; const done = Math.round((n - e.t0) / (e.t1 - e.t0) * 100);
+      nowH = `<div class="st-label" style="color:var(--now)">● Ahora</div><div class="st-title">${fmt(live)}</div><div class="st-sub">${w.flying ? 'En el aire · ' : ''}${done}% · faltan ${rel(e.t1 - n)} para terminar</div><div class="bar"><i style="width:${done}%"></i></div>`;
+    } else {
+      nowH = `<div class="st-label">Ahora</div><div class="st-title">📍 ${w.city}</div><div class="st-sub">Tiempo libre entre actividades.</div>`;
+    }
+    if (next) { const e = next.e; const s = shown(e.t0, e.sz, e.s.slice(0, 10)); nextH = `<div class="st-label" style="color:var(--co)">Siguiente</div><div class="st-title">${fmt(next)}</div><div class="st-sub">En <b>${rel(e.t0 - n)}</b> · ${s.txt} ${mode === 'col' ? '(hora Colombia)' : '(hora local)'}</div>`; }
+    else nextH = `<div class="st-label">Siguiente</div><div class="st-title">—</div><div class="st-sub">No hay más actividades.</div>`;
+    box.innerHTML = `<div class="st-card now">${nowH}</div><div class="st-card next">${nextH}</div>`;
+  }
+
+  /* ═════════ SIMULADOR ═════════ */
+  const simInput = document.getElementById('sim-input'), badge = document.getElementById('sim-badge');
+  const toLocalInput = (ms) => { const p = parts(ms, Z.BOG); return `${p.year}-${pad(p.month)}-${pad(p.day)}T${pad(p.hour)}:${pad(p.minute)}`; };
+  function syncSim() {
+    simInput.value = toLocalInput(nowMs());
+    badge.innerHTML = simMs == null ? '' : '<span class="badge-sim">Modo simulación</span>';
+  }
+  simInput.addEventListener('change', () => { if (!simInput.value) return; simMs = toUtc(simInput.value, Z.BOG); refresh(); });
+  document.getElementById('sim-reset').addEventListener('click', () => { simMs = null; refresh(); });
+
+  /* ═════════ EVENTOS UI ═════════ */
+  document.querySelectorAll('#tz-seg button').forEach(b => b.addEventListener('click', () => {
+    mode = b.dataset.mode; store.set('enVivoMode', mode);
+    document.querySelectorAll('#tz-seg button').forEach(x => x.classList.toggle('on', x === b));
+    refresh(true);
+  }));
+  document.getElementById('f-prop').addEventListener('change', () => refresh(true));
+  document.getElementById('f-trans').addEventListener('change', () => refresh(true));
+  document.getElementById('go-now').addEventListener('click', () => {
+    if (view === 'gantt') {
+      scrollGanttToToday(true);
+      const g = document.querySelector('#gantt .gnow') || document.getElementById('gantt');
+      scrollTo({ top: g.getBoundingClientRect().top + scrollY - 200, behavior: 'smooth' });
+      return;
+    }
+    const l = document.getElementById('now-line'); const t = l.classList.contains('hidden') ? document.querySelector('.ev') : l;
+    if (t) scrollTo({ top: t.getBoundingClientRect().top + scrollY - 220, behavior: 'smooth' });
+  });
+  document.querySelectorAll('#view-seg button').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+  (() => {
+    const w = document.getElementById('gantt-wrap');
+    const step = () => (document.querySelector('.gantt-day-head')?.offsetWidth || 118) + 1;
+    document.getElementById('gantt-prev').addEventListener('click', () => w.scrollBy({ left: -step(), behavior: 'smooth' }));
+    document.getElementById('gantt-next').addEventListener('click', () => w.scrollBy({ left: step(), behavior: 'smooth' }));
+    w.addEventListener('scroll', updateGanttNav, { passive: true });
+  })();
+  addEventListener('resize', () => updateLive());
+
+  function refresh(full) {
+    document.querySelectorAll('#tz-seg button').forEach(x => x.classList.toggle('on', x.dataset.mode === mode));
+    renderClocks(); renderCalendar(); renderTimeline(); buildGantt(); syncSim(); setView(view, { keepScroll: full === true });
+  }
+  refresh();
+  setInterval(() => { if (simMs == null) { renderClocks(); updateLive(); syncSim(); } }, 30000);
+})();
+</script>
+</body>
+</html>

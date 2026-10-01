@@ -1,3 +1,9 @@
 Viaje.xlsx
 cronograma.png
 .DS_Store
+
+# Documentos personales del viaje (tiquetes, reservas, fotos)
+2026-Oct-Europa/
+
+# Configuración local de Claude Code
+.claude/settings.local.json
