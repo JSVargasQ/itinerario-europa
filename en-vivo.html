@@ -205,7 +205,7 @@
 <header class="top">
   <div class="wrap">
     <div class="top-row">
-      <div class="brand">✈️ Viaje Europa · En vivo <a href="index.html">← Itinerario completo</a></div>
+      <div class="brand">✈️ Viaje Europa · En vivo <a href="index.html">← Itinerario completo</a><a href="mapa.html">🗺️ Mapa</a></div>
       <div class="seg" id="tz-seg" role="group" aria-label="Zona horaria">
         <button type="button" data-mode="col" class="on">🇨🇴 Hora Colombia (UTC-5)</button>
         <button type="button" data-mode="local">📍 Hora local del lugar</button>
@@ -294,7 +294,8 @@
   const DAY_NOTE = {
     8: 'Plitvice quedó para el 8 de octubre. Pendiente de reservar la excursión (Civitatis o similar).',
     9: 'Vuelo nocturno: el check-out es a las 11:00 pero el vuelo sale a las 22:45. Pueden dejar maletas en recepción.',
-    15: 'Wilderswil es la base: maletas quietas hasta el 17. Opcional Jungfraujoch (~CHF 271 p/p con reserva de asiento): sale ~6:30 y exige reservar.',
+    15: 'Llegan de noche a Wilderswil, que es la base: maletas quietas hasta el 17. Horarios de tren reales (SBB, consultados el 1 oct): confirmar en sbb.ch el día anterior.',
+    17: 'Opcional Jungfraujoch (~CHF 271 p/p con reserva de asiento): primer tren 6:34 desde Interlaken Ost, último regreso 18:43. Decidir con el pronóstico del día anterior.',
     19: 'Día de regreso: Ginebra → Madrid → Bogotá. Llegan a Bogotá a las 19:30 del mismo día.'
   };
 
@@ -309,14 +310,14 @@
   /* ── 4 oct ── */
   add({ kind:'transit', st:'prop', ic:'🛂', title:'Migración Schengen y conexión', sub:'Madrid-Barajas: pasar migración y moverse a la Terminal 2.', s:Y+'04T05:30', sz:Z.MAD, e:Y+'04T07:30', ez:Z.MAD, city:'Madrid' });
   F('04','09:20','Madrid',Z.MAD,'10:30','Sevilla',Z.MAD,'Vuelo Madrid → Sevilla','Air Europa (Express) · Terminal 2', { city:'Madrid' });
-  add({ kind:'transit', st:'prop', ic:'🚕', title:'Aeropuerto → centro de Sevilla', sub:'Taxi ~25 min o bus EA ~35 min.', s:Y+'04T11:00', sz:Z.MAD, e:Y+'04T11:45', ez:Z.MAD, city:'Sevilla' });
+  add({ kind:'transit', st:'prop', ic:'🚕', title:'Aeropuerto → centro de Sevilla', sub:'Bus EA (4 €, cada 12–15 min, ~35 min) o taxi ~25 min.', s:Y+'04T11:00', sz:Z.MAD, e:Y+'04T11:45', ez:Z.MAD, city:'Sevilla' });
   add({ kind:'hin', st:'fijo', ic:'🔑', title:'Check-in · Apartamentos RG Plaza de España', sub:'Av. de la Borbolla 77, Sevilla · desde 15:00 · 1 apartamento, 2 noches. Pueden dejar maletas antes.', s:Y+'04T15:00', sz:Z.MAD, city:'Sevilla', doc:'2026-10-04_Mad-Sev' });
   add({ kind:'act', st:'prop', ic:'🚶', title:'Barrio de Santa Cruz', sub:'Primer paseo sin agenda tras el vuelo largo.', s:Y+'04T16:30', sz:Z.MAD, e:Y+'04T18:00', ez:Z.MAD, city:'Sevilla' });
   add({ kind:'act', st:'prop', ic:'🌙', title:'Catedral y Giralda iluminadas (por fuera)', sub:'Plaza Virgen de los Reyes, desde que cae la noche.', s:Y+'04T20:00', sz:Z.MAD, e:Y+'04T21:00', ez:Z.MAD, city:'Sevilla' });
   add({ kind:'meal', st:'prop', ic:'🍷', title:'Cena en Triana (La Brunilda o Casa Cuesta)', sub:'Horario español, ~€15 p/p.', s:Y+'04T21:30', sz:Z.MAD, e:Y+'04T23:00', ez:Z.MAD, city:'Sevilla' });
 
   /* ── 5 oct ── */
-  add({ kind:'act', st:'prop', ic:'🏰', title:'Real Alcázar de Sevilla', sub:'Reservar entrada con horario (~€16).', s:Y+'05T09:30', sz:Z.MAD, e:Y+'05T12:00', ez:Z.MAD, city:'Sevilla' });
+  add({ kind:'act', st:'prop', ic:'🏰', title:'Real Alcázar de Sevilla', sub:'Reservar entrada con horario (~€16). Abre 9:30 y cierra 17:00; el lunes de 16:00 a 17:00 la entrada es gratuita (el 5 de oct es lunes).', s:Y+'05T09:30', sz:Z.MAD, e:Y+'05T12:00', ez:Z.MAD, city:'Sevilla' });
   add({ kind:'act', st:'prop', ic:'⛪', title:'Catedral + subida a la Giralda', sub:'~€13. La subida es por rampas.', s:Y+'05T12:15', sz:Z.MAD, e:Y+'05T13:45', ez:Z.MAD, city:'Sevilla' });
   add({ kind:'meal', st:'prop', ic:'🍽️', title:'Almuerzo', s:Y+'05T14:00', sz:Z.MAD, e:Y+'05T15:30', ez:Z.MAD, city:'Sevilla' });
   add({ kind:'act', st:'prop', ic:'🌳', title:'Plaza de España y Parque de María Luisa', s:Y+'05T16:00', sz:Z.MAD, e:Y+'05T17:30', ez:Z.MAD, city:'Sevilla' });
@@ -328,7 +329,7 @@
   F('06','10:50','Sevilla',Z.MAD,'12:25','Palma',Z.MAD,'Vuelo Sevilla → Palma','Ryanair (operado por Lauda Europe)', { city:'Sevilla', doc:'2026-10-06_Sev-Pal-Zag' });
   add({ kind:'meal', st:'prop', ic:'🍽️', title:'Escala en Palma — almuerzo en el aeropuerto', sub:'Es solo una conexión, no una visita a Mallorca.', s:Y+'06T12:40', sz:Z.MAD, e:Y+'06T13:30', ez:Z.MAD, city:'Palma' });
   F('06','14:00','Palma',Z.MAD,'16:25','Zagreb',Z.ZAG,'Vuelo Palma → Zagreb','Ryanair', { city:'Palma', doc:'2026-10-06_Sev-Pal-Zag' });
-  add({ kind:'transit', st:'prop', ic:'🚌', title:'Aeropuerto → centro de Zagreb', sub:'Bus/taxi ~40 min.', s:Y+'06T17:00', sz:Z.ZAG, e:Y+'06T17:40', ez:Z.ZAG, city:'Zagreb' });
+  add({ kind:'transit', st:'prop', ic:'🚌', title:'Aeropuerto → centro de Zagreb', sub:'Bus Pleso Prijevoz (9 €, ~40 min; sale 30–40 min tras el aterrizaje) o taxi.', s:Y+'06T17:00', sz:Z.ZAG, e:Y+'06T17:40', ez:Z.ZAG, city:'Zagreb' });
   add({ kind:'hin', st:'fijo', ic:'🔑', title:'Check-in · Modern Flat in Zagreb Centre', sub:'Gundulićeva 54, Lower Town · desde 15:00 · apartamento de 3 habitaciones, 3 noches.', s:Y+'06T17:45', sz:Z.ZAG, city:'Zagreb', doc:'2026-10-06_Sev-Pal-Zag' });
   add({ kind:'act', st:'prop', ic:'🚶', title:'Plaza Ban Jelačić y calle Tkalčićeva', s:Y+'06T18:30', sz:Z.ZAG, e:Y+'06T20:00', ez:Z.ZAG, city:'Zagreb' });
   add({ kind:'meal', st:'prop', ic:'🍖', title:'Cena en Batak Tkalčićeva (parrilla croata)', s:Y+'06T20:15', sz:Z.ZAG, e:Y+'06T21:45', ez:Z.ZAG, city:'Zagreb' });
@@ -340,7 +341,7 @@
   add({ kind:'act', st:'prop', ic:'⚡', title:'Museo Nikola Tesla o Túnel de Grič', s:Y+'07T15:30', sz:Z.ZAG, e:Y+'07T17:00', ez:Z.ZAG, city:'Zagreb' });
 
   /* ── 8 oct (Plitvice) ── */
-  add({ kind:'act', st:'pend', ic:'🌊', title:'Excursión a los Lagos de Plitvice', sub:'Día completo con almuerzo en ruta. Reservar (Civitatis o similar). Llevar calzado impermeable.', s:Y+'08T08:00', sz:Z.ZAG, e:Y+'08T17:30', ez:Z.ZAG, city:'Zagreb' });
+  add({ kind:'act', st:'pend', ic:'🌊', title:'Excursión a los Lagos de Plitvice', sub:'Tour de ~9 h con recogida en el Parque Zrinjevac (Civitatis o similar, cancelación gratis hasta 24 h antes). Parque abierto 8:00–19:00. Llevar calzado impermeable.', s:Y+'08T08:00', sz:Z.ZAG, e:Y+'08T17:30', ez:Z.ZAG, city:'Zagreb' });
   add({ kind:'meal', st:'prop', ic:'🍔', title:'Cena en Submarine Burger Tkalčićeva', s:Y+'08T19:30', sz:Z.ZAG, e:Y+'08T21:00', ez:Z.ZAG, city:'Zagreb' });
 
   /* ── 9 oct ── */
@@ -351,17 +352,17 @@
   F('09','22:45','Zagreb',Z.ZAG,'23:40','Dubrovnik',Z.ZAG,'Vuelo Zagreb → Dubrovnik','Croatia Airlines', { city:'Zagreb', doc:'2026-10-09_Zag-Dub' });
 
   /* ── 10 oct ── */
-  add({ kind:'transit', st:'prop', ic:'🚕', title:'Aeropuerto de Dubrovnik → hotel', sub:'~25 min (el aeropuerto queda en Čilipi).', s:Y+'10T00:00', sz:Z.ZAG, e:Y+'10T00:40', ez:Z.ZAG, city:'Dubrovnik' });
+  add({ kind:'transit', st:'prop', ic:'🚕', title:'Aeropuerto de Dubrovnik → hotel', sub:'Shuttle Platanus (10 €, sale ~30 min tras el aterrizaje) o taxi, ~25 min. El aeropuerto cierra a medianoche.', s:Y+'10T00:00', sz:Z.ZAG, e:Y+'10T00:40', ez:Z.ZAG, city:'Dubrovnik' });
   add({ kind:'hin', st:'pend', ic:'🔑', title:'Check-in Dubrovnik (hotel por reservar)', sub:'Llegada de madrugada: avisar al alojamiento para el check-in tardío. 4 noches.', s:Y+'10T00:45', sz:Z.ZAG, city:'Dubrovnik' });
-  add({ kind:'act', st:'prop', ic:'🧱', title:'Murallas de Dubrovnik', sub:'Abren a las 8:00. Entrada con Dubrovnik Pass.', s:Y+'10T09:30', sz:Z.ZAG, e:Y+'10T12:00', ez:Z.ZAG, city:'Dubrovnik' });
+  add({ kind:'act', st:'prop', ic:'🧱', title:'Murallas de Dubrovnik', sub:'Abren a las 8:00 y cierran 17:30 (17:00 desde el 15). Entrada desde 40 €.', s:Y+'10T09:30', sz:Z.ZAG, e:Y+'10T12:00', ez:Z.ZAG, city:'Dubrovnik' });
   add({ kind:'act', st:'prop', ic:'🏛️', title:'Stradun, Plaza de Luza y Escaleras Jesuitas', s:Y+'10T12:15', sz:Z.ZAG, e:Y+'10T13:45', ez:Z.ZAG, city:'Dubrovnik' });
   add({ kind:'act', st:'prop', ic:'⛪', title:'Palacio del Rector y Catedral', s:Y+'10T15:00', sz:Z.ZAG, e:Y+'10T16:30', ez:Z.ZAG, city:'Dubrovnik' });
 
   /* ── 11 oct ── */
-  add({ kind:'act', st:'prop', ic:'⛴️', title:'Isla Lokrum en ferry (10 min)', s:Y+'11T09:30', sz:Z.ZAG, e:Y+'11T12:30', ez:Z.ZAG, city:'Dubrovnik' });
+  add({ kind:'act', st:'prop', ic:'⛴️', title:'Isla Lokrum en ferry (10 min)', sub:'Ferry cada ~30 min entre 9:00 y 19:00; confirmar horario de octubre en el muelle.', s:Y+'11T09:30', sz:Z.ZAG, e:Y+'11T12:30', ez:Z.ZAG, city:'Dubrovnik' });
   add({ kind:'act', st:'prop', ic:'⛪', title:'Monasterio Franciscano', s:Y+'11T14:00', sz:Z.ZAG, e:Y+'11T15:00', ez:Z.ZAG, city:'Dubrovnik' });
   add({ kind:'act', st:'prop', ic:'🏯', title:'Fortaleza de San Lorenzo', s:Y+'11T15:15', sz:Z.ZAG, e:Y+'11T16:45', ez:Z.ZAG, city:'Dubrovnik' });
-  add({ kind:'act', st:'prop', ic:'🚡', title:'Teleférico al Monte Srđ (atardecer)', s:Y+'11T17:15', sz:Z.ZAG, e:Y+'11T19:15', ez:Z.ZAG, city:'Dubrovnik' });
+  add({ kind:'act', st:'prop', ic:'🚡', title:'Teleférico al Monte Srđ (atardecer)', sub:'Opera 9:00–21:00 hasta el 20 de oct. 30 € ida y vuelta.', s:Y+'11T17:15', sz:Z.ZAG, e:Y+'11T19:15', ez:Z.ZAG, city:'Dubrovnik' });
 
   /* ── 12 oct ── */
   add({ kind:'act', st:'opc', ic:'🗺️', title:'Opcional: día completo a Kotor (Montenegro) o Mostar (Bosnia)', sub:'Si no, día de playa y relax. Llevar pasaporte.', s:Y+'12T08:00', sz:Z.ZAG, e:Y+'12T17:00', ez:Z.ZAG, city:'Dubrovnik' });
@@ -371,44 +372,48 @@
   add({ kind:'hout', st:'pend', ic:'🧳', title:'Check-out Dubrovnik (hotel por reservar)', sub:'Límite habitual 11:00. Dejar maletas hasta la tarde.', s:Y+'13T11:00', sz:Z.ZAG, city:'Dubrovnik' });
   add({ kind:'transit', st:'prop', ic:'🚕', title:'Al aeropuerto de Dubrovnik', sub:'Llegar ~2 h antes del vuelo.', s:Y+'13T16:30', sz:Z.ZAG, e:Y+'13T17:15', ez:Z.ZAG, city:'Dubrovnik' });
   F('13','19:40','Dubrovnik',Z.ZAG,'21:40','Zúrich',Z.ZRH,'Vuelo Dubrovnik → Zúrich','Swiss · Economy Light', { city:'Dubrovnik', doc:'2026-10-13_Dub-Zur' });
-  add({ kind:'transit', st:'prop', ic:'🚕', title:'Aeropuerto de Zúrich → hotel (Glattbrugg)', sub:'Muy cerca del aeropuerto.', s:Y+'13T22:15', sz:Z.ZRH, e:Y+'13T22:45', ez:Z.ZRH, city:'Zúrich' });
-  add({ kind:'hin', st:'fijo', ic:'🔑', title:'Check-in · The Gate Boutique Hotel Zürich', sub:'Riethofstrasse 15, Glattbrugg · ventana de check-in 15:00–23:30 · habitaciones con desayuno incluido.', s:Y+'13T22:50', sz:Z.ZRH, city:'Zúrich', doc:'2026-10-13_Dub-Zur' });
+  add({ kind:'transit', st:'prop', ic:'🚕', title:'Aeropuerto de Zúrich → hotel (Glattbrugg)', sub:'Tranvía 10 o 12 hasta Glattbrugg Bahnhof (6 min, cada ~10 min).', s:Y+'13T22:15', sz:Z.ZRH, e:Y+'13T22:35', ez:Z.ZRH, city:'Zúrich' });
+  add({ kind:'hin', st:'fijo', ic:'🔑', title:'Check-in · The Gate Boutique Hotel Zürich', sub:'Riethofstrasse 15, Glattbrugg · ventana de check-in 15:00–23:30 · habitaciones con desayuno incluido.', s:Y+'13T22:45', sz:Z.ZRH, city:'Zúrich', doc:'2026-10-13_Dub-Zur' });
 
-  /* ── 14 oct ── */
+  /* ── 14 oct ── (trenes: horarios reales de SBB consultados el 1 oct 2026) */
   add({ kind:'hout', st:'fijo', ic:'🧳', title:'Check-out · The Gate Boutique Hotel Zürich', sub:'Ventana de check-out 07:00–11:00. Cancelación gratis hasta el 10 de oct.', s:Y+'14T08:30', sz:Z.ZRH, city:'Zúrich', doc:'2026-10-13_Dub-Zur' });
   add({ kind:'act', st:'prop', ic:'⛪', title:'Altstadt, Grossmünster y Fraumünster', s:Y+'14T09:30', sz:Z.ZRH, e:Y+'14T12:00', ez:Z.ZRH, city:'Zúrich' });
   add({ kind:'act', st:'prop', ic:'🍫', title:'Bahnhofstrasse y Museo del Chocolate Lindt', s:Y+'14T12:15', sz:Z.ZRH, e:Y+'14T14:15', ez:Z.ZRH, city:'Zúrich' });
-  add({ kind:'transit', st:'prop', ic:'🚆', title:'Tren Zúrich → Lucerna', sub:'~45 min.', s:Y+'14T15:00', sz:Z.ZRH, e:Y+'14T15:45', ez:Z.ZRH, city:'Lucerna' });
-  add({ kind:'hin', st:'pend', ic:'🔑', title:'Check-in Lucerna (hotel por reservar)', sub:'1 noche.', s:Y+'14T16:00', sz:Z.ZRH, city:'Lucerna' });
-  add({ kind:'act', st:'prop', ic:'🌉', title:'Puente de la Capilla y Monumento del León', s:Y+'14T17:00', sz:Z.ZRH, e:Y+'14T18:30', ez:Z.ZRH, city:'Lucerna' });
+  add({ kind:'transit', st:'prop', ic:'🚄', title:'Tren directo Zúrich HB → Lucerna', sub:'IR 70 directo, ~44 min. Sale cada 30 min (17:35 y 18:07 también sirven). Hay obras entre Pfäffikon y Wädenswil hasta el 19 de oct, que no afectan este tramo.', s:Y+'14T18:07', sz:Z.ZRH, e:Y+'14T18:51', ez:Z.ZRH, city:'Lucerna' });
+  add({ kind:'hin', st:'pend', ic:'🔑', title:'Check-in Lucerna (hotel por reservar)', sub:'1 noche.', s:Y+'14T19:15', sz:Z.ZRH, city:'Lucerna' });
+  add({ kind:'meal', st:'prop', ic:'🍷', title:'Cena en Lucerna', s:Y+'14T19:45', sz:Z.ZRH, e:Y+'14T21:00', ez:Z.ZRH, city:'Lucerna' });
 
   /* ── 15 oct ── */
-  add({ kind:'hout', st:'pend', ic:'🧳', title:'Check-out Lucerna', s:Y+'15T09:30', sz:Z.ZRH, city:'Lucerna' });
-  add({ kind:'transit', st:'prop', ic:'🚆', title:'Tren Lucerna → Wilderswil', sub:'~2 h con cambio en Interlaken.', s:Y+'15T10:00', sz:Z.ZRH, e:Y+'15T12:00', ez:Z.ZRH, city:'Wilderswil' });
-  add({ kind:'hin', st:'pend', ic:'🔑', title:'Check-in Wilderswil — base de 2 noches (por reservar)', sub:'Acordado en la reunión: maletas quietas hasta el 17.', s:Y+'15T14:30', sz:Z.ZRH, city:'Wilderswil' });
-  add({ kind:'act', st:'prop', ic:'🚠', title:'Harder Kulm al atardecer (funicular desde Interlaken)', s:Y+'15T16:00', sz:Z.ZRH, e:Y+'15T18:00', ez:Z.ZRH, city:'Wilderswil' });
+  add({ kind:'hout', st:'pend', ic:'🧳', title:'Check-out Lucerna', sub:'Dejar maletas en el hotel o en la consigna de la estación hasta el tren.', s:Y+'15T09:00', sz:Z.ZRH, city:'Lucerna' });
+  add({ kind:'act', st:'opc', ic:'⛰️', title:'Opcional: Monte Pilatus en teleférico (mejor por la mañana)', s:Y+'15T09:30', sz:Z.ZRH, e:Y+'15T13:00', ez:Z.ZRH, city:'Lucerna' });
+  add({ kind:'act', st:'prop', ic:'🌉', title:'Puente de la Capilla y Monumento del León', s:Y+'15T14:00', sz:Z.ZRH, e:Y+'15T15:30', ez:Z.ZRH, city:'Lucerna' });
+  add({ kind:'transit', st:'prop', ic:'🚞', title:'Tren panorámico Lucerna → Wilderswil', sub:'PanoramaExpress hasta Interlaken Ost (10 min de espera) + regional a Wilderswil, ~2 h 03 min. Con más luz: 16:06 → 18:09; el sol se pone ~18:45.', s:Y+'15T17:06', sz:Z.ZRH, e:Y+'15T19:09', ez:Z.ZRH, city:'Wilderswil' });
+  add({ kind:'hin', st:'pend', ic:'🔑', title:'Check-in Wilderswil — base de 2 noches (por reservar)', sub:'Acordado en la reunión: maletas quietas hasta el 17.', s:Y+'15T19:30', sz:Z.ZRH, city:'Wilderswil' });
+  add({ kind:'meal', st:'prop', ic:'🍷', title:'Cena en Wilderswil', s:Y+'15T20:00', sz:Z.ZRH, e:Y+'15T21:30', ez:Z.ZRH, city:'Wilderswil' });
 
   /* ── 16 oct ── */
   add({ kind:'act', st:'prop', ic:'💦', title:'Cascada Staubbach y valle de las 72 cascadas', sub:'Lauterbrunnen.', s:Y+'16T09:00', sz:Z.ZRH, e:Y+'16T10:30', ez:Z.ZRH, city:'Wilderswil' });
   add({ kind:'act', st:'prop', ic:'🏔️', title:'Mürren o Wengen (pueblos sin autos)', s:Y+'16T11:00', sz:Z.ZRH, e:Y+'16T13:30', ez:Z.ZRH, city:'Wilderswil' });
+  add({ kind:'act', st:'prop', ic:'🚠', title:'Harder Kulm al atardecer (funicular desde Interlaken)', sub:'Funicular cada 30 min hasta las 20:10 (último descenso) hasta el 26 de oct.', s:Y+'16T16:00', sz:Z.ZRH, e:Y+'16T18:00', ez:Z.ZRH, city:'Wilderswil' });
 
   /* ── 17 oct ── */
-  add({ kind:'hout', st:'pend', ic:'🧳', title:'Check-out Wilderswil', s:Y+'17T09:30', sz:Z.ZRH, city:'Wilderswil' });
-  add({ kind:'transit', st:'prop', ic:'🚆', title:'Tren Wilderswil → Berna', sub:'~1 h.', s:Y+'17T10:00', sz:Z.ZRH, e:Y+'17T11:00', ez:Z.ZRH, city:'Berna' });
-  add({ kind:'act', st:'prop', ic:'🕰️', title:'Ciudad Vieja (UNESCO) y Zytglogge', s:Y+'17T11:15', sz:Z.ZRH, e:Y+'17T13:15', ez:Z.ZRH, city:'Berna' });
-  add({ kind:'act', st:'prop', ic:'🏛️', title:'Bundeshaus (Parlamento federal)', s:Y+'17T13:30', sz:Z.ZRH, e:Y+'17T14:30', ez:Z.ZRH, city:'Berna' });
-  add({ kind:'hin', st:'pend', ic:'🔑', title:'Check-in Berna (hotel por reservar)', sub:'1 noche.', s:Y+'17T15:00', sz:Z.ZRH, city:'Berna' });
-  add({ kind:'act', st:'prop', ic:'🌹', title:'Rosengarten al atardecer', s:Y+'17T17:00', sz:Z.ZRH, e:Y+'17T18:00', ez:Z.ZRH, city:'Berna' });
+  add({ kind:'act', st:'opc', ic:'🚂', title:'Opcional: Jungfraujoch "Top of Europe"', sub:'Primer tren 6:34 desde Interlaken Ost; último regreso desde la cumbre 18:43. Reserva obligatoria. Alternativa: Trümmelbachfälle y Grindelwald (~CHF 14).', s:Y+'17T07:00', sz:Z.ZRH, e:Y+'17T14:30', ez:Z.ZRH, city:'Wilderswil' });
+  add({ kind:'hout', st:'pend', ic:'🧳', title:'Check-out Wilderswil', sub:'Límite habitual 11:00. Dejar maletas en recepción hasta el tren.', s:Y+'17T10:30', sz:Z.ZRH, city:'Wilderswil' });
+  add({ kind:'transit', st:'prop', ic:'🚞', title:'Wilderswil → Berna', sub:'Bus 105 a Interlaken West + IC 81, ~1 h 05 min. Alternativa: 18:21 → 19:25.', s:Y+'17T17:51', sz:Z.ZRH, e:Y+'17T18:56', ez:Z.ZRH, city:'Berna' });
+  add({ kind:'hin', st:'pend', ic:'🔑', title:'Check-in Berna (hotel por reservar)', sub:'1 noche.', s:Y+'17T19:20', sz:Z.ZRH, city:'Berna' });
+  add({ kind:'meal', st:'prop', ic:'🍷', title:'Cena en Berna', s:Y+'17T20:00', sz:Z.ZRH, e:Y+'17T21:30', ez:Z.ZRH, city:'Berna' });
 
   /* ── 18 oct ── */
-  add({ kind:'hout', st:'pend', ic:'🧳', title:'Check-out Berna', s:Y+'18T10:00', sz:Z.ZRH, city:'Berna' });
-  add({ kind:'transit', st:'prop', ic:'🚆', title:'Tren Berna → Ginebra', sub:'~1 h 45.', s:Y+'18T10:30', sz:Z.ZRH, e:Y+'18T12:15', ez:Z.ZRH, city:'Ginebra' });
-  add({ kind:'hin', st:'pend', ic:'🔑', title:'Check-in Ginebra (hotel por reservar)', sub:'1 noche. Idealmente cerca de Cornavin (tren directo al aeropuerto).', s:Y+'18T15:00', sz:Z.ZRH, city:'Ginebra' });
-  add({ kind:'act', st:'prop', ic:'⛲', title:'Jet d’Eau y paseo por el lago', s:Y+'18T16:00', sz:Z.ZRH, e:Y+'18T17:30', ez:Z.ZRH, city:'Ginebra' });
+  add({ kind:'hout', st:'pend', ic:'🧳', title:'Check-out Berna', sub:'Dejar maletas en recepción o consigna hasta el tren.', s:Y+'18T10:00', sz:Z.ZRH, city:'Berna' });
+  add({ kind:'act', st:'prop', ic:'🕰️', title:'Ciudad Vieja (UNESCO) y Zytglogge', s:Y+'18T10:30', sz:Z.ZRH, e:Y+'18T12:30', ez:Z.ZRH, city:'Berna' });
+  add({ kind:'act', st:'prop', ic:'🏛️', title:'Bundeshaus (Parlamento federal)', s:Y+'18T13:00', sz:Z.ZRH, e:Y+'18T14:00', ez:Z.ZRH, city:'Berna' });
+  add({ kind:'act', st:'prop', ic:'🌹', title:'Rosengarten al atardecer', s:Y+'18T17:00', sz:Z.ZRH, e:Y+'18T18:00', ez:Z.ZRH, city:'Berna' });
+  add({ kind:'transit', st:'prop', ic:'🚄', title:'Tren directo Berna → Ginebra', sub:'IR 15 directo, ~2 h. Más rápido: IC 18:34 → 20:25.', s:Y+'18T19:04', sz:Z.ZRH, e:Y+'18T21:05', ez:Z.ZRH, city:'Ginebra' });
+  add({ kind:'hin', st:'pend', ic:'🔑', title:'Check-in Ginebra (hotel por reservar)', sub:'1 noche. Idealmente cerca de Cornavin (tren directo al aeropuerto).', s:Y+'18T21:30', sz:Z.ZRH, city:'Ginebra' });
 
   /* ── 19 oct ── */
-  add({ kind:'hout', st:'pend', ic:'🧳', title:'Check-out Ginebra', s:Y+'19T06:30', sz:Z.ZRH, city:'Ginebra' });
-  add({ kind:'transit', st:'prop', ic:'🚆', title:'Tren a la estación del aeropuerto de Ginebra', sub:'~8 min. Llegar ~2 h antes del vuelo.', s:Y+'19T07:15', sz:Z.ZRH, e:Y+'19T07:30', ez:Z.ZRH, city:'Ginebra' });
+  add({ kind:'hout', st:'pend', ic:'🧳', title:'Check-out Ginebra', s:Y+'19T06:40', sz:Z.ZRH, city:'Ginebra' });
+  add({ kind:'transit', st:'prop', ic:'🚆', title:'Tren de Ginebra Cornavin al aeropuerto', sub:'7 min. Salidas 6:58 y 7:08, luego cada ~10 min. Llegar ~2 h antes del vuelo.', s:Y+'19T06:58', sz:Z.ZRH, e:Y+'19T07:05', ez:Z.ZRH, city:'Ginebra' });
   F('19','09:50','Ginebra',Z.ZRH,'11:55','Madrid',Z.MAD,'Vuelo Ginebra → Madrid','Iberia (operado por Air Nostrum) · Terminal 1 → T4 · billete aparte del de Bogotá', { city:'Ginebra', doc:'2026-10-19_Gin-Mad-Bog' });
   add({ kind:'meal', st:'prop', ic:'🍽️', title:'Escala en Madrid — almuerzo', sub:'~4 h entre vuelos, con billetes separados (sin protección si el primero se retrasa): recoger y volver a facturar equipaje con margen.', s:Y+'19T12:30', sz:Z.MAD, e:Y+'19T14:00', ez:Z.MAD, city:'Madrid' });
   F('19','16:25','Madrid',Z.MAD,'19:30','Bogotá',Z.BOG,'Vuelo Madrid → Bogotá','Iberia · llegada Terminal 1', { city:'Madrid', doc:'2026-10-19_Gin-Mad-Bog' });
@@ -421,14 +426,14 @@
     'Barrio de Santa Cruz': FREE, 'Catedral y Giralda iluminadas': FREE, 'Plaza de España': FREE, 'Triana y orilla': FREE,
     'Plaza Ban Jelačić': FREE, 'Cena en Batak': { a:15, c:'EUR' }, 'Ciudad Alta': { a:3, c:'EUR', n:'Funicular + torre' }, 'Catedral de Zagreb': FREE,
     'Mercado Dolac': { a:8, c:'EUR', n:'Entrada al museo (el mercado es gratis)' }, 'Museo Nikola Tesla': { a:2, c:'EUR' },
-    'Excursión a los Lagos de Plitvice': { tbd:true, n:'Entrada al parque + transporte; confirmar al reservar' }, 'Cena en Submarine': { a:15, c:'EUR' },
-    'Herradura de Lenuci': FREE, 'Murallas de Dubrovnik': { a:35, c:'EUR', n:'30–35 € según temporada' }, 'Stradun': FREE, 'Palacio del Rector': { a:10, c:'EUR' },
-    'Isla Lokrum': { a:27, c:'EUR', n:'Ferry + entrada' }, 'Monasterio Franciscano': { a:5, c:'EUR' }, 'Fortaleza de San Lorenzo': { a:10, c:'EUR' },
-    'Teleférico al Monte Srđ': { a:27, c:'EUR' }, 'Opcional: día completo a Kotor': { a:65, c:'EUR', n:'Tour de día completo' }, 'Mañana libre en la Ciudad Vieja': FREE,
+    'Excursión a los Lagos de Plitvice': { a:110, c:'EUR', n:'Tour Civitatis desde Zagreb (incluye transporte, guía y entrada)' }, 'Cena en Submarine': { a:15, c:'EUR' },
+    'Herradura de Lenuci': FREE, 'Murallas de Dubrovnik': { a:40, c:'EUR', n:'Desde 40 € (sitio oficial)' }, 'Stradun': FREE, 'Palacio del Rector': { a:10, c:'EUR' },
+    'Isla Lokrum': { a:30, c:'EUR', n:'Ferry + entrada' }, 'Monasterio Franciscano': { a:5, c:'EUR' }, 'Fortaleza de San Lorenzo': { a:10, c:'EUR' },
+    'Teleférico al Monte Srđ': { a:30, c:'EUR', n:'Ida y vuelta (precio oficial)' }, 'Opcional: día completo a Kotor': { a:65, c:'EUR', n:'Tour de día completo' }, 'Mañana libre en la Ciudad Vieja': FREE,
     'Altstadt': { free:true, n:'Fraumünster: entrada de pocos CHF' }, 'Bahnhofstrasse': { a:15, c:'CHF', n:'Lindt Home of Chocolate (estimado)' },
     'Puente de la Capilla': FREE, 'Harder Kulm': { a:32, c:'CHF', n:'Funicular ida y vuelta' }, 'Cascada Staubbach': FREE,
     'Mürren o Wengen': { tbd:true, n:'Depende del teleférico/tren elegido' }, 'Ciudad Vieja (UNESCO)': FREE, 'Bundeshaus': { free:true, n:'Tours gratuitos si no hay sesión' },
-    'Rosengarten': FREE, 'Jet d': FREE
+    'Rosengarten': FREE, 'Jet d': FREE, 'Opcional: Monte Pilatus': { a:84, c:'CHF', n:'Teleférico ida y vuelta desde Kriens' }, 'Opcional: Jungfraujoch': { a:271, c:'CHF', n:'261,20 CHF + 10 CHF de reserva de asiento' }
   };
   const SYM = { EUR:'€', CHF:'CHF ' };
   E.forEach(e => { for (const k in PRICE) if (e.title.startsWith(k)) { e.px = PRICE[k]; break; } });

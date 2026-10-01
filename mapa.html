@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Viaje Europa — Mapa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <style>
+    :root {
+      --co: #1565C0; --es: #F57F17; --cr: #C62828; --ch: #AD1457;
+      --bg: #F7F8FA; --card: #FFFFFF; --card2: #F1F4F8; --border: #E2E8F0;
+      --text: #0F172A; --muted: #475569; --muted2: #64748B;
+      --ok: #10B981; --warn-dark: #B45309; --now: #E11D48;
+      --flight: #1565C0; --train: #C62828; --bus: #F57F17; --ferry: #0891B2;
+      --r: 14px; --r-sm: 8px; --shadow: 0 1px 2px rgba(15,23,42,.04), 0 4px 14px rgba(15,23,42,.06);
+      --hdr: 96px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; overflow-x: hidden; }
+    button { font: inherit; cursor: pointer; }
+    header.top { background: rgba(255,255,255,.95); border-bottom: 1px solid var(--border); padding: 10px 16px; }
+    .top-row { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: space-between; }
+    .brand { font-weight: 800; letter-spacing: -.02em; }
+    .brand a { color: var(--muted2); font-weight: 500; font-size: .78rem; text-decoration: none; margin-left: 8px; }
+    .brand a:hover { color: var(--text); }
+    .stats { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .78rem; color: var(--muted); margin-top: 4px; }
+    .stats b { color: var(--text); }
+    .now-card { font-size: .8rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-top: 6px; }
+    .now-card b { color: var(--now); }
+    .sim { display: inline-flex; gap: 6px; align-items: center; font-size: .74rem; color: var(--muted2); }
+    .sim input { font: inherit; padding: 2px 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); color: var(--text); }
+    .sim button { border: 1px solid var(--border); background: var(--card); border-radius: 6px; padding: 2px 8px; font-size: .74rem; font-weight: 600; color: var(--muted); }
+
+    .layout { display: grid; grid-template-columns: 1fr 380px; height: calc(100vh - var(--hdr)); min-height: 520px; }
+    #map { height: 100%; width: 100%; background: #dfe7ef; z-index: 1; }
+    aside { background: var(--card); border-left: 1px solid var(--border); overflow-y: auto; padding: 12px; }
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; grid-template-rows: 55vh auto; height: auto; }
+      aside { border-left: 0; border-top: 1px solid var(--border); }
+    }
+
+    .controls { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .btn { border: 1px solid var(--border); background: var(--card); border-radius: 100px; padding: 6px 14px; font-weight: 600; font-size: .8rem; color: var(--text); }
+    .btn:hover { box-shadow: var(--shadow); }
+    .btn.primary { background: var(--now); color: #fff; border-color: var(--now); }
+    .btn.on { background: var(--text); color: #fff; border-color: var(--text); }
+    .days { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+    .days button { border: 1px solid var(--border); background: var(--card2); border-radius: 8px; padding: 3px 8px; font-size: .74rem; font-weight: 700; color: var(--muted); border-top: 3px solid var(--c, var(--border)); }
+    .days button.on { background: var(--text); color: #fff; }
+    .legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: .72rem; color: var(--muted); margin-bottom: 10px; }
+    .legend i { display: inline-block; width: 18px; height: 0; border-top: 3px solid var(--c); vertical-align: middle; margin-right: 4px; }
+    .legend i.dash { border-top-style: dashed; }
+    .layers { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .78rem; color: var(--muted); margin-bottom: 10px; }
+    .layers label { display: inline-flex; gap: 5px; align-items: center; }
+
+    .day-title { font-size: .74rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: var(--muted2); margin: 14px 0 6px; }
+    .leg { display: flex; gap: 10px; border: 1px solid var(--border); border-left: 5px solid var(--c, var(--border)); border-radius: var(--r-sm); padding: 8px 10px; margin-bottom: 6px; cursor: pointer; background: var(--card); }
+    .leg:hover { box-shadow: var(--shadow); }
+    .leg.on { background: #FFF1F2; border-color: var(--now); border-left-color: var(--now); }
+    .leg .ico { font-size: 1.2rem; line-height: 1.2; }
+    .leg b { font-size: .88rem; }
+    .leg small { display: block; color: var(--muted); font-size: .74rem; font-variant-numeric: tabular-nums; }
+    .tag { font-size: .6rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; border-radius: 100px; padding: 1px 7px; margin-left: 4px; vertical-align: 1px; }
+    .tag.fijo { background: #DCFCE7; color: #166534; } .tag.pend { background: #FEF3C7; color: var(--warn-dark); }
+    .tag.opc { background: #EDE9FE; color: #5B21B6; } .tag.exc { background: var(--card2); color: var(--muted2); }
+    .stay { display: flex; gap: 8px; align-items: center; font-size: .78rem; color: var(--muted); padding: 6px 4px; border-bottom: 1px dashed var(--border); }
+    .stay:last-child { border-bottom: 0; }
+    .stay b { color: var(--text); }
+    .hint { font-size: .72rem; color: var(--muted2); margin-top: 12px; }
+
+    .pin { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: .78rem; color: #fff; background: var(--c); border: 3px solid #fff; box-shadow: 0 2px 8px rgba(15,23,42,.35); }
+    .pin.pend { border: 3px dashed #fff; outline: 2px solid var(--c); }
+    .pin.conn { width: 14px; height: 14px; background: #64748B; border-width: 2px; }
+    .pin.home { background: var(--co); width: 30px; height: 30px; font-size: 1rem; }
+    .mover { font-size: 24px; filter: drop-shadow(0 2px 3px rgba(0,0,0,.4)); text-align: center; line-height: 1; }
+    .here { width: 22px; height: 22px; border-radius: 50%; background: var(--now); border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(225,29,72,.25); animation: pulse 1.6s infinite; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(225,29,72,.5); } 100% { box-shadow: 0 0 0 16px rgba(225,29,72,0); } }
+    .caption { position: absolute; left: 50%; transform: translateX(-50%); bottom: 18px; z-index: 500; background: rgba(15,23,42,.88); color: #fff; font-size: .82rem; font-weight: 600; border-radius: 100px; padding: 7px 16px; pointer-events: none; display: none; white-space: nowrap; }
+    .map-wrap { position: relative; }
+    .leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: .8rem; line-height: 1.45; }
+    .leaflet-popup-content b { font-size: .9rem; }
+  </style>
+</head>
+<body>
+
+<header class="top" id="hdr">
+  <div class="top-row">
+    <div class="brand">🗺️ Viaje Europa · Mapa <a href="en-vivo.html">← En vivo</a><a href="index.html">Itinerario completo</a></div>
+    <div class="sim">Simular (hora Colombia): <input type="datetime-local" id="sim-input"><button type="button" id="sim-reset">Hora real</button></div>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="now-card" id="now-card"></div>
+</header>
+
+<div class="layout">
+  <div class="map-wrap"><div id="map"></div><div class="caption" id="caption"></div></div>
+  <aside>
+    <div class="controls">
+      <button class="btn primary" id="btn-play" type="button">▶ Reproducir recorrido</button>
+      <button class="btn" id="btn-all" type="button">Ver todo</button>
+      <button class="btn" id="btn-here" type="button">📍 Dónde estamos</button>
+    </div>
+    <div class="legend">
+      <span><i style="--c:var(--flight)" class="dash"></i>Vuelo</span>
+      <span><i style="--c:var(--train)"></i>Tren</span>
+      <span><i style="--c:var(--bus)"></i>Bus / carretera</span>
+      <span><i style="--c:var(--ferry)" class="dash"></i>Ferry</span>
+      <span><i style="--c:#64748B" class="dash"></i>Excursión</span>
+    </div>
+    <div class="layers">
+      <label><input type="checkbox" id="l-exc" checked> Excursiones de día</label>
+      <label><input type="checkbox" id="l-stay" checked> Noches por ciudad</label>
+    </div>
+    <div class="day-title">Ver por día</div>
+    <div class="days" id="days"></div>
+    <div id="legs"></div>
+    <div class="day-title">Dónde dormimos</div>
+    <div id="stays"></div>
+    <p class="hint">Las líneas de tren y bus son aproximadas (no siguen la vía exacta) y las distancias son en línea recta. Las horas son locales del lugar de salida y llegada; debajo aparece la hora de Colombia (UTC-5). Toca un tramo para acercarte a él.</p>
+  </aside>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(() => {
+  /* ═════════ DATOS (editar aquí) ═════════ */
+  const CO = -5, EU = 2; // desfase UTC en octubre (Europa en horario de verano hasta el 25 de oct)
+  const STOPS = {
+    bog: { n:'Bogotá', ll:[4.711, -74.072], t:'home' },
+    mad: { n:'Madrid', ll:[40.4168, -3.7038], t:'conn', note:'Escala de conexión (4 y 19 de oct)' },
+    sev: { n:'Sevilla', ll:[37.3891, -5.9845], t:'stay', leg:'es', nights:2, dates:'4–6 oct', st:'fijo', hi:'Real Alcázar, Catedral y Giralda, Plaza de España, Triana' },
+    pal: { n:'Palma', ll:[39.5517, 2.7388], t:'conn', note:'Solo escala de aeropuerto (6 oct), no visita a Mallorca' },
+    zag: { n:'Zagreb', ll:[45.8150, 15.9819], t:'stay', leg:'cr', nights:3, dates:'6–9 oct', st:'fijo', hi:'Ciudad Alta, Catedral, mercado Dolac, excursión a Plitvice' },
+    dbv: { n:'Dubrovnik', ll:[42.6507, 18.0944], t:'stay', leg:'cr', nights:4, dates:'9–13 oct', st:'pend', hi:'Murallas, Stradun, Lokrum, teleférico Srđ, Kotor o Mostar (opcional)' },
+    zrh: { n:'Zúrich', ll:[47.3769, 8.5417], t:'stay', leg:'ch', nights:1, dates:'13–14 oct', st:'fijo', hi:'Altstadt, Bahnhofstrasse y Lindt' },
+    luc: { n:'Lucerna', ll:[47.0502, 8.3093], t:'stay', leg:'ch', nights:1, dates:'14–15 oct', st:'pend', hi:'Puente de la Capilla y Monumento del León' },
+    wil: { n:'Wilderswil', ll:[46.6644, 7.8719], t:'stay', leg:'ch', nights:2, dates:'15–17 oct', st:'pend', hi:'Base del Oberland: Harder Kulm, Lauterbrunnen, Mürren / Wengen' },
+    ber: { n:'Berna', ll:[46.9480, 7.4474], t:'stay', leg:'ch', nights:1, dates:'17–18 oct', st:'pend', hi:'Ciudad Vieja, Zytglogge, Rosengarten' },
+    gin: { n:'Ginebra', ll:[46.2044, 6.1432], t:'stay', leg:'ch', nights:1, dates:'18–19 oct', st:'pend', hi:'Jet d’Eau; vuelo de regreso el 19 a las 9:50' }
+  };
+  const PLACES = { // destinos de excursiones de día
+    pli: { n:'Lagos de Plitvice', ll:[44.8654, 15.5820] },
+    lok: { n:'Isla Lokrum', ll:[42.6306, 18.1217] },
+    kot: { n:'Kotor (Montenegro)', ll:[42.4247, 18.7712] },
+    mos: { n:'Mostar (Bosnia)', ll:[43.3438, 17.8078] },
+    lau: { n:'Lauterbrunnen / Mürren', ll:[46.5936, 7.9086] }
+  };
+  // d/a: salida y llegada en hora LOCAL; fz/az: desfase UTC de cada extremo
+  const LEGS = [
+    { id:1,  m:'flight', a:'bog', b:'mad', d:'2026-10-03T12:35', fz:CO, r:'2026-10-04T05:15', rz:EU, st:'fijo', info:'Vuelo nocturno · Iberia' },
+    { id:2,  m:'flight', a:'mad', b:'sev', d:'2026-10-04T09:20', fz:EU, r:'2026-10-04T10:30', rz:EU, st:'fijo', info:'Air Europa' },
+    { id:3,  m:'flight', a:'sev', b:'pal', d:'2026-10-06T10:50', fz:EU, r:'2026-10-06T12:25', rz:EU, st:'fijo', info:'Ryanair' },
+    { id:4,  m:'flight', a:'pal', b:'zag', d:'2026-10-06T14:00', fz:EU, r:'2026-10-06T16:25', rz:EU, st:'fijo', info:'Ryanair' },
+    { id:5,  m:'flight', a:'zag', b:'dbv', d:'2026-10-09T22:45', fz:EU, r:'2026-10-09T23:40', rz:EU, st:'fijo', info:'Croatia Airlines' },
+    { id:6,  m:'flight', a:'dbv', b:'zrh', d:'2026-10-13T19:40', fz:EU, r:'2026-10-13T21:40', rz:EU, st:'fijo', info:'Swiss' },
+    { id:7,  m:'train',  a:'zrh', b:'luc', d:'2026-10-14T18:07', fz:EU, r:'2026-10-14T18:51', rz:EU, st:'pend', info:'IR 70 directo (~44 min), horario real SBB' },
+    { id:8,  m:'train',  a:'luc', b:'wil', d:'2026-10-15T17:06', fz:EU, r:'2026-10-15T19:09', rz:EU, st:'pend', info:'PanoramaExpress + regional, cambio en Interlaken Ost (~2 h 03), horario real SBB' },
+    { id:9,  m:'train',  a:'wil', b:'ber', d:'2026-10-17T17:51', fz:EU, r:'2026-10-17T18:56', rz:EU, st:'pend', info:'Bus 105 + IC 81 (~1 h 05), horario real SBB' },
+    { id:10, m:'train',  a:'ber', b:'gin', d:'2026-10-18T19:04', fz:EU, r:'2026-10-18T21:05', rz:EU, st:'pend', info:'IR 15 directo (~2 h), horario real SBB' },
+    { id:11, m:'flight', a:'gin', b:'mad', d:'2026-10-19T09:50', fz:EU, r:'2026-10-19T11:55', rz:EU, st:'fijo', info:'Iberia · billete aparte del de Bogotá' },
+    { id:12, m:'flight', a:'mad', b:'bog', d:'2026-10-19T16:25', fz:EU, r:'2026-10-19T19:30', rz:CO, st:'fijo', info:'Iberia' }
+  ];
+  // Excursiones de día (ida y vuelta desde la base)
+  const TRIPS = [
+    { id:'e1', base:'zag', to:'pli', m:'bus',   day:8,  d:'08:00', r:'17:30', st:'pend', info:'Excursión de día completo (por reservar)' },
+    { id:'e2', base:'dbv', to:'lok', m:'ferry', day:11, d:'09:30', r:'12:30', st:'prop', info:'Ferry de 10 min desde el puerto viejo' },
+    { id:'e3', base:'dbv', to:'kot', m:'bus',   day:12, d:'08:00', r:'17:00', st:'opc',  info:'Opcional: día completo (Kotor o Mostar)' },
+    { id:'e4', base:'dbv', to:'mos', m:'bus',   day:12, d:'08:00', r:'17:00', st:'opc',  info:'Alternativa a Kotor' },
+    { id:'e5', base:'wil', to:'lau', m:'train', day:16, d:'09:00', r:'13:30', st:'prop', info:'Valle de Lauterbrunnen y Mürren o Wengen' }
+  ];
+  const LEGC = { co:'#1565C0', es:'#F57F17', cr:'#C62828', ch:'#AD1457' };
+  const MCOL = { flight:'#1565C0', train:'#C62828', bus:'#F57F17', ferry:'#0891B2' };
+  const MICO = { flight:'✈️', train:'🚆', bus:'🚌', ferry:'⛴️' };
+  const WD = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const ST = { fijo:['fijo','Fijo'], pend:['pend','Por reservar'], opc:['opc','Opcional'], prop:['exc','Propuesta'] };
+
+  /* ═════════ UTILIDADES ═════════ */
+  const pad = (n) => String(n).padStart(2, '0');
+  const utc = (local, z) => { const [d, t] = local.split('T'); const [y, m, dd] = d.split('-').map(Number); const [h, mi] = t.split(':').map(Number); return Date.UTC(y, m-1, dd, h, mi) - z * 3600000; };
+  const hmAt = (ms, z) => { const d = new Date(ms + z * 3600000); return pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()); };
+  const dayAt = (ms, z) => new Date(ms + z * 3600000).getUTCDate();
+  const wdAt = (ms, z) => WD[new Date(ms + z * 3600000).getUTCDay()];
+  const durTxt = (ms) => { const m = Math.round(ms / 60000), h = Math.floor(m / 60), r = m % 60; return h ? (r ? h + ' h ' + r + ' min' : h + ' h') : r + ' min'; };
+  const km = (a, b) => { const R = 6371, rad = Math.PI / 180, dLa = (b[0]-a[0])*rad, dLo = (b[1]-a[1])*rad; const x = Math.sin(dLa/2)**2 + Math.cos(a[0]*rad)*Math.cos(b[0]*rad)*Math.sin(dLo/2)**2; return 2 * R * Math.asin(Math.sqrt(x)); };
+  const kmTxt = (v) => (Math.round(v / 10) * 10).toLocaleString('es-CO') + ' km';
+  const store = { get(k, d) { try { return localStorage.getItem(k) ?? d; } catch (_) { return d; } } };
+
+  // trayectoria: los vuelos se curvan (arco), el resto es casi recto
+  function pathOf(from, to, mode, samples = 64) {
+    const a = from, b = to; const dist = km(a, b);
+    const k = mode === 'flight' ? 0.18 : 0.06;
+    const mid = [(a[0]+b[0])/2, (a[1]+b[1])/2]; const dx = b[1]-a[1], dy = b[0]-a[0];
+    const ctrl = [mid[0] + dx * k, mid[1] - dy * k]; // desplazamiento perpendicular
+    const pts = []; for (let i = 0; i <= samples; i++) { const t = i / samples; pts.push([(1-t)**2*a[0] + 2*(1-t)*t*ctrl[0] + t**2*b[0], (1-t)**2*a[1] + 2*(1-t)*t*ctrl[1] + t**2*b[1]]); }
+    return pts;
+  }
+
+  // preparar tramos
+  LEGS.forEach(l => {
+    l.A = STOPS[l.a]; l.B = STOPS[l.b];
+    l.t0 = utc(l.d, l.fz); l.t1 = utc(l.r, l.rz); l.dist = km(l.A.ll, l.B.ll);
+    l.path = pathOf(l.A.ll, l.B.ll, l.m); l.day = dayAt(l.t0, l.fz);
+  });
+  TRIPS.forEach(t => {
+    t.A = STOPS[t.base]; t.B = PLACES[t.to]; t.dist = km(t.A.ll, t.B.ll);
+    t.path = pathOf(t.A.ll, t.B.ll, t.m, 40);
+    t.t0 = utc('2026-10-' + pad(t.day) + 'T' + t.d, EU); t.t1 = utc('2026-10-' + pad(t.day) + 'T' + t.r, EU);
+  });
+  const DAY_LEG = { 3:'co', 4:'es', 5:'es', 6:'cr', 7:'cr', 8:'cr', 9:'cr', 10:'cr', 11:'cr', 12:'cr', 13:'ch', 14:'ch', 15:'ch', 16:'ch', 17:'ch', 18:'ch', 19:'es' };
+
+  /* ═════════ MAPA ═════════ */
+  const map = L.map('map', { zoomControl: true, scrollWheelZoom: true }).setView([44, 8], 4);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
+
+  const lineLayer = L.layerGroup().addTo(map), tripLayer = L.layerGroup().addTo(map), stopLayer = L.layerGroup().addTo(map);
+  const lines = {}, tripLines = {};
+  LEGS.forEach(l => {
+    const pl = L.polyline(l.path, { color: MCOL[l.m], weight: 3.5, opacity: .85, dashArray: l.m === 'flight' ? '8 8' : null }).addTo(lineLayer);
+    pl.bindPopup(`<b>${MICO[l.m]} ${l.A.n} → ${l.B.n}</b><br>${legWhen(l)}<br>${l.info}`);
+    pl.on('click', () => selectLeg(l.id, true));
+    lines[l.id] = pl;
+  });
+  TRIPS.forEach(t => {
+    const pl = L.polyline(t.path, { color: '#64748B', weight: 2.5, opacity: .8, dashArray: '3 7' }).addTo(tripLayer);
+    pl.bindPopup(`<b>${MICO[t.m]} ${t.A.n} ⇄ ${t.B.n}</b><br>${t.d}–${t.r} · ${t.day} oct<br>${t.info}`);
+    tripLines[t.id] = pl;
+    L.circleMarker(t.B.ll, { radius: 5, color: '#64748B', fillColor: '#fff', fillOpacity: 1, weight: 2 }).bindTooltip(t.B.n).addTo(tripLayer);
+  });
+  // marcadores de ciudad
+  const stayOrder = Object.keys(STOPS).filter(k => STOPS[k].t === 'stay'); let num = 0;
+  Object.keys(STOPS).forEach(k => {
+    const s = STOPS[k]; let html, size;
+    if (s.t === 'home') { html = '<div class="pin home">🏠</div>'; size = 30; }
+    else if (s.t === 'conn') { html = '<div class="pin conn"></div>'; size = 14; }
+    else { num++; html = `<div class="pin ${s.st === 'pend' ? 'pend' : ''}" style="--c:${LEGC[s.leg]}">${num}</div>`; size = 28; }
+    const mk = L.marker(s.ll, { icon: L.divIcon({ html, className: '', iconSize: [size, size], iconAnchor: [size/2, size/2] }) });
+    const pop = s.t === 'stay'
+      ? `<b>${s.n}</b><br>${s.dates} · ${s.nights} ${s.nights === 1 ? 'noche' : 'noches'}<br>Hospedaje: <b>${s.st === 'fijo' ? 'reservado' : 'por reservar'}</b><br><small>${s.hi}</small>`
+      : `<b>${s.n}</b>${s.note ? '<br><small>' + s.note + '</small>' : ''}`;
+    mk.bindPopup(pop); mk.bindTooltip(s.n, { direction: 'top', offset: [0, -10] });
+    if (s.t === 'stay') mk._stay = true; mk.addTo(stopLayer);
+  });
+
+  function legWhen(l) {
+    return `${wdAt(l.t0, l.fz)} ${dayAt(l.t0, l.fz)} oct · ${hmAt(l.t0, l.fz)} → ${hmAt(l.t1, l.rz)}${dayAt(l.t1, l.rz) !== dayAt(l.t0, l.fz) ? ' (+1 día)' : ''} · ${durTxt(l.t1 - l.t0)}`;
+  }
+
+  /* ═════════ BARRA SUPERIOR: ESTADÍSTICAS ═════════ */
+  (() => {
+    const by = (m) => LEGS.filter(l => l.m === m);
+    const sum = (arr) => arr.reduce((s, l) => s + l.dist, 0);
+    const fl = by('flight'), tr = by('train');
+    document.getElementById('stats').innerHTML =
+      `<span>✈️ <b>${fl.length} vuelos</b> · ~${kmTxt(sum(fl))}</span><span>🚆 <b>${tr.length} trenes</b> · ~${kmTxt(sum(tr))}</span><span>🛏️ <b>${stayOrder.length} ciudades</b> con noche</span><span>📅 <b>3 – 19 oct 2026</b></span>`;
+  })();
+
+  /* ═════════ PANEL: DÍAS Y TRAMOS ═════════ */
+  let selDay = null, selLeg = null;
+  const daysEl = document.getElementById('days');
+  daysEl.innerHTML = '<button type="button" data-d="" class="on">Todo</button>' + Object.keys(DAY_LEG).map(d => `<button type="button" data-d="${d}" style="--c:${LEGC[DAY_LEG[d]]}">${d}</button>`).join('');
+  daysEl.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; selectDay(b.dataset.d ? +b.dataset.d : null); });
+
+  function renderLegs() {
+    const el = document.getElementById('legs'); let h = ''; let last = null;
+    const items = [...LEGS.map(l => ({ k:'leg', x:l, day:l.day, t:l.t0 })), ...TRIPS.filter(() => document.getElementById('l-exc').checked).map(t => ({ k:'trip', x:t, day:t.day, t:t.t0 }))]
+      .filter(i => selDay == null || i.day === selDay).sort((a, b) => a.t - b.t);
+    if (!items.length) h = '<p class="hint">Ese día no hay traslados entre ciudades: se queda en la misma ciudad.</p>';
+    items.forEach(i => {
+      if (i.day !== last) { last = i.day; h += `<div class="day-title">${WD[new Date(Date.UTC(2026, 9, i.day)).getUTCDay()]} ${i.day} de octubre</div>`; }
+      if (i.k === 'leg') {
+        const l = i.x; const [c, tx] = ST[l.st];
+        const co = `${hmAt(l.t0, CO)} → ${hmAt(l.t1, CO)}`;
+        h += `<div class="leg${selLeg === l.id ? ' on' : ''}" data-leg="${l.id}" style="--c:${MCOL[l.m]}"><div class="ico">${MICO[l.m]}</div><div><b>${l.A.n} → ${l.B.n}</b><span class="tag ${c}">${tx}</span><small>${legWhen(l)}</small><small>~${kmTxt(l.dist)} en línea recta · ${l.info}</small>${l.fz === EU || l.rz === EU ? `<small>🇨🇴 Hora Colombia: ${co}</small>` : ''}</div></div>`;
+      } else {
+        const t = i.x; const [c, tx] = ST[t.st];
+        h += `<div class="leg" data-trip="${t.id}" style="--c:#64748B"><div class="ico">${MICO[t.m]}</div><div><b>${t.A.n} ⇄ ${t.B.n}</b><span class="tag ${c}">${tx}</span><span class="tag exc">Excursión</span><small>${t.d} – ${t.r} · ~${kmTxt(t.dist)} (ida)</small><small>${t.info}</small></div></div>`;
+      }
+    });
+    el.innerHTML = h;
+  }
+  document.getElementById('legs').addEventListener('click', e => {
+    const c = e.target.closest('.leg'); if (!c) return;
+    if (c.dataset.leg) selectLeg(+c.dataset.leg, true);
+    else { const t = TRIPS.find(x => x.id === c.dataset.trip); map.fitBounds(L.latLngBounds(t.path).pad(.4), { animate: true }); tripLines[t.id].openPopup(); }
+  });
+  function renderStays() {
+    document.getElementById('stays').innerHTML = stayOrder.map((k, i) => { const s = STOPS[k]; const [c, tx] = ST[s.st];
+      return `<div class="stay"><b>${i+1}</b><span style="flex:1"><b>${s.n}</b> · ${s.dates} · ${s.nights} ${s.nights === 1 ? 'noche' : 'noches'}</span><span class="tag ${c}">${tx}</span></div>`; }).join('');
+  }
+  function highlight() {
+    LEGS.forEach(l => { const on = selLeg === l.id || (selLeg == null && (selDay == null || l.day === selDay));
+      lines[l.id].setStyle({ opacity: on ? .95 : .18, weight: selLeg === l.id ? 6 : 3.5 }); });
+    TRIPS.forEach(t => tripLines[t.id].setStyle({ opacity: selDay == null || t.day === selDay ? .8 : .15 }));
+  }
+  function selectLeg(id, fit) {
+    selLeg = id; const l = LEGS.find(x => x.id === id); highlight(); renderLegs();
+    if (fit) { map.fitBounds(L.latLngBounds(l.path).pad(.3), { animate: true }); lines[id].openPopup(); }
+  }
+  function selectDay(d) {
+    selDay = d; selLeg = null; stopPlay();
+    daysEl.querySelectorAll('button').forEach(b => b.classList.toggle('on', (b.dataset.d ? +b.dataset.d : null) === d));
+    renderLegs(); highlight();
+    if (d == null) { fitAll(); return; }
+    const pts = []; LEGS.filter(l => l.day === d).forEach(l => pts.push(...l.path)); TRIPS.filter(t => t.day === d).forEach(t => pts.push(...t.path));
+    if (!pts.length) { // día sin traslado: centrar en la ciudad donde está
+      const k = cityOnDay(d); if (k) map.flyTo(STOPS[k].ll, 11, { duration: .8 });
+    } else map.fitBounds(L.latLngBounds(pts).pad(.3), { animate: true });
+  }
+  function cityOnDay(d) { const arr = LEGS.filter(l => l.day <= d); return arr.length ? arr[arr.length - 1].b : 'bog'; }
+  function fitAll() { map.fitBounds(L.latLngBounds(Object.keys(STOPS).filter(k => k !== 'bog').map(k => STOPS[k].ll)).pad(.12), { animate: true }); } // Europa; el vuelo desde Bogotá se ve al tocar ese tramo
+  document.getElementById('btn-all').addEventListener('click', () => selectDay(null));
+  document.getElementById('l-exc').addEventListener('change', e => { e.target.checked ? tripLayer.addTo(map) : map.removeLayer(tripLayer); renderLegs(); });
+  document.getElementById('l-stay').addEventListener('change', e => { e.target.checked ? stopLayer.addTo(map) : map.removeLayer(stopLayer); });
+
+  /* ═════════ DÓNDE ESTAMOS (hora real o simulada) ═════════ */
+  let simMs = null; const nowMs = () => simMs ?? Date.now();
+  let hereMarker = null;
+  function interp(path, f) { const x = f * (path.length - 1), i = Math.min(path.length - 2, Math.floor(x)), t = x - i; return [path[i][0] + (path[i+1][0] - path[i][0]) * t, path[i][1] + (path[i+1][1] - path[i][1]) * t]; }
+  function whereNow() {
+    const n = nowMs();
+    const cur = LEGS.find(l => n >= l.t0 && n < l.t1);
+    if (cur) { const f = (n - cur.t0) / (cur.t1 - cur.t0); return { ll: interp(cur.path, f), txt: `${MICO[cur.m]} En camino: <b>${cur.A.n} → ${cur.B.n}</b> (${Math.round(f * 100)}%, faltan ${durTxt(cur.t1 - n)})`, leg: cur }; }
+    const done = LEGS.filter(l => l.t1 <= n); const nxt = LEGS.find(l => l.t0 > n);
+    const at = done.length ? STOPS[done[done.length - 1].b] : STOPS.bog;
+    if (!nxt) return { ll: STOPS.bog.ll, txt: '🎉 Viaje terminado: de vuelta en <b>Bogotá</b>' };
+    const pre = !done.length;
+    return { ll: at.ll, txt: `${pre ? '🏠' : '🛏️'} ${pre ? 'Aún en' : 'Estamos en'} <b>${at.n}</b> · siguiente traslado: ${MICO[nxt.m]} ${nxt.A.n} → ${nxt.B.n} en <b>${durTxt(nxt.t0 - n)}</b>` };
+  }
+  function updateHere() {
+    const w = whereNow();
+    document.getElementById('now-card').innerHTML = `<b>● Ahora</b><span>${w.txt}</span>`;
+    if (!hereMarker) hereMarker = L.marker(w.ll, { icon: L.divIcon({ html: '<div class="here"></div>', className: '', iconSize: [22, 22], iconAnchor: [11, 11] }), zIndexOffset: 1000, interactive: false }).addTo(map);
+    else hereMarker.setLatLng(w.ll);
+    return w;
+  }
+  document.getElementById('btn-here').addEventListener('click', () => { stopPlay(); const w = updateHere(); map.flyTo(w.ll, w.leg ? 6 : 9, { duration: .8 }); });
+  const simInput = document.getElementById('sim-input');
+  const toInput = (ms) => { const d = new Date(ms + CO * 3600000); return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`; };
+  const syncSim = () => { simInput.value = toInput(nowMs()); };
+  simInput.addEventListener('change', () => { if (simInput.value) { simMs = utc(simInput.value, CO); updateHere(); } });
+  document.getElementById('sim-reset').addEventListener('click', () => { simMs = null; syncSim(); updateHere(); });
+
+  /* ═════════ REPRODUCIR RECORRIDO ═════════ */
+  let playing = false, playToken = 0, mover = null;
+  const btnPlay = document.getElementById('btn-play'), cap = document.getElementById('caption');
+  const wait = (ms) => new Promise(r => setTimeout(r, ms));
+  function stopPlay() { playToken++; playing = false; btnPlay.textContent = '▶ Reproducir recorrido'; btnPlay.classList.add('primary'); cap.style.display = 'none'; if (mover) { map.removeLayer(mover); mover = null; } }
+  btnPlay.addEventListener('click', async () => {
+    if (playing) { stopPlay(); highlight(); return; }
+    selDay = null; selLeg = null; daysEl.querySelectorAll('button').forEach(b => b.classList.toggle('on', !b.dataset.d)); renderLegs();
+    const my = ++playToken; playing = true; btnPlay.textContent = '⏹ Detener'; btnPlay.classList.remove('primary');
+    LEGS.forEach(l => lines[l.id].setStyle({ opacity: .15, weight: 3.5 }));
+    cap.style.display = 'block'; fitAll(); await wait(900);
+    for (const l of LEGS) {
+      if (my !== playToken) return;
+      cap.textContent = `${wdAt(l.t0, l.fz)} ${dayAt(l.t0, l.fz)} oct · ${MICO[l.m]} ${l.A.n} → ${l.B.n} · ${durTxt(l.t1 - l.t0)}`;
+      map.fitBounds(L.latLngBounds(l.path).pad(.35), { animate: true, duration: .7 }); await wait(750);
+      if (my !== playToken) return;
+      lines[l.id].setStyle({ opacity: .95, weight: 5 });
+      if (!mover) mover = L.marker(l.path[0], { icon: L.divIcon({ html: `<div class="mover">${MICO[l.m]}</div>`, className: '', iconSize: [28, 28], iconAnchor: [14, 14] }), zIndexOffset: 2000, interactive: false }).addTo(map);
+      else mover.setIcon(L.divIcon({ html: `<div class="mover">${MICO[l.m]}</div>`, className: '', iconSize: [28, 28], iconAnchor: [14, 14] }));
+      const dur = l.m === 'flight' ? 2600 : 1800; const t0 = performance.now();
+      await new Promise(res => { const step = (t) => { if (my !== playToken) return res(); const f = Math.min(1, (t - t0) / dur); mover.setLatLng(interp(l.path, f)); f < 1 ? requestAnimationFrame(step) : res(); }; requestAnimationFrame(step); });
+      if (my !== playToken) return;
+      lines[l.id].setStyle({ opacity: .6, weight: 3.5 }); await wait(500);
+    }
+    if (my === playToken) { stopPlay(); highlight(); fitAll(); }
+  });
+
+  /* ═════════ INICIO ═════════ */
+  renderLegs(); renderStays(); highlight(); fitAll(); syncSim(); updateHere();
+  setInterval(() => { if (simMs == null) { updateHere(); syncSim(); } }, 30000);
+  const setHdr = () => { const h = document.getElementById('hdr').offsetHeight; document.documentElement.style.setProperty('--hdr', h + 'px'); map.invalidateSize(); };
+  addEventListener('resize', setHdr); setHdr();
+})();
+</script>
+</body>
+</html>
